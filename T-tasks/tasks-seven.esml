@@ -36,6 +36,7 @@
     <task name="est" kind="estimation">
       <tspan from="0" to="60"/>
       <estimate name="g.lambda" initial="0.05"/>
+      <data source="syntax/decay_data.csv" cols="t,N" format="csv"/>
       <samples>
         <sample x="0" y="100"/>
         <sample x="30" y="22.3"/>
