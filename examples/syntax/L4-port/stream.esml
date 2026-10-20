@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 portType 内的端口变量**元素**形态 `<stream name type/>`：直接挂在 `<portType>` 下，
+     不经 `<variables>` 容器；元素名即 role=stream（等价 `role="stream"`，
+     显式 role= 属性优先）。与属性形态同构：Mix 进出组分直通 out.c = in.c。
+     `check` errors=0（单实例 stream 对无回路，方程欠定，故本例只验声明与角色映射）。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_PortVarStream">
+  <portTypes><portType name="StreamPort" connectorFamily="stream">
+    <stream name="c" type="real"/>
+  </portType></portTypes>
+  <modelTypes><modelType name="Mix">
+    <ports><port name="in"  portType="StreamPort"/><port name="out" portType="StreamPort"/></ports>
+    <variables>
+      <variable name="in.c"  type="real" role="algebraic"/>
+      <variable name="out.c" type="real" role="algebraic"/>
+    </variables>
+    <equations><equation>out.c = in.c</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="Mix"/></instances>
+    <schedule><sequence><continueFor time="0"/></sequence></schedule>
+  </system></systems>
+</esml>

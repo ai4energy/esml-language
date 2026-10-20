@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 单位锚点定义式：`name=` 是标签，`base=` 是定义式，`scale` / `offset`
+     给出到相干 SI 的仿射映射 `v_SI = v·scale + offset`。
+     验证方式为 `esml check-units <本文件>`，期望 errors=0、unknown_anchors=0。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L0_UnitsAnchoring">
+  <units name="anchoring">
+    <unitsBase>
+      <unit name="kg" base="M"     scale="1" offset="0" description="kilogram (letter M)"/>
+      <unit name="m"  base="L"     scale="1" offset="0" description="metre (letter L)"/>
+      <unit name="s"  base="T"     scale="1" offset="0" description="second (letter T)"/>
+      <unit name="K"  base="Theta" scale="1" offset="0" description="kelvin (letter Theta)"/>
+      <unit name="mol" base="N"    scale="1" offset="0" description="mole (letter N)"/>
+    </unitsBase>
+    <unitsDerived>
+      <!-- 复合定义式：/ 对整个操作数指数相减 -->
+      <unit name="kg/s"    base="kg/s"         scale="1" offset="0" description="mass flow"/>
+      <unit name="kJ/kg"   base="m2/s2"        scale="1000" offset="0" description="kJ/kg = 1000 m²/s²"/>
+      <unit name="kg/kmol" base="kg/mol"       scale="0.001" offset="0" description="k in kmol cancels"/>
+      <unit name="W_per_m2_K4" base="W/(m^2·K^4)" scale="1" offset="0" description="Stefan-Boltzmann"/>
+      <!-- 显式无量纲：`-` 与 `1` 同一个一等条目 -->
+      <unit name="fraction" base="-" scale="1" offset="0" description="dimensionless "/>
+    </unitsDerived>
+  </units>
+  <variableTypes>
+    <type name="MassFlow" unit="kg/s"/>
+    <type name="Specific" unit="kJ/kg"/>
+    <type name="MolarMass" unit="kg/kmol"/>
+    <type name="HeatFlux" unit="W_per_m2_K4"/>
+    <type name="Fraction" unit="fraction"/>
+  </variableTypes>
+  <modelTypes><modelType name="M">
+    <variables>
+      <variable name="frac" type="Fraction" role="algebraic"/>
+    </variables>
+    <equations>
+      <!-- 无量纲变量：维度检查可完整建立 -->
+      <equation>frac = 0.5</equation>
+    </equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="g" type="M"/></instances>
+  </system></systems>
+</esml>

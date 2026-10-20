@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `<use library="group:artifact:version"/>`：库闭包沿被并入文件里的 `<use>` 传递展开；
+     registry 中找不到的坐标会显式失败，不会静默跳过。
+     坐标须与某个 libroot 的 registry 行**精确**一致。
+     本例库为 `cn.ai4energy.esml.thermal:heat-elements:0.1`，提供 FixedT / Conductor / Body
+     与 HeatPort 端口（port / port_a / port_b）。
+     检查阶段只做坐标审计、不合并库内容（库内模型会报未找到）；
+     `solve <本文件> -L <库根>` 才做全闭包合并：FixedT(Tset=350) — Conductor(R=0.5) — Body，
+     稳态全链 350 K，Q_flow = 0。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="X_UseLibrary">
+  <use library="cn.ai4energy.esml.thermal:heat-elements:0.1"/>
+  <systems><system name="S" discipline="thermal">
+    <instances>
+      <instance name="f" type="FixedT"/>
+      <instance name="k" type="Conductor"/>
+      <instance name="b" type="Body"/>
+    </instances>
+    <connections>
+      <connection from="f.port" to="k.port_a"/>
+      <connection from="k.port_b" to="b.port"/>
+    </connections>
+    <sets>
+      <scope instance="f"><set path="Tset" value="350.0"/></scope>
+      <scope instance="k"><set path="R" value="0.5"/></scope>
+    </sets>
+    <schedule><sequence><continueFor time="60"/></sequence></schedule>
+  </system></systems>
+</esml>

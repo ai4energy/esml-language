@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `<equation>lhs = rhs</equation>`：微分方程 D(x) 与代数方程并列书写。
+     方程数与未知数相等；代数未知量不进状态向量。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_EquationBasic">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes><modelType name="M">
+    <parameters><parameter name="k" type="real" default="0.5"/></parameters>
+    <variables>
+      <variable name="x" type="real" role="state" initial="1.0"/>
+      <variable name="y" type="real" role="algebraic"/>
+    </variables>
+    <equations>
+      <equation>D(x) = -k * x</equation>
+      <equation>y = 2.0 * x</equation>
+    </equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="M"/></instances>
+    <schedule><sequence><continueFor time="1"/></sequence></schedule>
+  </system></systems>
+</esml>

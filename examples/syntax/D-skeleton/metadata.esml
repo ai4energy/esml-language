@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 文档根元数据 `<metadata>`：`author` / `license` / `description` 等子元素，
+     子结构不固定。`<metadata>` 必须是 `<esml>` 的子元素。metadata 不参与求解，
+     `check` 通过，`solve` 结果不受影响（本例 x = 1.0）。 -->
+ <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="D_Metadata">
+   <metadata>
+     <author>Ai4Energy ESML Syntax Examples</author>
+     <license>COMMERCIAL</license>
+     <description>文档根元数据（lax 通过，引擎不消费子结构）</description>
+   </metadata>
+   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+   <modelTypes><modelType name="M">
+     <variables><variable name="x" type="real" role="algebraic"/></variables>
+     <equations><equation>x = 1.0</equation></equations>
+   </modelType></modelTypes>
+   <systems><system name="Demo">
+     <instances><instance name="m" type="M"/></instances>
+     <schedule><sequence><continueFor time="0"/></sequence></schedule>
+   </system></systems>
+ </esml>

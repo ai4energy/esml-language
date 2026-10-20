@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 任务级超参容器 `<hyperParams>`（canonical camelCase；kebab 拼法会被拒绝）。
+     实现作为元数据接受并跳过，与 `<benchmark>` / `<verdict>` 同判据。
+     本例写 camel 容器，只演示「任务级 vendor 容器被接受并跳过」这一点；
+     `param` 子元素当前仍按 legacy 拼法拒收，故暂不给出。
+     `check` errors=0，`tasks` 的 simulate exit=0（N(60) ≈ 4.98）。 -->
+  <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="T_HyperParams">
+    <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+    <modelTypes><modelType name="DecayModel" discipline="generic">
+      <parameters><parameter name="lambda" type="real" default="0.05"/></parameters>
+      <variables><variable name="N" type="real" role="state" initial="100.0"/></variables>
+      <equations><equation>D(N) = -lambda * N</equation></equations>
+    </modelType></modelTypes>
+    <systems><system name="S">
+      <instances><instance name="g" type="DecayModel"/></instances>
+      <schedule><sequence><continueFor time="60"/></sequence></schedule>
+    </system></systems>
+    <computeTasks name="t-hyper" target="S">
+      <task name="sim" kind="simulate">
+        <tspan from="0" to="60"/>
+        <solver name="Tsit5"/>
+        <hyperParams/>
+      </task>
+    </computeTasks>
+  </esml>

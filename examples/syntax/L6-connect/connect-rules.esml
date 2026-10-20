@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `<connectRules><rule from="…" to="…"/></connectRules>`：带 `category=` 的连接规则。
+     feed（producer.out）只允许接 primary / secondary（consumer.in_a / in_b）；
+     未列出的类别对在编译期报错。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L6_ConnectRules">
+  <variableTypes><typesDimensionless discipline="generic">
+    <type name="real" unit="1" default="0.0" role="algebraic"/>
+  </typesDimensionless></variableTypes>
+  <portTypes name="pt">
+    <portType name="Fluid1" connectorFamily="generic"><variables><portVariable name="x"/></variables></portType>
+  </portTypes>
+  <modelTypes>
+    <modelType name="Producer" discipline="generic">
+      <ports><port name="out" portType="Fluid1" category="feed"/></ports>
+      <variables><variable name="out.x" type="real" initial="0.0" role="algebraic"/></variables>
+    </modelType>
+    <modelType name="Consumer" discipline="generic">
+      <ports>
+        <port name="in_a" portType="Fluid1" category="primary"/>
+        <port name="in_b" portType="Fluid1" category="secondary"/>
+      </ports>
+      <variables>
+        <variable name="in_a.x" type="real" initial="0.0" role="algebraic"/>
+        <variable name="in_b.x" type="real" initial="0.0" role="algebraic"/>
+      </variables>
+    </modelType>
+  </modelTypes>
+  <systems><system name="NET">
+    <connectRules>
+      <rule from="feed" to="primary"/>
+      <rule from="feed" to="secondary"/>
+    </connectRules>
+    <instances>
+      <instance name="p1" type="Producer"/>
+      <instance name="p2" type="Producer"/>
+      <instance name="c1" type="Consumer"/>
+    </instances>
+    <connections>
+      <connection from="p1.out" to="c1.in_a"/>
+      <connection from="p2.out" to="c1.in_b"/>
+    </connections>
+  </system></systems>
+</esml>

@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `<transition reset="true">`：状态机迁移上的复位标记，迁移触发时复位相关状态。
+     与 stateMachine / state / transition 诸例互补，本例专补 `reset=` 属性。
+     `check` 通过；`simulate`（system S）exit=0（D(y) = 1 无稳态，故走 simulate；
+     t = 3 时 A→B→A 两次迁移，B→A 带 reset）。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L2_ResetTransition">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes><modelType name="M">
+    <variables><variable name="y" type="real" role="state" initial="0.0"/></variables>
+    <equations><equation>D(y) = 1.0</equation></equations>
+    <stateMachine name="fsm">
+      <state name="A" initialState="true"/>
+      <state name="B"/>
+      <transition from="A" to="B" condition="time &gt; 1"/>
+      <transition from="B" to="A" condition="time &gt; 2" reset="true"/>
+    </stateMachine>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="M"/></instances>
+    <schedule><sequence><continueFor time="3"/></sequence></schedule>
+  </system></systems>
+</esml>

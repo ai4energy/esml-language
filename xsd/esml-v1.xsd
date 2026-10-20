@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ESML v1 — 单一 schema。
+     规范入口：校验文档为合法 ESML（namespace / 根元素 / 基本属性）。
+     本 schema 不约束内部结构，需更强内容校验时用 esml-canonical-basic.xsd。 -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:esml="https://www.ai4energy.cn/esml/v1"
+           targetNamespace="https://www.ai4energy.cn/esml/v1"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified"
+           version="1.0.0">
+
+  <xs:element name="esml">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:any namespace="##targetNamespace" processContents="lax"/>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attribute name="name" type="xs:string" use="optional"/>
+      <xs:attribute name="schema" type="xs:string" use="optional"/>
+      <xs:anyAttribute processContents="lax"/>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- 独立库文件根（units/types/ports/components/processes/schedules/tasks 等） -->
+  <xs:element name="units">
+    <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
+  </xs:element>
+  <xs:element name="variableTypes">
+    <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
+  </xs:element>
+  <xs:element name="portTypes">
+    <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
+  </xs:element>
+  <xs:element name="modelTypes">
+    <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
+  </xs:element>
+  <xs:element name="systems">
+    <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
+  </xs:element>
+  <!-- `<system>` 也可作为文档根出现（少见但合法）。 -->
+  <xs:element name="system">
+    <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
+  </xs:element>
+  <xs:element name="schedule">
+    <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
+  </xs:element>
+  <xs:element name="solutionParameters">
+    <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
+  </xs:element>
+  <xs:element name="computeTasks">
+    <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
+  </xs:element>
+  <xs:element name="tasks">
+    <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
+  </xs:element>
+  <xs:element name="variables">
+    <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
+  </xs:element>
+  <xs:element name="domain">
+    <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
+  </xs:element>
+  <!-- 序集写作单数 `<orderedSet>`，复数容器 `<orderedSets>` 不是合法语法：
+       序集在文档中是平铺的一层集合，不存在「集合的集合」这一层。 -->
+  <xs:element name="orderedSet">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="element" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType mixed="true">
+            <xs:anyAttribute processContents="lax"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="name" type="xs:string" use="optional"/>
+      <xs:attribute name="static" type="xs:string" use="optional"/>
+      <xs:anyAttribute processContents="lax"/>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

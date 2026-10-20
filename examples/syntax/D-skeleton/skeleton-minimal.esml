@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 最小文档骨架：根 `<esml …>` 加最小的 variableTypes / modelTypes / systems 三段。
+     `check` 通过；求解时衰减模型稳态趋于 N=0。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="D_Minimal">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes><modelType name="Decay" discipline="generic">
+    <parameters><parameter name="lambda" type="real" default="0.05"/></parameters>
+    <variables><variable name="N" type="real" role="state" initial="100.0"/></variables>
+    <equations><equation>D(N) = -lambda * N</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="g" type="Decay"/></instances>
+    <schedule><sequence><continueFor time="60"/></sequence></schedule>
+  </system></systems>
+</esml>

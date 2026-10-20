@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `<unitsDerived>` 派生单位容器：`base` 引用基本单位，`scale` 给出
+     min 与 s 的换算。`check` 通过；求解得 T = 350 K。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L0_UnitsDerived">
+  <units>
+    <unitsBase>
+      <unit name="K" base="K" scale="1" offset="0"/>
+      <unit name="s" base="s" scale="1" offset="0"/>
+    </unitsBase>
+    <unitsDerived>
+      <unit name="min" base="s" scale="60" offset="0"/>
+    </unitsDerived>
+  </units>
+  <variableTypes>
+    <type name="TempK" unit="K"  default="350.0"/>
+    <type name="Time"  unit="min" default="5.0"/>
+  </variableTypes>
+  <modelTypes><modelType name="M">
+    <parameters><parameter name="t_delay" type="Time"/></parameters>
+    <variables><variable name="T" type="TempK" role="state" initial="350.0"/></variables>
+    <equations><equation>D(T) = 0</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="g" type="M"/></instances>
+  </system></systems>
+</esml>

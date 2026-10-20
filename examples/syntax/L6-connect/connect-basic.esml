@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `<connections><connection from="a.p" to="b.q"/></connections>`：
+     端口对连。求解前展开为 potential 相等 + flow 守恒。
+     本例是电气回路 Src—R—Gnd。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L6_ConnectBasic">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <portTypes><portType name="Pin" connectorFamily="electrical">
+    <variables>
+      <portVariable name="v" role="potential" type="real"/>
+      <portVariable name="i" role="flow"      type="real"/>
+    </variables>
+  </portType></portTypes>
+  <modelTypes>
+    <modelType name="Src">
+      <ports><port name="p" portType="Pin"/></ports>
+      <parameters><parameter name="V" type="real" default="10.0"/></parameters>
+      <variables><variable name="p.v" type="real" role="algebraic"/><variable name="p.i" type="real" role="algebraic"/></variables>
+      <equations><equation>p.v = V</equation></equations>
+    </modelType>
+    <modelType name="R">
+      <ports><port name="p" portType="Pin"/></ports>
+      <parameters><parameter name="R" type="real" default="100.0"/></parameters>
+      <variables><variable name="p.v" type="real" role="algebraic"/><variable name="p.i" type="real" role="algebraic"/></variables>
+      <equations><equation>p.v = R * p.i</equation></equations>
+    </modelType>
+    <modelType name="Gnd">
+      <ports><port name="g" portType="Pin"/></ports>
+      <variables><variable name="g.v" type="real" role="algebraic"/><variable name="g.i" type="real" role="algebraic"/></variables>
+      <equations><equation>g.v = 0</equation></equations>
+    </modelType>
+  </modelTypes>
+  <systems><system name="S" discipline="electrical">
+    <instances><instance name="s" type="Src"/><instance name="r" type="R"/><instance name="g" type="Gnd"/></instances>
+    <connections><connection from="s.p" to="r.p"/><connection from="r.p" to="g.g"/></connections>
+  </system></systems>
+</esml>

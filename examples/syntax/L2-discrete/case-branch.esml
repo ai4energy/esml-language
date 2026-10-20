@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `<case on=>`：方程块内的条件分支，按 on 表达式的值选择 `<branch value=>`，
+     可与普通 `<equation>` 混排。`check` 通过；s = 1 时取 branch value="1" ⇒ y = s + 1 = 2。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L2_Case">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes><modelType name="M">
+    <parameters><parameter name="s" type="real" default="1.0"/></parameters>
+    <variables><variable name="y" type="real" role="algebraic"/></variables>
+    <equations>
+      <case on="s">
+        <branch value="1"><equation>y = s + 1.0</equation></branch>
+        <branch value="0"><equation>y = s - 1.0</equation></branch>
+      </case>
+    </equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="M"/></instances>
+    <schedule><sequence><continueFor time="0"/></sequence></schedule>
+  </system></systems>
+</esml>

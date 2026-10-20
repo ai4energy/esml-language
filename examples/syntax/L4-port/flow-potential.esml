@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 portType 内端口变量的两种写法：属性形态 `<portVariable role="…">`
+     与元素形态 `<flow>` / `<potential>`（直接挂在 `<portType>` 下）。两者等价，
+     元素名即角色。`check` errors=0。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_FlowPotential">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <portTypes><portType name="FP">
+    <variables>
+      <portVariable name="c" role="algebraic" type="real"/>
+    </variables>
+    <flow name="q" type="real"/>
+    <potential name="v" type="real"/>
+  </portType></portTypes>
+  <modelTypes><modelType name="M" discipline="generic">
+    <variables><variable name="q" type="real" role="parameter"/></variables>
+    <equations><equation>q = 1.0</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="M"/></instances>
+    <schedule><sequence><continueFor time="1"/></sequence></schedule>
+  </system></systems>
+</esml>

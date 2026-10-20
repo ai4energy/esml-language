@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 类别 wrapper `<typesGeneric>`：在 `<variableTypes>` 内按类别包裹 `<type>`
+     声明。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L0_TypesGeneric">
+  <variableTypes>
+    <typesGeneric>
+      <type name="real" unit="1" default="0.0" role="algebraic"/>
+    </typesGeneric>
+  </variableTypes>
+  <modelTypes><modelType name="M">
+    <variables><variable name="x" type="real" role="algebraic"/></variables>
+    <equations><equation>x = 1.0</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="M"/></instances>
+    <schedule><sequence><continueFor time="0"/></sequence></schedule>
+  </system></systems>
+</esml>

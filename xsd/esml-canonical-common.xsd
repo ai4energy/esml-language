@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ESML canonical — 共享 primitive（model 与 compute 子集共用，避免 include 冲突）。 -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:esml="https://www.ai4energy.cn/esml/v1"
+           targetNamespace="https://www.ai4energy.cn/esml/v1"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified"
+           version="1.0.0">
+
+  <xs:simpleType name="Ident">
+    <xs:restriction base="xs:string">
+      <!-- 系统名/组件名可含 `-`；空格不进入字符集，以免命名歧义。 -->
+      <xs:pattern value="[A-Za-z_][A-Za-z0-9_.\-]*"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- ===== 单位词法（basic 与 compute 都 include 本文件 ⇒ 共享层）=====
+       单位的唯一词法定义：文档解析、单位校验与 schema 校验共用同一字符集。
+       放在 common 而非 basic，是因为 compute.xsd 只 include common
+       （basic → include → {common, compute}）；把词法留在 basic 会让
+       compute 无法单独编译。 -->
+  <!--
+    记法：
+      · 乘号三种写法等价：`*`、`·`(U+00B7)、`.`（`.` 仅在标识符/括号之间
+        视作乘号，数字内部的 `.` 仍是小数点）；
+      · `^` 幂；相邻数字当指数（`m2`、`kg/m3`）；
+      · `/` 是对整个操作数做指数相减（左结合：`a/b/c` = `(a/b)/c`）；
+      · `1` / `-` / 空串 = 无量纲（无量纲的既有写法）；
+      · 锚点字母表 {M=kg, L=m, T=s, Theta=K, N=mol} + 导出字母 {J=焦耳, P=功率}
+        —— 字母表**只在整串恰为一个字母**时生效；复合式里的 J/N 是单位名。
+    歧义不排优先级：`N`/`T` 这类同拼写双义必须报错给位置，绝不静默消解。
+  -->
+  <xs:simpleType name="UnitExpressionType">
+    <xs:annotation>
+      <xs:documentation>
+        单位定义式 / 引用式。允许字母、数字、`_`、括号、`*` `/` `^` `+` `-`
+        `·` `.`；**不允许空白**。文档中 `base=` 与 `unit=` 的全部取值
+        都必须通过本 pattern。
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[A-Za-z0-9_()*/^+.\-·]+"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <!-- `scale` / `offset`：到相干 SI 的仿射映射 `v_SI = v·scale + offset`。 -->
+  <xs:simpleType name="UnitNumberType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[+-]?([0-9]+\.?[0-9]*|\.[0-9]+)([eE][+-]?[0-9]+)?"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+</xs:schema>

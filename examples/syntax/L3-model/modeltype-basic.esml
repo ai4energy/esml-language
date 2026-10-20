@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `<modelType name [discipline]>` 加 `<description>`，内嵌 `<parameters>` /
+     `<variables>` / `<equations>`。`discipline` 表示物理领域（thermal / electrical 等），
+     省略时取默认。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L3_ModelBasic">
+  <modelTypes><modelType name="FirstOrder" discipline="generic">
+    <description>一阶 ODE：dx/dt = -k*x。L3 基本形态（不含端口/成员）。</description>
+    <parameters><parameter name="k" type="real" default="0.5"/></parameters>
+    <variables><variable name="x" type="real" role="state" initial="1.0"/></variables>
+    <equations><equation>D(x) = -k * x</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="FirstOrder"/></instances>
+    <schedule><sequence><continueFor time="1"/></sequence></schedule>
+  </system></systems>
+</esml>

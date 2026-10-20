@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 顶层 `<solutionParameters>` 容器，用于放置求解参数。本例给 solver 子元素
+     （tspan to=60、abstol=1e-6）。`check` 通过。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="D_SolutionParameters">
+  <solutionParameters name="sp1">
+    <solver name="Tsit5" abstol="1e-6" reltol="1e-3" saveat="0.1" maxsteps="10000"/>
+  </solutionParameters>
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes><modelType name="M">
+    <parameters><parameter name="k" type="real" default="0.3"/></parameters>
+    <variables><variable name="x" type="real" role="state" initial="1.0"/></variables>
+    <equations><equation>D(x) = -k * x</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="M"/></instances>
+    <schedule><sequence><continueFor time="1"/></sequence></schedule>
+  </system></systems>
+</esml>

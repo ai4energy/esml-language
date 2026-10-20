@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `<locals><local name=/>` 声明函数内局部量，在 `<algorithm>` 内被内联展开：
+     `<assign name="t" value="x*2"/>` 之后 `<assign name="y" value="t+1"/>`。
+     `check` errors=0；`solve` 验证 f(3) = 3·2 + 1 = 7。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L8_Locals">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <functions>
+    <function name="f" returns="real">
+      <inputs><input name="x" type="real"/></inputs>
+      <outputs><output name="y" type="real"/></outputs>
+      <locals><local name="t"/></locals>
+      <algorithm>
+        <assign name="t" value="x * 2"/>
+        <assign name="y" value="t + 1"/>
+      </algorithm>
+    </function>
+  </functions>
+  <modelTypes>
+    <modelType name="M" discipline="generic">
+      <parameters><parameter name="x" type="real" default="3.0"/></parameters>
+      <variables><variable name="y" type="real" role="algebraic"/></variables>
+      <equations><equation>y = f(x)</equation></equations>
+    </modelType>
+  </modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="M"/></instances>
+    <schedule><sequence><continueFor time="0"/></sequence></schedule>
+  </system></systems>
+</esml>

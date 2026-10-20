@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 负例（预期失败）：数组维 `"GhostSet"` 未在顶层 `<set>` 声明，也不是参数名，
+     因此不是合法维。期望 `check` 报错，并在消息中说明三种合法维形态：
+     字面量（如 `"3"`）、已声明序集（如 `"Species"`）、已声明参数名（如 `"N"`）。
+     非零退出是预期行为；配套正例见 `array-index.esml`。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_ArrayIndexProbe">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes>
+    <modelType name="M" discipline="generic">
+      <variables><variable name="x" type="real" array="GhostSet" initial="0.0" role="algebraic"/></variables>
+      <equations><equation>x = 0.0</equation></equations>
+    </modelType>
+  </modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="M"/></instances>
+    <schedule><sequence><continueFor time="0"/></sequence></schedule>
+  </system></systems>
+</esml>

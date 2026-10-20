@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 系统级自由度控制：`<fixed>` 钉住变量，`<presets>` 给预设值。
+     `<fixed><scope instance="…"><set path value/></scope></fixed>` 把 a 钉到 5，
+     `<presets><scope instance="…"><preset path value lower upper/></scope></presets>` 给预设。
+     `check` 通过；`solve`（system S）：y = K·a + c = 2·5 + 1 = 11。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L9_FixedPreset">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes><modelType name="Calc">
+    <parameters><parameter name="K" type="real" default="2.0"/><parameter name="c" type="real" default="1.0"/></parameters>
+    <variables><variable name="y" type="real" role="algebraic" initial="0.0"/><variable name="a" type="real" role="algebraic" initial="0.0"/></variables>
+    <equations><equation>y = K * a + c</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="u" type="Calc"/></instances>
+    <fixed><scope instance="u"><set path="a" value="5.0"/></scope></fixed>
+    <presets><scope instance="u"><preset path="y" value="0.0"/></scope></presets>
+    <schedule><sequence><continueFor time="0"/></sequence></schedule>
+  </system></systems>
+</esml>

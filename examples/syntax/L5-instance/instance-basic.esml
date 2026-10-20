@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `<systems><system name discipline><instances><instance name type/></instances>`：
+     单一 modelType 实例化一次。system 的 `discipline` 与 modelType 的 `discipline`
+     相互独立，可以不同。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L5_InstanceBasic">
+  <modelTypes><modelType name="M">
+    <parameters><parameter name="k" type="real" default="0.2"/></parameters>
+    <variables><variable name="x" type="real" role="state" initial="1.0"/></variables>
+    <equations><equation>D(x) = -k * x</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S" discipline="generic">
+    <instances><instance name="m" type="M"/></instances>
+    <schedule><sequence><continueFor time="1"/></sequence></schedule>
+  </system></systems>
+</esml>

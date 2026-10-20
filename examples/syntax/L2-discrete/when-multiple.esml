@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 多个并列 `<when>`：同一时刻按声明序应用。
+     此形态用于表达互斥的多分支语义；`<elsewhen>` 见 `elsewhen.esml`。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L2_MultipleWhen">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes><modelType name="M">
+    <discrete><variable name="mode" type="real" default="0.0"/></discrete>
+    <variables><variable name="x" type="real" role="state" initial="0.0"/></variables>
+    <equations>
+      <equation>D(x) = mode</equation>
+    </equations>
+    <events>
+      <when condition="time &gt; 1.0">
+        <assign path="mode" value="1.0"/>
+      </when>
+      <when condition="time &gt; 2.0">
+        <assign path="mode" value="2.0"/>
+      </when>
+    </events>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="M"/></instances>
+    <schedule><sequence><continueFor time="3"/></sequence></schedule>
+  </system></systems>
+</esml>

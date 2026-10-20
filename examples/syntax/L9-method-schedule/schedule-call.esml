@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `<schedule><sequence><continueFor time=/><call method="label"/></sequence></schedule>`：
+     `<call method="ramp"/>` 给**下一段**打标签（段名 ramp）；
+     两个 5 s 段合起来是一次 10 s 运行。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L9_ScheduleCall">
+  <variableTypes>
+    <type name="real" unit="1" default="0.0" role="algebraic"/>
+  </variableTypes>
+  <modelTypes><modelType name="Decay" discipline="generic">
+    <parameters><parameter name="lambda" type="real" default="0.05"/></parameters>
+    <variables><variable name="N" type="real" role="state" initial="100.0"/></variables>
+    <equations><equation>D(N) = -lambda * N</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="g" type="Decay"/></instances>
+    <schedule><sequence>
+      <continueFor time="5"/>
+      <call method="ramp"/>
+      <continueFor time="5"/>
+    </sequence></schedule>
+  </system></systems>
+</esml>

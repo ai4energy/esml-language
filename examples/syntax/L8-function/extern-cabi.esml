@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 外部函数：`<function kind="external">` 必须绑定 `<extern ffi library symbol threadSafe/>`。
+     导数契约三档：analytic（解析导数）、fd（有限差分）、opaque（不透明）；
+     本例用 fd 档：`<derivative mode="fd"/>` 加 `<fd step relative/>` 给出步长契约。
+     库与符号在 install / solve 期解析，`check` 期只验声明。
+     外部函数文档须自带一个 `<system name="Demo">` 用例。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L8_ExternCabi">
+  <functions>
+    <function name="psatDemo" kind="external" returns="real">
+      <inputs><input name="T" type="real" unit="K"/></inputs>
+      <extern ffi="c" library="libesml_extern_testlib.so" symbol="demo_psat" threadSafe="true"/>
+      <derivative mode="fd"/>
+      <fd step="1e-6" relative="true"/>
+    </function>
+  </functions>
+  <modelTypes><modelType name="M">
+    <parameters><parameter name="T" type="real" default="300.0"/></parameters>
+    <variables><variable name="p" type="real" role="algebraic"/></variables>
+    <equations><equation>p = psatDemo(T)</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="Demo"><instances><instance name="m" type="M"/></instances></system></systems>
+</esml>

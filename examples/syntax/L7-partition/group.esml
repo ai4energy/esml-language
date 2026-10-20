@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `<units>` 内的 `<group>`：单位分组包装。`<group>` 内的 `<unit>` 照常可用。
+     `check` errors=0。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L7_Group">
+  <units>
+    <unitsDerived>
+      <group name="mechanical">
+        <unit name="m" scale="1"/>
+        <unit name="kg" scale="1"/>
+      </group>
+      <unit name="N" base="kg*m*s^-2" scale="1"/>
+    </unitsDerived>
+  </units>
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes><modelType name="M" discipline="generic">
+    <parameters><parameter name="x" type="real" default="3.0"/></parameters>
+    <variables><variable name="y" type="real" role="algebraic"/></variables>
+    <equations><equation>y = x</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="M"/></instances>
+    <schedule><sequence><continueFor time="0"/></sequence></schedule>
+  </system></systems>
+</esml>

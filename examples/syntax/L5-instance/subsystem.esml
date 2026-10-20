@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 子系统：`<system>` 也可作为 instance 的 type 引用，即「系统套系统」，
+     用于分层建模与分区。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L5_Subsystem">
+  <modelTypes><modelType name="Leaf">
+    <parameters><parameter name="k" type="real" default="0.3"/></parameters>
+    <variables><variable name="x" type="real" role="state" initial="1.0"/></variables>
+    <equations><equation>D(x) = -k * x</equation></equations>
+  </modelType></modelTypes>
+  <systems>
+    <system name="Sub" discipline="generic">
+      <instances><instance name="leaf" type="Leaf"/></instances>
+      <schedule><sequence><continueFor time="0"/></sequence></schedule>
+    </system>
+    <system name="Top" discipline="generic">
+      <instances><instance name="sub" type="Sub"/></instances>
+      <schedule><sequence><continueFor time="1"/></sequence></schedule>
+    </system>
+  </systems>
+</esml>

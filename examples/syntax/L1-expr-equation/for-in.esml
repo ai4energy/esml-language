@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 方程级 `<for var="i" in="…">` 循环。当前可运行形态是**字面范围** `in="1..3"`
+     加 body 内**直接**的 `<equation>`（循环展开）；`in="1..n"`（参数范围）与
+     `<body>` 包裹形态目前不展开。`i` 在 body 内按下标使用（`x[i]`）。
+     `check` errors=0；`solve`（system S）：lo = {1,2,3}、hi = {2,4,6}。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_ForIn">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes><modelType name="Ladder">
+    <parameters><parameter name="n" type="integer" default="3"/></parameters>
+    <variables>
+      <variable name="lo" type="real" role="algebraic" array="n"/>
+      <variable name="hi" type="real" role="algebraic" array="n"/>
+    </variables>
+    <equations>
+      <for var="i" in="1..3">
+        <equation>hi[i] = 2.0 * lo[i]</equation>
+      </for>
+      <equation>lo[1] = 1.0</equation>
+      <equation>lo[2] = 2.0</equation>
+      <equation>lo[3] = 3.0</equation>
+    </equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="Ladder"/></instances>
+    <schedule><sequence><continueFor time="0"/></sequence></schedule>
+  </system></systems>
+</esml>

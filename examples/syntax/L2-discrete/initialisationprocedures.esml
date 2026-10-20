@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `<initialisationProcedures>` + `<initialisationProcedure>` 的 process 子元素族：
+     `<start><assign path value/></start>` 与
+     `<next><jumpTo><set path value/></jumpTo><complete unit=/></next>`。
+     命名均为 camelCase，kebab 拼法会被拒绝。
+     `check` errors=0（声明例，当前只解析、不参与求解）。
+     另一支过程子元素见 `initialisationprocedure-advance.esml`。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L2_InitProcCamel">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes><modelType name="Mass" discipline="generic">
+    <parameters><parameter name="k" type="real" default="2.0"/></parameters>
+    <variables><variable name="x" type="real" role="state" initial="0.0"/></variables>
+    <equations><equation>D(x) = -k * x</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="Mass"/></instances>
+    <initialisationProcedures>
+      <initialisationProcedure name="cooling">
+        <start><assign path="m.x" value="0.5"/></start>
+        <next>
+          <jumpTo><set path="m.x" value="1.5"/></jumpTo>
+          <complete unit="s"/>
+        </next>
+      </initialisationProcedure>
+    </initialisationProcedures>
+    <schedule><sequence><continueFor time="1"/></sequence></schedule>
+  </system></systems>
+</esml>

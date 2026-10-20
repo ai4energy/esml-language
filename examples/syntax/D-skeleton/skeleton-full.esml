@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 完整文档骨架：按 canonical 顶层顺序（units → variableTypes → portTypes →
+     functions → modelTypes → systems）铺满可写的顶层段，每段放一个最小真实内容。
+     函数用纯表达式形态（无 `<outputs>`，`<body>` 是表达式），可内联求解。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="D_FullSkeleton">
+  <units>
+    <unitsBase><unit name="K" base="K" scale="1" offset="0"/></unitsBase>
+  </units>
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <portTypes><portType name="HeatPort" connectorFamily="thermal">
+    <portVariable name="T"      role="potential" type="real"/>
+    <portVariable name="Q_flow" role="flow"      type="real"/>
+  </portType></portTypes>
+  <functions><function name="offset">
+    <inputs><input name="x"/></inputs>
+    <body>x + 20.0</body>
+  </function></functions>
+  <modelTypes><modelType name="Probe" discipline="thermal">
+    <description>完整骨架例：带端口的模型，端口电位由库内函数 offset 给定。</description>
+    <ports><port name="p" portType="HeatPort"/></ports>
+    <parameters><parameter name="Tref" type="real" default="300.0"/></parameters>
+    <variables><variable name="p.T" type="real" role="algebraic"/></variables>
+    <equations><equation>p.T = offset(Tref)</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S" discipline="thermal">
+    <!-- 完整骨架例系统：单实例 Probe。 -->
+    <instances><instance name="probe" type="Probe"/></instances>
+    <schedule><sequence><continueFor time="0"/></sequence></schedule>
+  </system></systems>
+</esml>

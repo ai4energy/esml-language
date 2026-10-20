@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `<methods><onLoad><set path="X" value="v"/>…</onLoad></methods>`：求解前覆盖变量初值
+     （`initial=`）或参数默认值（`default=`），覆盖在解析期应用。
+     值可以是字面量，也可以是表达式（如 `value="3*W"` 或裸标识符），
+     对本模型参数求值；指向未声明的名字会显式报错。
+     本例对照：c（带 onLoad，K 由 1 覆盖为 5）⇒ x = 5 + 6 = 11；
+     p（无 onLoad）⇒ x = 1 + 6 = 7；e（表达式 preset，K = 3·W = 6）⇒ x = 12。
+     `check` errors=0；`solve`（system Demo）验证这三组值。 -->
+ <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L9_OnLoadPreset">
+   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+   <modelTypes>
+     <modelType name="Calc" discipline="generic">
+       <parameters><parameter name="K" type="real" default="1.0"/></parameters>
+       <variables><variable name="x" type="real" role="algebraic"/></variables>
+       <equations><equation>x = K + 6</equation></equations>
+       <methods>
+         <onLoad><set path="K" value="5"/></onLoad>
+       </methods>
+     </modelType>
+      <modelType name="CalcPlain" discipline="generic">
+        <parameters><parameter name="K" type="real" default="1.0"/></parameters>
+        <variables><variable name="x" type="real" role="algebraic"/></variables>
+        <equations><equation>x = K + 6</equation></equations>
+      </modelType>
+      <modelType name="CalcExpr" discipline="generic">
+        <parameters>
+          <parameter name="K" type="real" default="1.0"/>
+          <parameter name="W" type="real" default="2.0"/>
+        </parameters>
+        <variables><variable name="x" type="real" role="algebraic"/></variables>
+        <equations><equation>x = K + 6</equation></equations>
+        <methods>
+          <onLoad><set path="K" value="3*W"/></onLoad>
+        </methods>
+      </modelType>
+    </modelTypes>
+    <systems><system name="Demo">
+      <instances>
+        <instance name="c" type="Calc"/>
+        <instance name="p" type="CalcPlain"/>
+        <instance name="e" type="CalcExpr"/>
+      </instances>
+     <schedule><sequence><continueFor time="0"/></sequence></schedule>
+   </system></systems>
+ </esml>

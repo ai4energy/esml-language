@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `<reference>`：外部参考数据源引用（source / cols / format），与 `<dataset>` /
+     `<testData>` 同族，挂在 estimation 类任务上。实现只做元数据透传，
+     不消费具体属性，不影响任务执行。`check` errors=0。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="T_Reference">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes><modelType name="DecayModel" discipline="generic">
+    <parameters><parameter name="lambda" type="real" default="0.05"/></parameters>
+    <variables><variable name="N" type="real" role="state" initial="100.0"/></variables>
+    <equations><equation>D(N) = -lambda * N</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="g" type="DecayModel"/></instances>
+    <schedule><sequence><continueFor time="60"/></sequence></schedule>
+  </system></systems>
+  <computeTasks name="t-ref" target="S">
+    <task name="est" kind="estimation">
+      <estimate name="g.lambda" initial="0.1" lowerBound="0.0" upperBound="1.0"/>
+      <reference source="decay_ref.csv" cols="t,N" format="csv"/>
+    </task>
+  </computeTasks>
+</esml>

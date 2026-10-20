@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `<observe>` 观察列表：`<observe name=><var path= name=/></observe>`。
+     `check` 通过；稳态解 x→0、y = 2x。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L0_Observe">
+  <modelTypes><modelType name="Decay">
+    <parameters><parameter name="k" type="real" default="1.0"/></parameters>
+    <variables>
+      <variable name="x" type="real" initial="1.0" role="state"/>
+      <variable name="y" type="real" initial="2.0" role="algebraic"/>
+    </variables>
+    <equations>
+      <equation>D(x) = -k * x</equation>
+      <equation>y = 2.0 * x</equation>
+    </equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="Decay"/></instances>
+    <observe name="default">
+      <var path="t"   name="time"/>
+      <var path="m.x" name="x"/>
+      <var path="m.y"/>
+    </observe>
+  </system></systems>
+</esml>

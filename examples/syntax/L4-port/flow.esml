@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 端口变量角色 `role="flow"`：连接节点上各 flow 之和为零（守恒），悬空端口的 flow 钉零。
+     本例两个恒温源（300 K / 280 K）经导体相连，节点守恒把 Q_flow 钉出
+     (300 − 280) / 0.5 = 40 W。`check` errors=0；`solve`（system S）cd.port_a.Q_flow = 40.0。 -->
+ <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_FlowRole">
+   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+   <portTypes><portType name="HeatPort" connectorFamily="thermal">
+     <variables>
+       <portVariable name="T"      role="potential" type="real"/>
+       <portVariable name="Q_flow" role="flow"      type="real"/>
+     </variables>
+   </portType></portTypes>
+   <modelTypes>
+     <modelType name="FixedT">
+       <ports><port name="port" portType="HeatPort"/></ports>
+       <parameters><parameter name="Tset" type="real" default="300.0"/></parameters>
+       <variables>
+         <variable name="port.T"      type="real" role="algebraic"/>
+         <variable name="port.Q_flow" type="real" role="algebraic"/>
+       </variables>
+       <equations><equation>port.T = Tset</equation></equations>
+     </modelType>
+     <modelType name="Conductor">
+       <ports><port name="port_a" portType="HeatPort"/><port name="port_b" portType="HeatPort"/></ports>
+       <parameters><parameter name="R" type="real" default="0.5"/></parameters>
+       <variables>
+         <variable name="port_a.T"      type="real" role="algebraic"/>
+         <variable name="port_a.Q_flow" type="real" role="algebraic"/>
+         <variable name="port_b.T"      type="real" role="algebraic"/>
+         <variable name="port_b.Q_flow" type="real" role="algebraic"/>
+       </variables>
+       <equations>
+         <equation>port_a.T - port_b.T = R * port_a.Q_flow</equation>
+         <equation>port_a.Q_flow + port_b.Q_flow = 0.0</equation>
+       </equations>
+     </modelType>
+   </modelTypes>
+   <systems><system name="S" discipline="thermal">
+     <instances>
+       <instance name="hot" type="FixedT"/>
+       <instance name="cd"  type="Conductor"/>
+       <instance name="cold" type="FixedT"/>
+     </instances>
+     <sets><scope instance="cold"><set path="Tset" value="280.0"/></scope></sets>
+     <connections>
+       <connection from="hot.port" to="cd.port_a"/>
+       <connection from="cd.port_b" to="cold.port"/>
+     </connections>
+     <schedule><sequence><continueFor time="1"/></sequence></schedule>
+   </system></systems>
+ </esml>

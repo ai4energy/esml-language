@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 复数内建 `real()` / `imag()`：`type="complex"` 标量展平为实部/虚部一对实数，
+     `complex( , )` / `conj` 与复数四则运算在求解前降为实数方程。
+     方程形态须**复数 = 复数**：一侧是实变量时会降为「实方程 + 0 = 0 虚方程」，导致过定。
+     `check` errors=0；`solve` 稳态全解：Z = 3+1j · V = 1+0j · I = 0.3−0.1j ·
+     J = −0.1+0.3j（J 的实部 = imag(I)、虚部 = real(I)）。 -->
+ <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_BuiltinsComplex">
+   <modelTypes><modelType name="Impedance" discipline="generic">
+     <description>AC 阻抗：Z = R + j·w·L，V = Z·I，V = 1∠0；J 交换 I 的实/虚部以实锤 imag()/real()。</description>
+     <parameters>
+       <parameter name="R" type="real" default="3.0"/>
+       <parameter name="L" type="real" default="0.1"/>
+       <parameter name="w" type="real" default="10.0"/>
+     </parameters>
+     <variables>
+       <variable name="V" type="complex" role="algebraic"/>
+       <variable name="I" type="complex" role="algebraic"/>
+       <variable name="Z" type="complex" role="algebraic"/>
+       <variable name="J" type="complex" role="algebraic"/>
+     </variables>
+     <equations>
+       <equation>Z = complex(R, w * L)</equation>
+       <equation>V = complex(1.0, 0.0)</equation>
+       <equation>V = Z * I</equation>
+       <equation>J = complex(imag(I), real(I))</equation>
+     </equations>
+   </modelType></modelTypes>
+   <systems><system name="S">
+     <instances><instance name="m" type="Impedance"/></instances>
+   </system></systems>
+ </esml>

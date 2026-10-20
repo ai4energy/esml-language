@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 文档骨架：根 `<esml xmlns=… schema=… name=…>`（`name` 是**属性**），
+     并在模型级与系统级使用 `<description>`。`check` 与 `solve` 均通过。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="D_Skeleton">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes><modelType name="Decay" discipline="generic">
+    <description>指数衰减：D(N) = -lambda·N，N(0)=100（模型级 description，规范 §4）。</description>
+    <parameters><parameter name="lambda" type="real" default="0.05"/></parameters>
+    <variables><variable name="N" type="real" role="state" initial="100.0"/></variables>
+    <equations><equation>D(N) = -lambda * N</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <!-- 文档骨架 D 例：根 esml 的 name 属性 + 模型级 / 系统级 description。 -->
+    <instances><instance name="g" type="Decay"/></instances>
+    <schedule><sequence><continueFor time="60"/></sequence></schedule>
+  </system></systems>
+</esml>

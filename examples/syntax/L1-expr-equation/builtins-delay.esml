@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 延迟算子 `delay(u, T)`：纯延迟的一阶 Padé 近似（PT1 滞后环节），
+     降为隐藏滞后态 d：T·D(d) = u − d，d(0) = u(0)。
+     `solve`（system S）：常数输入的延迟仍是常数，y = u = 5.0。
+     `simulate`（system R，tspan 0–2）：斜坡 u = 2t、T = 0.5 时
+     y(t) = 2t − 1 + e^(−2t)，t = 0.5 → 0.36788。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_BuiltinsDelay">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes>
+    <modelType name="Steady" discipline="generic">
+      <parameters><parameter name="u" type="real" default="5.0"/></parameters>
+      <variables><variable name="y" type="real" role="algebraic"/></variables>
+      <equations><equation>y = delay(u, 1.0)</equation></equations>
+    </modelType>
+    <modelType name="Ramp" discipline="generic">
+      <variables><variable name="y" type="real" initial="0.0" role="algebraic"/></variables>
+      <equations><equation>y = delay(2*t, 0.5)</equation></equations>
+    </modelType>
+  </modelTypes>
+  <systems>
+    <system name="S">
+      <instances><instance name="g" type="Steady"/></instances>
+      <schedule><sequence><continueFor time="1"/></sequence></schedule>
+    </system>
+    <system name="R">
+      <instances><instance name="g" type="Ramp"/></instances>
+      <schedule><sequence><continueFor time="2"/></sequence></schedule>
+    </system>
+  </systems>
+</esml>

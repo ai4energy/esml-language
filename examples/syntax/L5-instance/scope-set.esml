@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 参数覆盖：`<sets><scope instance="i"><set path="k" value="…"/></scope></sets>`，
+     覆盖路径走实例命名空间。`<set>` 只接受参数与取值，不接受 `unit=`。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L5_ScopeSet">
+  <modelTypes><modelType name="M">
+    <parameters><parameter name="k" type="real" default="0.2"/></parameters>
+    <variables><variable name="x" type="real" role="state" initial="1.0"/></variables>
+    <equations><equation>D(x) = -k * x</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances>
+      <instance name="m1" type="M"/>
+      <instance name="m2" type="M"/>
+    </instances>
+    <sets>
+      <scope instance="m1"><set path="k" value="0.5"/></scope>
+      <scope instance="m2"><set path="k" value="1.0"/></scope>
+    </sets>
+    <schedule><sequence><continueFor time="1"/></sequence></schedule>
+  </system></systems>
+</esml>

@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 负例：`<zeroDerivative wrt="…">`，函数 `<derivative>` 的子元素，显式声明对某变量的
+     偏导为 0。与 `<noDerivative>` 的区别：前者说「答案是 0」，后者说「不要算」。
+     `<body>` 与 `<derivative>` 互斥；本件同时给出 `<body>` 与零偏导声明，
+     因此 `check` 应报错（rc=1）。本件只演示该 token 的拼写，不是可运行样例。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_ZeroDerivative">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <functions><function name="sq">
+    <inputs><input name="x"/><input name="d"/></inputs>
+    <outputs><output name="z"/></outputs>
+    <body>z = x * x</body>
+    <derivative mode="analytic">
+      <partial wrt="x">2.0 * x</partial>
+      <zeroDerivative wrt="d"/>
+    </derivative>
+  </function></functions>
+  <modelTypes><modelType name="M">
+    <parameters>
+      <parameter name="x" type="real" default="3.0"/>
+      <parameter name="d" type="real" default="7.0"/>
+    </parameters>
+    <variables><variable name="z" type="real" role="algebraic"/></variables>
+    <equations><equation>z = sq(x, d)</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="M"/></instances>
+    <schedule><sequence><continueFor time="0"/></sequence></schedule>
+  </system></systems>
+</esml>

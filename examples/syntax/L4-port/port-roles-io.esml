@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 端口角色 `input` / `output`：portType 用 `domain=` 标领域，端口变量用
+     `role="input"` / `role="output"`（与 potential / flow / stream 并列）。
+     `check` 通过。input 端口的取值由流程层的方程给定——`<set>` 只给参数，不能替代方程。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_PortRolesIO">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <portTypes><portType name="IO" domain="electrical">
+    <portVariable name="u" role="input"  type="real"/>
+    <portVariable name="w" role="output" type="real"/>
+  </portType></portTypes>
+  <modelTypes><modelType name="M">
+    <ports><port name="p" portType="IO"/></ports>
+    <parameters><parameter name="K" type="real" default="2.0"/></parameters>
+    <variables>
+      <variable name="p.u" type="real" role="algebraic"/>
+      <variable name="p.w" type="real" role="algebraic"/>
+    </variables>
+    <equations><equation>p.w = p.u + K</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S" discipline="electrical">
+    <instances><instance name="m" type="M"/></instances>
+    <equations>
+      <!-- 系统输入：钉住 input 口（**流程层方程**，不是 `<set>`） -->
+      <equation>m.p.u = 1.0</equation>
+    </equations>
+    <schedule><sequence><continueFor time="0"/></sequence></schedule>
+  </system></systems>
+</esml>

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 负例（预期失败）：`<use library="…">` 的坐标与任何 libroot 的 registry 行都不精确一致时，
+     会显式报错并给出「是否指这个」的提示，不会静默跳过。
+     本例故意使用不存在的版本 `:9.9.9`（registry 中为 `:0.1`）。
+     注意：该审计只在对文档自身解析成功时执行，因此本例用**自包含**模型（不引用库模型）；
+     若像 `use-library.esml` 那样引用库模型，检查阶段不会合并库内容，会先报「库未找到」。
+     `check <本文件> -L <库根>` 预期 exit≠0，并给出坐标不匹配与「是否指 …:0.1」两条信息。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="X_UseF12Mismatch">
+  <use library="cn.ai4energy.esml.thermal:heat-elements:9.9.9"/>
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes><modelType name="Local" discipline="generic">
+    <variables><variable name="y" type="real" role="algebraic"/></variables>
+    <equations><equation>y = 1.0</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="Local"/></instances>
+    <schedule><sequence><continueFor time="0"/></sequence></schedule>
+  </system></systems>
+</esml>

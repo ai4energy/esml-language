@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 顶层求解参数段 `<solutionParameters>`：与 `<computeTasks>` 同族的顶层段，
+     内容按松散规则透传。实现接受并跳过、不消费，文档本体仍可求解。
+     `check` errors=0。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="T_SolutionParameters">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes><modelType name="DecayModel" discipline="generic">
+    <parameters><parameter name="lambda" type="real" default="0.05"/></parameters>
+    <variables><variable name="N" type="real" role="state" initial="100.0"/></variables>
+    <equations><equation>D(N) = -lambda * N</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="g" type="DecayModel"/></instances>
+    <schedule><sequence><continueFor time="60"/></sequence></schedule>
+  </system></systems>
+  <solutionParameters reltol="1e-6" abstol="1e-9"/>
+</esml>

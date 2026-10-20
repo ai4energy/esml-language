@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `<extendsFrom>` 文本形态：子模型继承 Base 的参数 k，并增加参数 u 与方程
+     y' = −k·y + u。canonical 拼法是 camelCase `extendsFrom`，kebab 写法会被拒绝。
+     `check` errors=0。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L3_ExtendsFromChild">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes>
+    <modelType name="Base" discipline="generic">
+      <parameters><parameter name="k" type="real" default="0.3"/></parameters>
+    </modelType>
+    <modelType name="Child" discipline="generic">
+      <extendsFrom>Base</extendsFrom>
+      <variables><variable name="x" type="real" role="state" initial="1.0"/></variables>
+      <equations><equation>D(x) = -k * x</equation></equations>
+    </modelType>
+  </modelTypes>
+  <systems><system name="S">
+    <instances><instance name="c" type="Child"/></instances>
+    <schedule><sequence><continueFor time="1"/></sequence></schedule>
+  </system></systems>
+</esml>

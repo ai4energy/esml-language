@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 常用数学内建：三角/指数/取整/夹取、min/max/mid 等，每个各用一次。
+     实现遇到未注册的函数名会显式报错，不会静默忽略。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_Builtins">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes><modelType name="M">
+    <parameters>
+      <parameter name="w" type="real" default="2.0"/>
+      <parameter name="a" type="real" default="3.0"/>
+      <parameter name="b" type="real" default="1.0"/>
+    </parameters>
+     <variables>
+       <variable name="x"  type="real" role="state" initial="1.0"/>
+       <variable name="s1" type="real" role="algebraic"/>
+       <variable name="s2" type="real" role="algebraic"/>
+       <variable name="s3" type="real" role="algebraic"/>
+       <variable name="s4" type="real" role="algebraic"/>
+     </variables>
+     <equations>
+       <equation>D(x) = -x</equation>
+       <equation>s1 = sin(w * time) + exp(-x)</equation>
+       <equation>s2 = sqrt(a) + abs(-b) + floor(a) + ceil(b)</equation>
+       <equation>s3 = clamp(a, 0.0, 2.0) + min(a, b) + max(a, b) + mid(a, b, 0.5)</equation>
+       <equation>s4 = sign(a - b)</equation>
+     </equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="M"/></instances>
+    <schedule><sequence><continueFor time="1"/></sequence></schedule>
+  </system></systems>
+</esml>

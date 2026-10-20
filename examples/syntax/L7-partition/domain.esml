@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 顶层 `<domains><domain name><discretization intervals/></domain></domains>`：
+     声明计算域及其离散区间数。`check` errors=0（声明段，读入文档结构）。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L7_Domain">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <domains>
+    <domain name="time">
+      <discretization intervals="10"/>
+    </domain>
+  </domains>
+  <modelTypes><modelType name="M" discipline="generic">
+    <parameters><parameter name="x" type="real" default="3.0"/></parameters>
+    <variables><variable name="y" type="real" role="algebraic"/></variables>
+    <equations><equation>y = x</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="M"/></instances>
+    <schedule><sequence><continueFor time="0"/></sequence></schedule>
+  </system></systems>
+</esml>

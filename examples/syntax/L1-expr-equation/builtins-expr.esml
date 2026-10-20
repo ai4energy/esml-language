@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 常用表达式内建：三角/双曲/反三角/对数/取整/夹取、同伦与松弛、复数实部、
+     `noEvent`/`edge`（解析糖）、数组归约 `sum/mean/product/size`、时间积分 `integral`。
+     域安全取值：asin/acos/atanh 要求 |a| < 1，acosh 要求 b ≥ 1，ln/log10 要求 b > 0。
+     `solve`（system S）稳态全解；`simulate`（system I）验时间积分
+     （I = integral(a=2)，t = 1 → 2.0；integral 无稳态，故走 simulate）。
+     延迟与复数用法另见 `builtins-delay.esml`、`builtins-complex.esml`。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_BuiltinsExpr">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes>
+    <modelType name="B" discipline="generic">
+      <parameters>
+        <parameter name="a" type="real" default="0.5"/>
+        <parameter name="b" type="real" default="2.0"/>
+        <parameter name="m" type="real" default="7.0"/>
+        <parameter name="n" type="real" default="3.0"/>
+      </parameters>
+      <variables>
+        <variable name="v_cos" type="real" role="algebraic"/>
+        <variable name="v_tan" type="real" role="algebraic"/>
+        <variable name="v_asin" type="real" role="algebraic"/>
+        <variable name="v_acos" type="real" role="algebraic"/>
+        <variable name="v_atan" type="real" role="algebraic"/>
+        <variable name="v_sinh" type="real" role="algebraic"/>
+        <variable name="v_cosh" type="real" role="algebraic"/>
+        <variable name="v_tanh" type="real" role="algebraic"/>
+        <variable name="v_asinh" type="real" role="algebraic"/>
+        <variable name="v_acosh" type="real" role="algebraic"/>
+        <variable name="v_atanh" type="real" role="algebraic"/>
+        <variable name="v_ln" type="real" role="algebraic"/>
+        <variable name="v_log10" type="real" role="algebraic"/>
+        <variable name="v_atan2" type="real" role="algebraic"/>
+        <variable name="v_integer" type="real" role="algebraic"/>
+        <variable name="v_mod" type="real" role="algebraic"/>
+        <variable name="v_homotopy" type="real" role="algebraic"/>
+        <variable name="v_relaxation" type="real" role="algebraic"/>
+        <variable name="v_real" type="real" role="algebraic"/>
+        <variable name="v_noEvent" type="real" role="algebraic"/>
+        <variable name="v_edge" type="real" role="algebraic"/>
+        <variable name="v_sum" type="real" role="algebraic"/>
+        <variable name="v_mean" type="real" role="algebraic"/>
+        <variable name="v_product" type="real" role="algebraic"/>
+        <variable name="v_size" type="real" role="algebraic"/>
+        <variable name="x" type="real" role="algebraic" array="n"/>
+      </variables>
+      <equations>
+        <equation>v_cos = cos(a)</equation>
+        <equation>v_tan = tan(a)</equation>
+        <equation>v_asin = asin(a)</equation>
+        <equation>v_acos = acos(a)</equation>
+        <equation>v_atan = atan(a)</equation>
+        <equation>v_sinh = sinh(a)</equation>
+        <equation>v_cosh = cosh(a)</equation>
+        <equation>v_tanh = tanh(a)</equation>
+        <equation>v_asinh = asinh(a)</equation>
+        <equation>v_acosh = acosh(b)</equation>
+        <equation>v_atanh = atanh(a)</equation>
+        <equation>v_ln = ln(b)</equation>
+        <equation>v_log10 = log10(b)</equation>
+        <equation>v_atan2 = atan2(a, b)</equation>
+        <equation>v_integer = integer(b)</equation>
+        <equation>v_mod = mod(m, n)</equation>
+        <equation>v_homotopy = homotopy(a, b)</equation>
+        <equation>v_relaxation = relaxation(0.0, 10.0, 1.0)</equation>
+        <equation>v_real = real(b)</equation>
+        <equation>v_noEvent = noEvent(a)</equation>
+        <equation>v_edge = edge(a > 0.0)</equation>
+        <equation>v_sum = sum({1.0, 2.0, 3.0})</equation>
+        <equation>v_mean = mean({1.0, 2.0, 3.0})</equation>
+        <equation>v_product = product({2.0, 3.0})</equation>
+        <equation>x = {1.0, 2.0, 3.0}</equation>
+        <equation>v_size = size(x)</equation>
+      </equations>
+    </modelType>
+    <modelType name="Integ" discipline="generic">
+      <parameters><parameter name="a" type="real" default="2.0"/></parameters>
+      <variables><variable name="I" type="real" role="state" initial="0.0"/></variables>
+      <equations><equation>I = integral(a)</equation></equations>
+    </modelType>
+  </modelTypes>
+  <systems>
+    <system name="S">
+      <instances><instance name="g" type="B"/></instances>
+      <schedule><sequence><continueFor time="1"/></sequence></schedule>
+    </system>
+    <system name="I">
+      <instances><instance name="g" type="Integ"/></instances>
+      <schedule><sequence><continueFor time="3"/></sequence></schedule>
+    </system>
+  </systems>
+</esml>

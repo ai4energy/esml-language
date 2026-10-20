@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `<tasks>`：顶层容器，内容按松散规则透传任意子元素；它是 `<computeTasks>` 之外的
+     可选外层壳，可与顶层其它元素并列。
+     本例在同一 `<esml>` 内并列写 `<tasks><computeTasks>…</computeTasks></tasks>`，
+     验证外层容器被识别且不与 `<computeTasks>` 冲突。`tasks`（system S）exit=0。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="T_Tasks">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes><modelType name="DecayModel" discipline="generic">
+    <parameters><parameter name="lambda" type="real" default="0.05"/></parameters>
+    <variables><variable name="N" type="real" role="state" initial="100.0"/></variables>
+    <equations><equation>D(N) = -lambda * N</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="g" type="DecayModel"/></instances>
+    <schedule><sequence><continueFor time="60"/></sequence></schedule>
+  </system></systems>
+  <tasks>
+    <computeTasks name="t-outer" target="S">
+      <task name="sim" kind="simulate">
+        <tspan from="0" to="60"/>
+        <solver name="Tsit5"/>
+      </task>
+    </computeTasks>
+  </tasks>
+</esml>

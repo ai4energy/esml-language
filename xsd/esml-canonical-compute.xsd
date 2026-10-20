@@ -1,0 +1,591 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ESML canonical — compute / task subset。
+
+  计算求解体系：task 声明（kind + 载荷）→ 构造问题 → 求解。七类 kind：
+    simulate 仿真 · sensitivity 敏感性 · estimation 参数估计 · optimize 优化 ·
+    control 控制 MPC · surrogate 数据驱动代理 · validation 验证。
+
+  - 目标模型 = 模型体系里的 <system>（computeTasks @target 或逐 task @target）。
+  - 自由度（欠定/钉值）由系统级 <fixed>/<free> 标签表达，不在此声明；
+    本 schema 只描述“任务声明”本身。
+  - 载荷元素逐类对应任务参数（perturb_vars / estimate_vars / decision_vars /
+    bounds / …）；观测数据用 <data source="…"/> 外部引用。
+  - 数值矩阵/黑盒闭包等无法 XML 化的载荷走 <extension>（见下）；
+    本子集只保证“声明面”可 XSD 校验。
+  - `<task>` 末尾以命名形式列出任务语义扩展元素
+    （<verdict>/<checks>/<check>/<dataset>/<features>/<feature>/<target[s]>/<hyper-params>/
+    <controller>/<setpoint>/<gains>/<actuator>/<sensor>/<controlled>/<method>/<test-data>/
+    <reference>/<constraints>/<constraint>/<benchmarks>/<benchmark>/<status>/<tolerance>/
+    <control-vars>/<design-vars>/<inputs>/<outputs>/<outputList>）+ `<xs:any namespace="##other">`
+    兜底。XSD 1.0 UPA 限制让 `<xs:any>` 与同 ns 已命名元素冲突（已记于文件顶部说明），故
+    采用**命名枚举**。这些元素仅作元数据承载，不参与求解语义。
+
+  校验：python3 -c "import xmlschema; xmlschema.XMLSchema('xsd/esml-canonical-compute.xsd').validate('<file>')"
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:esml="https://www.ai4energy.cn/esml/v1"
+           targetNamespace="https://www.ai4energy.cn/esml/v1"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified"
+           version="1.0.0">
+
+  <xs:include schemaLocation="esml-canonical-common.xsd"/>
+  <xs:simpleType name="TaskKindType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="simulate"/>
+      <xs:enumeration value="sensitivity"/>
+      <xs:enumeration value="estimation"/>
+      <xs:enumeration value="optimize"/>
+      <xs:enumeration value="control"/>
+      <xs:enumeration value="surrogate"/>
+      <xs:enumeration value="validation"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- 通用子元素 -->
+  <xs:complexType name="TspanType">
+    <xs:attribute name="from" type="xs:double" use="optional" default="0"/>
+    <xs:attribute name="to" type="xs:double" use="required"/>
+    <xs:attribute name="unit" type="esml:UnitExpressionType" use="optional"/>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+
+  <xs:complexType name="VarRefType">
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="lower" type="xs:double" use="optional"/>
+    <xs:attribute name="upper" type="xs:double" use="optional"/>
+    <xs:attribute name="fraction" type="xs:double" use="optional"/>
+    <xs:attribute name="initial" type="xs:double" use="optional"/>
+    <xs:attribute name="unit" type="esml:UnitExpressionType" use="optional"/>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+
+  <xs:complexType name="VarListType">
+    <xs:sequence>
+      <xs:element name="var" type="esml:VarRefType" minOccurs="1" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="DataRefType">
+    <xs:attribute name="source" type="xs:string" use="optional"/>
+    <xs:attribute name="cols" type="xs:string" use="optional"/>
+    <xs:attribute name="format" type="xs:string" use="optional"/>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+
+  <!--
+    ─────────────────────────────────────────────────────────
+    任务级语义扩展元素共用的 complexType
+    ─────────────────────────────────────────────────────────
+    文档可在 `<task>` 内携带领域特定的元数据：
+      <verdict>PASS|FAIL</verdict>
+      <checks><check name="…">…</check>*</checks>
+      <dataset source="…" cols="…" format="…"/>
+      <features><feature name="…"/>*</features>
+      <target name="…"/>
+      <hyper-params><param name="…" value="…"/>*</hyper-params>
+      <controller kind="…"><setpoint var="…" value="…"/><gains Kp="…" Ki="…" Kd="…"/></controller>
+      <actuator var="…" lowerBound="…" upperBound="…"/>
+      <sensor var="…"/>
+      <method name="…" samples="…" horizon="…"/>
+      <test-data source="…" format="…"/>
+      <reference source="…" format="…"/>
+      <constraints><constraint name="…" expr="…"/>*</constraints>
+      <benchmarks><benchmark name="…" expected="…" unit="…" tol="…"/>*</benchmarks>
+      <status>PASS|FAIL</status>
+      <tolerance>5%</tolerance>
+    这些字段在求解中仅作元数据承载，不改变求解语义。
+    它们在 `<task>` 内被统一接收：XSD 1.0 的 UPA 限制使 `<xs:any>` 不能与同命名空间的
+    已命名元素并存，故以命名形式逐一列出，并用 `<xs:any namespace="##other">` 兜底其他内容。
+  -->
+
+  <!-- 简单文本型扩展元素（verdict / status / tolerance / description）-->
+  <xs:complexType name="VendorTextType" mixed="true">
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+
+  <!-- 数据源型扩展元素（dataset / test-data / reference）-->
+  <xs:complexType name="VendorDataRefType">
+    <xs:attribute name="source" type="xs:string" use="optional"/>
+    <xs:attribute name="cols" type="xs:string" use="optional"/>
+    <xs:attribute name="format" type="xs:string" use="optional"/>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+
+  <!-- 名称引用型扩展元素（target / feature / param / var-name）-->
+  <xs:complexType name="VendorNamedRefType">
+    <xs:attribute name="name" type="xs:string" use="optional"/>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+
+  <!-- 含 <check> 子元素的容器（checks）-->
+  <xs:complexType name="VendorChecksType">
+    <xs:sequence>
+      <xs:element name="check" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType mixed="true">
+          <xs:attribute name="name" type="xs:string" use="optional"/>
+          <xs:anyAttribute processContents="lax"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+
+  <!-- 含 <feature> 子元素的容器（features）-->
+  <xs:complexType name="VendorFeaturesType">
+    <xs:sequence>
+      <xs:element name="feature" type="esml:VendorNamedRefType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+
+  <!-- 含 <target> 子元素的容器（targets）-->
+  <xs:complexType name="VendorTargetsType">
+    <xs:sequence>
+      <xs:element name="target" type="esml:VendorNamedRefType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+
+  <!-- 含 <constraint> 子元素的容器（constraints）-->
+  <xs:complexType name="VendorConstraintsType">
+    <xs:sequence>
+      <xs:element name="constraint" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType mixed="true">
+          <xs:attribute name="name" type="xs:string" use="optional"/>
+          <xs:attribute name="expr" type="xs:string" use="optional"/>
+          <xs:anyAttribute processContents="lax"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+
+  <!-- 含 <param> 子元素的容器（hyper-params）-->
+  <xs:complexType name="VendorHyperParamsType">
+    <xs:sequence>
+      <xs:element name="param" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="name" type="xs:string" use="optional"/>
+          <xs:attribute name="value" type="xs:string" use="optional"/>
+          <xs:anyAttribute processContents="lax"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+
+  <!-- 含 <benchmark> 子元素的容器（benchmarks）-->
+  <xs:complexType name="VendorBenchmarksType">
+    <xs:sequence>
+      <xs:element name="benchmark" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="name" type="xs:string" use="optional"/>
+          <xs:attribute name="expected" type="xs:string" use="optional"/>
+          <xs:attribute name="unit" type="esml:UnitExpressionType" use="optional"/>
+          <xs:attribute name="tol" type="xs:string" use="optional"/>
+          <xs:attribute name="source" type="xs:string" use="optional"/>
+          <xs:anyAttribute processContents="lax"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+
+  <!-- 控制器（controller 含 setpoint/gains 子元素；setpoint/control-vars 内允许 <var> 引用）-->
+  <xs:complexType name="VendorControllerType">
+    <xs:sequence>
+      <xs:element name="setpoint" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType mixed="true">
+          <xs:sequence>
+            <xs:element name="var" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:attribute name="name" type="xs:string" use="optional"/>
+                <xs:attribute name="value" type="xs:string" use="optional"/>
+                <xs:anyAttribute processContents="lax"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="var" type="xs:string" use="optional"/>
+          <xs:attribute name="value" type="xs:string" use="optional"/>
+          <xs:anyAttribute processContents="lax"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="gains" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="Kp" type="xs:string" use="optional"/>
+          <xs:attribute name="Ki" type="xs:string" use="optional"/>
+          <xs:attribute name="Kd" type="xs:string" use="optional"/>
+          <xs:anyAttribute processContents="lax"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="kind" type="xs:string" use="optional"/>
+    <xs:attribute name="horizon" type="xs:string" use="optional"/>
+    <xs:attribute name="sampleTime" type="xs:string" use="optional"/>
+    <xs:attribute name="controlHorizon" type="xs:string" use="optional"/>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+
+  <!-- 估计参数（estimate 同时支持属性式与 <var> 子元素式）-->
+  <xs:complexType name="EstimateRefType">
+    <xs:sequence>
+      <xs:element name="var" type="esml:VarRefType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="optional"/>
+    <xs:attribute name="initial" type="xs:double" use="optional"/>
+    <xs:attribute name="lowerBound" type="xs:string" use="optional"/>
+    <xs:attribute name="upperBound" type="xs:string" use="optional"/>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+
+  <!-- 决策变量（decision 同时支持属性式与 <var> 子元素式）-->
+  <xs:complexType name="DecisionRefType">
+    <xs:sequence>
+      <xs:element name="var" type="esml:VarRefType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="optional"/>
+    <xs:attribute name="lower" type="xs:double" use="optional"/>
+    <xs:attribute name="upper" type="xs:double" use="optional"/>
+    <xs:attribute name="initial" type="xs:double" use="optional"/>
+    <xs:attribute name="unit" type="esml:UnitExpressionType" use="optional"/>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+
+  <xs:complexType name="TaskType">
+    <!--
+      <task>：`kind` 取值见 `TaskKindType`；每类按需带：
+        simulate      → tspan?/solver?
+        sensitivity   → perturb(<var … fraction/>)* [output?]
+        estimation    → estimate(<var …/>)* + data?
+        optimize      → decision(<var lower upper/>)* + objective? + solver?(hi|ipopt)
+        control(MPC)  → mpc(N dt …)（线性预测矩阵 A/B/c 走 extension）
+        surrogate     → data? + surrogate(degree/method)?  (X/Y 数据外部)
+        validation    → data? + metrics?
+
+      实际文档中 task 子元素的顺序是灵活的（扩展元数据可前可后）。
+      若用 `<xs:sequence>` 强约束顺序会拒绝合法文档，故改用单一
+      `<xs:choice minOccurs="0" maxOccurs="unbounded">` 容纳全部 task 子元素（核心结构
+      与扩展元数据），允许任意顺序与重复；末尾 `<xs:any namespace="##other">`
+      兜底其他命名空间的内容（skip）。
+    -->
+    <xs:sequence>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <!-- 核心结构（kind-specific payload）-->
+        <xs:element name="tspan" type="esml:TspanType"/>
+        <xs:element name="solver">
+          <xs:complexType>
+            <xs:attribute name="name" type="xs:string" use="optional"/>
+            <xs:attribute name="abstol" type="xs:double" use="optional"/>
+            <xs:attribute name="reltol" type="xs:double" use="optional"/>
+            <xs:attribute name="saveat" type="xs:double" use="optional"/>
+            <xs:attribute name="maxsteps" type="xs:int" use="optional"/>
+            <xs:anyAttribute processContents="lax"/>
+          </xs:complexType>
+        </xs:element>
+        <!-- 内联样本表（estimation / validation / surrogate 载荷；`tasks.rs`
+             `samples` 分支）。`x` 可逗号分隔多值，`y` 必填。 -->
+        <xs:element name="samples">
+          <xs:complexType><xs:sequence>
+            <xs:element name="sample" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:attribute name="x" type="xs:string" use="optional"/>
+                <xs:attribute name="y" type="xs:double" use="required"/>
+                <xs:anyAttribute processContents="lax"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
+        </xs:element>
+        <xs:element name="perturb">
+          <xs:complexType>
+            <xs:attribute name="name" type="xs:string" use="optional"/>
+            <xs:attribute name="lower" type="xs:double" use="optional"/>
+            <xs:attribute name="upper" type="xs:double" use="optional"/>
+            <xs:attribute name="fraction" type="xs:double" use="optional"/>
+            <xs:attribute name="initial" type="xs:double" use="optional"/>
+            <xs:attribute name="unit" type="esml:UnitExpressionType" use="optional"/>
+            <xs:attribute name="range" type="xs:string" use="optional"/>
+            <xs:attribute name="distribution" type="xs:string" use="optional"/>
+            <xs:anyAttribute processContents="lax"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="estimate" type="esml:EstimateRefType"/>
+        <xs:element name="decision" type="esml:DecisionRefType"/>
+        <xs:element name="data" type="esml:DataRefType"/>
+        <xs:element name="output" type="esml:VarListType"/>
+        <xs:element name="objective">
+          <xs:complexType mixed="true">
+            <xs:sequence>
+              <xs:element name="expr" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType mixed="true">
+                  <xs:sequence>
+                    <xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+                  </xs:sequence>
+                  <xs:anyAttribute processContents="lax"/>
+                </xs:complexType>
+              </xs:element>
+              <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+            <xs:attribute name="direction" type="xs:string" use="optional"/>
+            <xs:attribute name="name" type="xs:string" use="optional"/>
+            <xs:attribute name="target" type="xs:string" use="optional"/>
+            <xs:anyAttribute processContents="lax"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="mpc">
+          <xs:complexType>
+            <xs:attribute name="N" type="xs:int" use="optional"/>
+            <xs:attribute name="dt" type="xs:double" use="optional"/>
+            <xs:attribute name="a" type="xs:string" use="optional"/>
+            <xs:attribute name="b" type="xs:string" use="optional"/>
+            <xs:attribute name="c" type="xs:string" use="optional"/>
+            <xs:attribute name="x0" type="xs:string" use="optional"/>
+            <xs:attribute name="xref" type="xs:string" use="optional"/>
+            <xs:attribute name="umin" type="xs:string" use="optional"/>
+            <xs:attribute name="umax" type="xs:string" use="optional"/>
+            <xs:attribute name="q" type="xs:double" use="optional"/>
+            <xs:attribute name="r" type="xs:double" use="optional"/>
+            <xs:attribute name="steps" type="xs:int" use="optional"/>
+            <xs:anyAttribute processContents="lax"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="surrogate">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="samples" minOccurs="0" maxOccurs="1">
+                <xs:complexType><xs:sequence>
+                  <xs:element name="sample" minOccurs="0" maxOccurs="unbounded">
+                    <xs:complexType>
+                      <xs:attribute name="x" type="xs:string" use="optional"/>
+                      <xs:attribute name="y" type="xs:double" use="required"/>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence></xs:complexType>
+              </xs:element>
+              <xs:element name="hyperParams" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="param" minOccurs="0" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:attribute name="name" type="xs:string" use="optional"/>
+                        <xs:attribute name="value" type="xs:string" use="optional"/>
+                        <xs:anyAttribute processContents="lax"/>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:anyAttribute processContents="lax"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="method" type="xs:string" use="optional"/>
+            <xs:attribute name="degree" type="xs:int" use="optional"/>
+            <xs:attribute name="model" type="xs:string" use="optional"/>
+            <xs:anyAttribute processContents="lax"/>
+          </xs:complexType>
+        </xs:element>
+        <!--
+          511 C6: `<sampling size=N>` —— DOE 样本数（surrogate/data-driven 任务子元素）
+          与 `<samples>` 内联行（surrogate 内）非同一物：sampling 声明 DOE 维度，samples 内联 (X, y) 数据点。
+          属性仅 `size`（必填，≥1）；无子元素。canonical 命名，camelCase。
+        -->
+        <xs:element name="sampling">
+          <xs:complexType>
+            <xs:attribute name="size" type="xs:int" use="required"/>
+            <xs:anyAttribute processContents="lax"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="metrics">
+          <xs:complexType><xs:sequence>
+            <xs:element name="metric" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:attribute name="name" type="xs:string" use="optional"/>
+                <xs:attribute name="expected" type="xs:string" use="optional"/>
+                <xs:attribute name="tolerancePct" type="xs:string" use="optional"/>
+                <xs:anyAttribute processContents="lax"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence></xs:complexType>
+        </xs:element>
+        <!--
+          任务语义扩展元素（命名枚举，避免 UPA 冲突）
+          ─────────────────────────────────────────────────────────────────────
+          XSD 1.0 UPA 限制：`<xs:any>` 与同命名空间的已命名元素并存会冲突，故**以命名形式
+          列出**常见的扩展元素；它们仅作元数据承载，不参与求解语义。
+        -->
+        <!-- 简单文本 -->
+        <xs:element name="verdict" type="esml:VendorTextType"/>
+        <xs:element name="status" type="esml:VendorTextType"/>
+        <xs:element name="tolerance" type="esml:VendorTextType"/>
+        <xs:element name="description" type="esml:VendorTextType"/>
+        <!-- 数据源 -->
+        <xs:element name="dataset" type="esml:VendorDataRefType"/>
+        <xs:element name="testData" type="esml:VendorDataRefType"/>
+        <xs:element name="reference" type="esml:VendorDataRefType"/>
+        <!-- 名称引用 + 子元素容器 -->
+        <xs:element name="target" type="esml:VendorNamedRefType"/>
+        <xs:element name="targets" type="esml:VendorTargetsType"/>
+        <xs:element name="features" type="esml:VendorFeaturesType"/>
+        <xs:element name="checks" type="esml:VendorChecksType"/>
+        <xs:element name="constraints" type="esml:VendorConstraintsType"/>
+        <xs:element name="constraint">
+          <xs:complexType mixed="true">
+            <xs:attribute name="name" type="xs:string" use="optional"/>
+            <xs:attribute name="expr" type="xs:string" use="optional"/>
+            <xs:anyAttribute processContents="lax"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="hyperParams" type="esml:VendorHyperParamsType"/>
+        <xs:element name="benchmarks" type="esml:VendorBenchmarksType"/>
+        <xs:element name="benchmark">
+          <xs:complexType mixed="true">
+            <xs:sequence>
+              <xs:any namespace="##targetNamespace" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+              <xs:any namespace="##other" processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+            <xs:attribute name="name" type="xs:string" use="optional"/>
+            <xs:attribute name="expected" type="xs:string" use="optional"/>
+            <xs:attribute name="unit" type="esml:UnitExpressionType" use="optional"/>
+            <xs:attribute name="tol" type="xs:string" use="optional"/>
+            <xs:attribute name="source" type="xs:string" use="optional"/>
+            <xs:anyAttribute processContents="lax"/>
+          </xs:complexType>
+        </xs:element>
+        <!-- 控制/MPC 元素 -->
+        <xs:element name="controller" type="esml:VendorControllerType"/>
+        <xs:element name="setpoint">
+          <xs:complexType mixed="true">
+            <xs:sequence>
+              <xs:element name="var" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:attribute name="name" type="xs:string" use="optional"/>
+                  <xs:attribute name="value" type="xs:string" use="optional"/>
+                  <xs:anyAttribute processContents="lax"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="var" type="xs:string" use="optional"/>
+            <xs:attribute name="value" type="xs:string" use="optional"/>
+            <xs:anyAttribute processContents="lax"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="actuator">
+          <xs:complexType>
+            <xs:attribute name="var" type="xs:string" use="optional"/>
+            <xs:attribute name="lowerBound" type="xs:string" use="optional"/>
+            <xs:attribute name="upperBound" type="xs:string" use="optional"/>
+            <xs:attribute name="range" type="xs:string" use="optional"/>
+            <xs:anyAttribute processContents="lax"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="sensor">
+          <xs:complexType>
+            <xs:attribute name="var" type="xs:string" use="optional"/>
+            <xs:anyAttribute processContents="lax"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="controlled">
+          <xs:complexType>
+            <xs:attribute name="var" type="xs:string" use="optional"/>
+            <xs:attribute name="setpoint" type="xs:string" use="optional"/>
+            <xs:attribute name="tolerance" type="xs:string" use="optional"/>
+            <xs:anyAttribute processContents="lax"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="controlVars">
+          <xs:complexType mixed="true">
+            <xs:sequence>
+              <xs:element name="var" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:attribute name="name" type="xs:string" use="optional"/>
+                  <xs:anyAttribute processContents="lax"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:anyAttribute processContents="lax"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="designVars">
+          <xs:complexType mixed="true">
+            <xs:sequence>
+              <xs:element name="var" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:attribute name="name" type="xs:string" use="optional"/>
+                  <xs:anyAttribute processContents="lax"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:anyAttribute processContents="lax"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="inputs">
+          <xs:complexType mixed="true">
+            <xs:sequence>
+              <xs:element name="var" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:attribute name="name" type="xs:string" use="optional"/>
+                  <xs:anyAttribute processContents="lax"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:anyAttribute processContents="lax"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="outputs">
+          <xs:complexType mixed="true">
+            <xs:sequence>
+              <xs:element name="var" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:attribute name="name" type="xs:string" use="optional"/>
+                  <xs:anyAttribute processContents="lax"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:anyAttribute processContents="lax"/>
+          </xs:complexType>
+        </xs:element>
+        <!-- 方法 / solver 选项 -->
+        <xs:element name="method">
+          <xs:complexType>
+            <xs:attribute name="name" type="xs:string" use="optional"/>
+            <xs:attribute name="samples" type="xs:string" use="optional"/>
+            <xs:attribute name="horizon" type="xs:string" use="optional"/>
+            <xs:attribute name="timestep" type="xs:string" use="optional"/>
+            <xs:attribute name="generations" type="xs:string" use="optional"/>
+            <xs:attribute name="population" type="xs:string" use="optional"/>
+            <xs:anyAttribute processContents="lax"/>
+          </xs:complexType>
+        </xs:element>
+        <!-- 输出（含 <var> 子元素）— 与现有 output/VarListType 共存 -->
+        <xs:element name="outputList">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="var" type="esml:VarRefType" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+            <xs:anyAttribute processContents="lax"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+      <!-- 非 target ns 兜底（skip，不校验）-->
+      <xs:any namespace="##other" processContents="skip"
+               minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="esml:Ident" use="required"/>
+    <xs:attribute name="kind" type="esml:TaskKindType" use="required"/>
+    <xs:attribute name="target" type="xs:string" use="optional"/>
+    <xs:attribute name="description" type="xs:string" use="optional"/>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+
+  <xs:element name="computeTasks">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="task" type="esml:TaskType" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="name" type="xs:string" use="optional"/>
+      <xs:attribute name="target" type="xs:string" use="optional"/>
+      <xs:attribute name="schema" type="xs:string" use="optional"/>
+      <xs:anyAttribute processContents="lax"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

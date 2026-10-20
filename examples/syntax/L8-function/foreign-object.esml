@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `<foreignObjects><foreignObject name class><method name><set name value/></method></foreignObject></foreignObjects>`：
+     宿主对象方法，在方程里以 `fo.Method()` 调用，方法体是「赋值后返回」。
+     本例 y = fo.Level()，Level 返回常量 3.0。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L8_ForeignObject">
+  <modelTypes>
+    <modelType name="M">
+      <variables>
+        <variable name="y" type="real" role="algebraic" initial="0.0"/>
+      </variables>
+      <equations>
+        <equation>y = fo.Level()</equation>
+      </equations>
+    </modelType>
+  </modelTypes>
+  <foreignObjects>
+    <foreignObject name="fo" class="sensor">
+      <method name="Level">
+        <set path="y" value="3.0"/>
+      </method>
+    </foreignObject>
+  </foreignObjects>
+  <systems>
+    <system name="S">
+      <instances>
+        <instance name="m" type="M"/>
+      </instances>
+    </system>
+  </systems>
+</esml>

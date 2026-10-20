@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 同一系统内两个实例（canonical `type=` 写法）：a 与 b 均实例化 M，同参数同行为，
+     a.x 与 b.x 同轨（1.0·e^(−0.2t)，稳态 0）。
+     旧 `component=` / `model-type=` 别名已移除，出现时会报错并提示改用 `type=`。
+     `check` errors=0；`solve`（system S）exit=0。 -->
+ <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L5_ComponentAlias">
+   <modelTypes><modelType name="M">
+     <parameters><parameter name="k" type="real" default="0.2"/></parameters>
+     <variables><variable name="x" type="real" role="state" initial="1.0"/></variables>
+     <equations><equation>D(x) = -k * x</equation></equations>
+   </modelType></modelTypes>
+   <systems><system name="S" discipline="generic">
+     <instances>
+       <instance name="a" type="M"/>
+       <instance name="b" type="M"/>
+     </instances>
+     <schedule><sequence><continueFor time="1"/></sequence></schedule>
+   </system></systems>
+ </esml>

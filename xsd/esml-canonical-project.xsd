@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ESML canonical — Project container subset (P layer).
+  `Project { name; systems[]; tasks[]; scenario_chain[]; results[] }`。
+
+  Self-contained (does not include basic/compute): `<computeTasks>` is accepted
+  loosely so the seven-task payload stays validated by `esml-canonical-compute.xsd`.
+
+  Canonical element names are **camelCase** (`systemRef`, `computeTasks`,
+  `scenarioChain`); kebab-case spellings are accepted as compatibility aliases.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:esml="https://www.ai4energy.cn/esml/v1"
+           targetNamespace="https://www.ai4energy.cn/esml/v1"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified"
+           version="1.0.0">
+
+  <xs:complexType name="SystemRefType">
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="src" type="xs:string" use="required"/>
+    <xs:attribute name="system" type="xs:string" use="optional"/>
+    <xs:attribute name="libroot" type="xs:string" use="optional"/>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+
+  <xs:complexType name="SetType" mixed="true">
+    <xs:attribute name="path" type="xs:string" use="optional"/>
+    <xs:attribute name="name" type="xs:string" use="optional"/>
+    <xs:attribute name="param" type="xs:string" use="optional"/>
+    <xs:attribute name="value" type="xs:string" use="optional"/>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+
+  <xs:complexType name="PointType">
+    <xs:attribute name="t" type="xs:double" use="required"/>
+    <xs:attribute name="y" type="xs:double" use="required"/>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+
+  <xs:complexType name="DataType">
+    <xs:sequence>
+      <xs:element name="point" type="esml:PointType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="t" type="xs:double" use="optional"/>
+    <xs:attribute name="y" type="xs:double" use="optional"/>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+
+  <xs:complexType name="ScenarioType">
+    <xs:sequence>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="set" type="esml:SetType"/>
+        <xs:element name="data" type="esml:DataType"/>
+      </xs:choice>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="tasks" type="xs:string" use="optional"/>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+
+  <xs:complexType name="SystemRefListType">
+    <xs:sequence>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="systemRef" type="esml:SystemRefType"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ComputeTasksType">
+    <xs:sequence>
+      <xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="optional"/>
+    <xs:attribute name="target" type="xs:string" use="optional"/>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+
+  <xs:complexType name="ScenarioListType">
+    <xs:sequence>
+      <xs:element name="scenario" type="esml:ScenarioType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="project">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="systems" type="esml:SystemRefListType" minOccurs="0" maxOccurs="1"/>
+        <xs:choice minOccurs="0" maxOccurs="1">
+          <xs:element name="computeTasks" type="esml:ComputeTasksType"/>
+        </xs:choice>
+        <xs:choice minOccurs="0" maxOccurs="1">
+          <xs:element name="scenarioChain" type="esml:ScenarioListType"/>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attribute name="name" type="xs:string" use="optional"/>
+      <xs:attribute name="description" type="xs:string" use="optional"/>
+      <xs:anyAttribute processContents="lax"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

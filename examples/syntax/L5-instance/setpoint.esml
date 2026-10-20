@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `<setpoint>`：控制器设定点，可写成属性形（`var=` / `value=`）
+     或子元素形（`<var name value/>`）。它挂在 control 任务的 controller 下，
+     实现只做元数据透传、不参与求解。`check` errors=0。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L5_Setpoint">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes><modelType name="DecayModel" discipline="generic">
+    <parameters><parameter name="lambda" type="real" default="0.05"/></parameters>
+    <variables><variable name="N" type="real" role="state" initial="100.0"/></variables>
+    <equations><equation>D(N) = -lambda * N</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="g" type="DecayModel"/></instances>
+    <schedule><sequence><continueFor time="60"/></sequence></schedule>
+  </system></systems>
+  <computeTasks name="t-sp" target="S">
+    <task name="ctrl" kind="control">
+      <mpc N="5" dt="1"/>
+      <controller kind="PI">
+        <setpoint var="g.N" value="50.0"/>
+      </controller>
+    </task>
+  </computeTasks>
+</esml>

@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `<portTypes><portType name connectorFamily><portVariable role type/></portType></portTypes>`：
+     电气 Pin = v（potential）+ i（flow）。端口对连时 potential 相等、flow 守恒；
+     模型侧用 `<port name portType="…"/>` 引用。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_PortElectrical">
+  <portTypes><portType name="Pin" connectorFamily="electrical">
+    <variables>
+      <portVariable name="v" role="potential" type="real"/>
+      <portVariable name="i" role="flow"      type="real"/>
+    </variables>
+  </portType></portTypes>
+  <modelTypes><modelType name="Src">
+    <ports><port name="p" portType="Pin"/></ports>
+    <parameters><parameter name="V" type="real" default="0.0"/></parameters>
+    <variables>
+      <variable name="p.v" type="real" role="algebraic"/>
+      <variable name="p.i" type="real" role="algebraic"/>
+    </variables>
+    <equations><equation>p.v = V</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S" discipline="electrical">
+    <instances><instance name="src" type="Src"/></instances>
+    <schedule><sequence><continueFor time="0"/></sequence></schedule>
+  </system></systems>
+</esml>

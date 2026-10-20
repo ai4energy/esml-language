@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 数组元素引用与切片：`x[i]`（方括号、1-based）、`x[i,j]`（多维，行主序展平）、
+     `x[lo:hi]`（切片，含两端点）、`x[i] = v`（元素赋值，逐元素展开）。
+     与 `sum/mean/size` 的标量归约正交。`check` errors=0；`solve` 稳态全解
+     （切片归约示例：sum(T[1:4]) = 0+10+20+30 = 60）。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_ArrayIndex">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <orderedSet name="Species" static="true">
+    <element>A</element><element>B</element><element>C</element>
+  </orderedSet>
+  <modelTypes>
+    <modelType name="M1D" discipline="generic">
+      <variables><variable name="x" type="real" array="3" role="algebraic"/></variables>
+      <equations>
+        <equation>x[1] = 1.0</equation>
+        <equation>x[2] = 2.0</equation>
+        <equation>x[3] = 3.0</equation>
+      </equations>
+    </modelType>
+    <modelType name="M2D" discipline="generic">
+      <variables><variable name="M" type="real" array="2,3" role="algebraic"/></variables>
+      <equations>
+        <equation>M[1,1] = 1.0</equation><equation>M[1,2] = 2.0</equation><equation>M[1,3] = 3.0</equation>
+        <equation>M[2,1] = 4.0</equation><equation>M[2,2] = 5.0</equation><equation>M[2,3] = 6.0</equation>
+      </equations>
+    </modelType>
+    <modelType name="MOrdSet" discipline="generic">
+      <variables><variable name="c" type="real" array="Species" role="algebraic"/></variables>
+      <equations>
+        <equation>c["A"] = 1.0</equation>
+        <equation>c["B"] = 2.0</equation>
+        <equation>c["C"] = 3.0</equation>
+      </equations>
+    </modelType>
+    <modelType name="MSlice" discipline="generic">
+      <parameters>
+        <parameter name="lo" type="real" default="1"/>
+        <parameter name="hi" type="real" default="3"/>
+      </parameters>
+      <variables>
+        <variable name="T" type="real" array="4" role="algebraic"/>
+        <variable name="s" type="real" role="algebraic"/>
+      </variables>
+      <equations>
+        <equation>T[1] = 0.0</equation>
+        <equation>T[2] = 10.0</equation>
+        <equation>T[3] = 20.0</equation>
+        <equation>T[4] = 30.0</equation>
+        <equation>s = sum(T[lo:hi])</equation>
+      </equations>
+    </modelType>
+  </modelTypes>
+  <systems>
+    <system name="S1D">
+      <instances><instance name="m" type="M1D"/></instances>
+    </system>
+    <system name="S2D">
+      <instances><instance name="m" type="M2D"/></instances>
+    </system>
+    <system name="SOrdSet">
+      <instances><instance name="m" type="MOrdSet"/></instances>
+    </system>
+    <system name="SSlice">
+      <instances><instance name="m" type="MSlice"/></instances>
+    </system>
+  </systems>
+</esml>

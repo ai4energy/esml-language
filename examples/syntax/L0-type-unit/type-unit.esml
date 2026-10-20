@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 变量类型全貌：`<variableTypes>` / `<type>` 的三种形态——基本标量类型、
+     类别 wrapper、枚举类型——以及声明侧引用；同时对照 `<parameter default=>` 与
+     `<variable initial=>` 两种初始值写法。 -->
+ <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L0_TypeUnit">
+   <units>
+     <unitsBase>
+       <unit name="K"  base="K"  scale="1" offset="0"/>
+       <unit name="Hz" base="1/s"  scale="1" offset="0"/>
+     </unitsBase>
+   </units>
+   <variableTypes>
+     <type name="real" unit="1"  default="0.0"    role="algebraic"/>
+     <type name="Temp" unit="K"  default="293.15" role="algebraic"/>
+     <type name="Rate" unit="Hz" default="0.05"   role="parameter"/>
+     <typesDimensionless>
+       <type name="Mode" kind="enumeration" values="off,heat,cool" default="heat"/>
+     </typesDimensionless>
+   </variableTypes>
+   <modelTypes><modelType name="M">
+     <description>变量类型引用侧：类型三形态（基本/wrapper/枚举）× 取值三来源（类型默认/声明默认/initial）。</description>
+     <parameters>
+       <parameter name="k" type="Rate"/>
+       <parameter name="k2" type="Rate" default="0.2"/>
+       <parameter name="mode" type="Mode" default="heat"/>
+     </parameters>
+     <variables>
+       <variable name="T" type="Temp" role="state" initial="300.0"/>
+       <variable name="Tset" type="Temp"/>
+       <variable name="kRatio" type="real"/>
+     </variables>
+     <equations>
+       <equation>D(T) = -k * (T - Tset)</equation>
+       <equation>Tset = 293.15 + mode + 2 * Mode.cool</equation>
+       <equation>kRatio = k2 / k</equation>
+     </equations>
+   </modelType></modelTypes>
+   <systems><system name="S">
+     <instances><instance name="g" type="M"/></instances>
+     <schedule><sequence><continueFor time="60"/></sequence></schedule>
+   </system></systems>
+ </esml>

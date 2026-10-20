@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 顶层序集声明用**单数** `<orderedSet>`。复数容器 `<orderedSets>` 无声明，
+     出现时会报错并提示改用单数写法。`check` errors=0。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L7_OrderedSets">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <orderedSet name="states" static="true">
+    <element>solid</element>
+    <element>liquid</element>
+  </orderedSet>
+  <modelTypes><modelType name="M" discipline="generic">
+    <parameters><parameter name="x" type="real" default="3.0"/></parameters>
+    <variables><variable name="y" type="real" role="algebraic"/></variables>
+    <equations><equation>y = x</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="M"/></instances>
+    <schedule><sequence><continueFor time="0"/></sequence></schedule>
+  </system></systems>
+</esml>

@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `<initial>`：`<system>` 子元素，内部用 `<scope instance="…">` 包住
+     `<equation>lhs = rhs</equation>`，给出初始赋值。
+     `check` errors=0；`solve` 验证 initial 覆盖状态初值。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L2_Initial">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes><modelType name="DecayModel" discipline="generic">
+    <parameters><parameter name="lambda" type="real" default="0.05"/></parameters>
+    <variables><variable name="N" type="real" role="state" initial="100.0"/></variables>
+    <equations><equation>D(N) = -lambda * N</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="g" type="DecayModel"/></instances>
+    <initial>
+      <scope instance="g">
+        <equation>N = 50.0</equation>
+      </scope>
+    </initial>
+    <schedule><sequence><continueFor time="60"/></sequence></schedule>
+  </system></systems>
+</esml>

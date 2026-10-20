@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 文档级序集 `<orderedSet name static="true"><element>…</element></orderedSet>`。
+     本例把序集用作 `<for>` 的枚举维，每个 `<element>` 对应一个取序位值的整数参数。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L0_OrderedSet">
+  <orderedSet name="comp" static="true">
+    <element>methane</element>
+    <element>ethane</element>
+    <element>propane</element>
+  </orderedSet>
+  <modelTypes><modelType name="Mix">
+    <variables>
+      <variable name="x" type="real" role="state" initial="1.0"/>
+    </variables>
+    <equations>
+      <equation>D(x) = -x</equation>
+    </equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="Mix"/></instances>
+    <schedule><sequence><continueFor time="1"/></sequence></schedule>
+  </system></systems>
+</esml>

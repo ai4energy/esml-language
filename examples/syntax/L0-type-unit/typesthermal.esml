@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 类别 wrapper `<typesThermal>`：热工类型库按类别包裹 `<type>` 声明
+     （unit 用 K / W）。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L0_TypesThermal">
+  <units><unitsBase>
+    <unit name="K" base="K" scale="1" offset="0"/>
+    <unit name="W" base="W" scale="1" offset="0"/>
+  </unitsBase></units>
+  <variableTypes>
+    <typesThermal>
+      <type name="temperature" unit="K" role="algebraic" default="300"/>
+      <type name="heatflow"    unit="W" role="algebraic" default="0"/>
+    </typesThermal>
+  </variableTypes>
+  <modelTypes><modelType name="Sink">
+    <variables><variable name="T" type="temperature" role="algebraic"/></variables>
+    <equations><equation>T = 300.0</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="s" type="Sink"/></instances>
+    <schedule><sequence><continueFor time="0"/></sequence></schedule>
+  </system></systems>
+</esml>

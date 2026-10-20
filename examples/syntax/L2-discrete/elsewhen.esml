@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `<when>` 内的 `<elsewhen condition>`：候选分支。解析期把 `<elsewhen>` 拍平为
+     独立的 `<when>`，同刻按声明序应用（顺序近似，不是显式 priority 链）。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L2_ElseWhen">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes><modelType name="M">
+    <discrete><variable name="mode" type="real" default="0.0"/></discrete>
+    <variables><variable name="x" type="real" role="state" initial="0.0"/></variables>
+    <equations>
+      <equation>D(x) = mode</equation>
+    </equations>
+    <events>
+      <when condition="time > 1.0">
+        <assign path="mode" value="1.0"/>
+        <elsewhen condition="time > 2.0">
+          <assign path="mode" value="2.0"/>
+        </elsewhen>
+      </when>
+    </events>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="M"/></instances>
+    <schedule><sequence><continueFor time="3"/></sequence></schedule>
+  </system></systems>
+</esml>

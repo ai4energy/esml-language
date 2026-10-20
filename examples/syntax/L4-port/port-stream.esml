@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 端口变量角色 `role="stream"`（物质流，inStream 语义），与 potential / flow 并列，
+     用于组分或物质流。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_PortStream">
+  <portTypes><portType name="StreamPort" connectorFamily="stream">
+    <variables>
+      <portVariable name="c" role="stream" type="real"/>
+    </variables>
+  </portType></portTypes>
+  <modelTypes><modelType name="Mix">
+    <ports><port name="in"  portType="StreamPort"/><port name="out" portType="StreamPort"/></ports>
+    <variables>
+      <variable name="in.c"  type="real" role="algebraic"/>
+      <variable name="out.c" type="real" role="algebraic"/>
+    </variables>
+    <equations><equation>out.c = in.c</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="Mix"/></instances>
+    <schedule><sequence><continueFor time="0"/></sequence></schedule>
+  </system></systems>
+</esml>

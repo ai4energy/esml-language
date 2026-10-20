@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `<functions><function name><inputs><input name/></inputs><body>…</body></function></functions>`：
+     纯表达式函数，可嵌套调用另一函数。方程中直接调用，例如
+     D(H) = Fin − weir_flow(H, W)。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L8_FunctionExpr">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <functions>
+    <function name="weir_flow">
+      <inputs><input name="H"/><input name="W"/></inputs>
+      <body>1.84 * max(H - W, 0.0)^1.5</body>
+    </function>
+    <function name="weir_half">
+      <inputs><input name="H"/><input name="W"/></inputs>
+      <body>0.5 * weir_flow(H, W)</body>
+    </function>
+  </functions>
+  <modelTypes><modelType name="TankF" discipline="generic">
+    <parameters>
+      <parameter name="Fin" type="real" default="0.1"/>
+      <parameter name="W" type="real" default="0.5"/>
+    </parameters>
+    <variables><variable name="H" type="real" initial="0.2" role="state"/></variables>
+    <equations><equation>D(H) = Fin - weir_flow(H, W)</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="Sys"><instances><instance name="t" type="TankF"/></instances></system></systems>
+</esml>

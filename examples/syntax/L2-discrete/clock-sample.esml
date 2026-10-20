@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 时钟采样：`<clock name interval/>` 加 `sample` / `previous`。
+     yp = previous(y) 在时钟 c 上每 0.1 s 采一次并保持一拍（[0, 0.1) 取初值）；
+     ys = sample(y, c) 取 y 在当前拍上的采样值。
+     `check` 通过；`simulate`（system S）exit=0（y = e^(−t) 衰减轨迹）。 -->
+ <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L2_ClockSample">
+   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+   <modelTypes><modelType name="ClockPrev">
+     <clock name="c" interval="0.1"/>
+     <variables>
+       <variable name="y"  type="real" role="state" initial="1.0"/>
+       <variable name="yp" type="real" role="algebraic" initial="1.0"/>
+       <variable name="ys" type="real" role="algebraic" initial="1.0"/>
+     </variables>
+     <equations>
+       <equation>D(y) = -y</equation>
+       <equation>yp = previous(y)</equation>
+       <equation>ys = sample(y, c)</equation>
+     </equations>
+   </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="ClockPrev"/></instances>
+    <schedule><sequence><continueFor time="1"/></sequence></schedule>
+  </system></systems>
+</esml>

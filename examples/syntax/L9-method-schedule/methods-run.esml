@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `<methods><method name>…</method></methods>`（系统级方法块）。
+     可用命令：`<fix name value/>` 钉住变量、`<free name/>` 释放、`<run name/>` 引入另一具名方法。
+     本例 base 把 u.y 钉在 5.0；combo 通过 `<run name="base"/>` 复用 base
+     ⇒ a = (5 − 1) / 2 = 2。模型级 `<onLoad>` 见 `onload.esml`。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L9_MethodsRun">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes><modelType name="Calc" discipline="generic">
+    <parameters><parameter name="K" type="real" default="2.0"/><parameter name="c" type="real" default="1.0"/></parameters>
+    <variables><variable name="y" type="real" role="algebraic"/><variable name="a" type="real" role="algebraic"/></variables>
+    <equations><equation>y = K * a + c</equation></equations>
+  </modelType></modelTypes>
+  <systems>
+    <system name="MethodSys">
+      <instances><instance name="u" type="Calc"/></instances>
+      <methods>
+        <method name="base"><fix name="u.y" value="5.0"/></method>
+        <method name="combo"><run name="base"/></method>
+      </methods>
+    </system>
+  </systems>
+</esml>

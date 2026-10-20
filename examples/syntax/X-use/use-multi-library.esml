@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 多库 `<use>`：同一 `<esml>` 根下两个 `<use>` 各引一个 registry 坐标，
+     合并为并集——库 A 提供模型（heat-elements 的 FixedT / Conductor / Body），
+     库 B 提供函数（math/nonsmooth 的 pos / mid / complementarity）。
+     库坐标：
+       cn.ai4energy.esml.thermal:heat-elements:0.1
+       cn.ai4energy.esml.math:nonsmooth:0.1
+     系统级 `<set>` 的值必须是常数，所以库 B 的函数放在本地模型方程里
+     （PosUse：y = pos(x)），以此证明两库定义都被并入且各自可用。
+     `solve <本文件> -L <库根>` exit=0：本地 PosUse 的 y = pos(350.0) = 350.0（库 B 函数）；
+     热链 FixedT(Tset=300，默认) — Conductor — Body 稳态全链 300 K（库 A 模型）。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="X_UseMultiLib">
+  <use library="cn.ai4energy.esml.thermal:heat-elements:0.1"/>
+  <use library="cn.ai4energy.esml.math:nonsmooth:0.1"/>
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes><modelType name="PosUse" discipline="generic">
+    <description>本地模型：方程调用**库 B**（nonsmooth）的 pos() 函数。</description>
+    <parameters><parameter name="x" type="real" default="350.0"/></parameters>
+    <variables><variable name="y" type="real" role="algebraic"/></variables>
+    <equations><equation>y = pos(x)</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S" discipline="thermal">
+    <instances>
+      <instance name="p" type="PosUse"/>
+      <instance name="f" type="FixedT"/>
+      <instance name="k" type="Conductor"/>
+      <instance name="b" type="Body"/>
+    </instances>
+    <connections>
+      <connection from="f.port" to="k.port_a"/>
+      <connection from="k.port_b" to="b.port"/>
+    </connections>
+    <schedule><sequence><continueFor time="60"/></sequence></schedule>
+  </system></systems>
+</esml>

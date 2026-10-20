@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 负例（预期失败）：rank-1 数组上写 `sum(x, 1)`，axis 1 越界；rank-1 时唯一合法 axis 是 0。
+     期望 `check` 报错并指出合法范围 0..0。非零退出是预期行为；
+     配套正例见 `axis-reduce.esml`。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_AxisReduceProbe">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes>
+    <modelType name="M" discipline="generic">
+      <variables>
+        <variable name="x" type="real" array="3" initial="0.0" role="algebraic"/>
+        <variable name="s" type="real" initial="0.0" role="algebraic"/>
+      </variables>
+      <equations>
+        <equation>x[1] = 1.0</equation>
+        <equation>x[2] = 2.0</equation>
+        <equation>x[3] = 3.0</equation>
+        <equation>s = sum(x, 1)</equation>
+      </equations>
+    </modelType>
+  </modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="M"/></instances>
+    <schedule><sequence><continueFor time="0"/></sequence></schedule>
+  </system></systems>
+</esml>

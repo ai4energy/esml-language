@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 任务附属的厂商文本族：`<benchmark>`（属性 `name` / `expected` / `unit` / `tol` /
+     `source`，声明基准点）与 `<verdict>`（自由文本结论）。
+     实现接受并跳过，不解释内容，也不猜语义。`check` errors=0；`tasks`（system S）
+     simulate exit=0（N(t) = 100·e^(−0.05t)，t = 60 ⇒ N ≈ 4.98；两段文本不影响执行）。 -->
+ <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="T_VendorText">
+   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+   <modelTypes><modelType name="DecayModel" discipline="generic">
+     <parameters><parameter name="lambda" type="real" default="0.05"/></parameters>
+     <variables><variable name="N" type="real" role="state" initial="100.0"/></variables>
+     <equations><equation>D(N) = -lambda * N</equation></equations>
+   </modelType></modelTypes>
+   <systems><system name="S">
+     <instances><instance name="g" type="DecayModel"/></instances>
+     <schedule><sequence><continueFor time="60"/></sequence></schedule>
+   </system></systems>
+   <computeTasks name="t-vendor" target="S">
+     <task name="sim" kind="simulate">
+       <tspan from="0" to="60"/>
+       <solver name="Tsit5"/>
+       <benchmark name="g.N" expected="4.98" unit="1" tol="0.05" source="syntax-example decay steady"/>
+       <verdict>N decays to ~4.98 at t=60 (vendor text, engine pass-through)</verdict>
+     </task>
+   </computeTasks>
+ </esml>

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `ifelse(c, t, f)`：分段表达式（光滑分段，不是事件）。
+     c ≠ 0 取 t，否则取 f；分支切换精度由积分器容差决定。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_IfElse">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes><modelType name="M">
+    <variables><variable name="x" type="real" role="state" initial="0.0"/></variables>
+    <equations>
+      <equation>D(x) = ifelse(time &lt; 0.5, 2.0, 0.0)</equation>
+    </equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="M"/></instances>
+    <schedule><sequence><continueFor time="1"/></sequence></schedule>
+  </system></systems>
+</esml>

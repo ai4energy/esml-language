@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `<initialisationProcedures>` 容器与单数过程 `<initialisationProcedure name=>`：
+     过程子元素用 `<use><unit name procedure=/></use>`、
+     `<start><set path value/></start>`、
+     `<next><moveTo><set path value/></moveTo><advance unit=/></next>`。
+     容器与子元素均为 camelCase，kebab 拼法会被拒绝。
+     `check` errors=0（声明例，当前只解析、不参与求解）。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L2_InitProcAdvance">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes><modelType name="Mass" discipline="generic">
+    <parameters><parameter name="k" type="real" default="2.0"/></parameters>
+    <variables><variable name="x" type="real" role="state" initial="0.0"/></variables>
+    <equations><equation>D(x) = -k * x</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="Mass"/></instances>
+    <initialisationProcedures>
+      <initialisationProcedure name="warmup">
+        <use><unit name="real" procedure="standard"/></use>
+        <start><set path="m.x" value="1.0"/></start>
+        <next>
+          <moveTo><set path="m.x" value="2.0"/></moveTo>
+          <advance unit="s"/>
+        </next>
+      </initialisationProcedure>
+    </initialisationProcedures>
+    <schedule><sequence><continueFor time="1"/></sequence></schedule>
+  </system></systems>
+</esml>

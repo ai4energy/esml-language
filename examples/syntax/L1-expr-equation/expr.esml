@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 探针：optimize 任务的 `<objective>` 里用 `<expr>` 包住表达式。
+     当前实现只读 `<objective>` 的文本体、不读 `<expr>` 子元素，因此 `check` 通过而
+     `tasks` 报错（objective 文本体为空）。工作形态是把表达式直接写成文本体。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_Expr">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes><modelType name="M" discipline="generic">
+    <parameters><parameter name="x" type="real" default="3.0"/></parameters>
+    <variables><variable name="y" type="real" role="algebraic"/></variables>
+    <equations><equation>y = x</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="M"/></instances>
+    <schedule><sequence><continueFor time="0"/></sequence></schedule>
+  </system></systems>
+  <computeTasks name="t-expr" target="S">
+    <task name="opt" kind="optimize">
+      <decision name="m.x" lower="0" upper="10" initial="3"/>
+      <objective direction="min">
+        <expr>(m.x - 3) * (m.x - 3)</expr>
+      </objective>
+    </task>
+  </computeTasks>
+</esml>

@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 时钟容器与时钟函数：`<clocks><clock name interval/></clocks>` 加
+     `interval(c)` / `firstTick(c)` / `noClock(x)`（与 previous/sample 并列）。
+     容器形态与直挂 `<clock>` 等价。`check` 通过，无未声明符号告警。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L2_ClockFunctions">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes><modelType name="M">
+    <clocks><clock name="c" interval="0.1"/></clocks>
+    <parameters><parameter name="x" type="real" default="1.0"/></parameters>
+    <variables>
+      <variable name="y"  type="real" role="state" initial="1.0"/>
+      <variable name="iv" type="real" role="algebraic"/>
+      <variable name="ft" type="real" role="algebraic"/>
+      <variable name="nc" type="real" role="algebraic"/>
+    </variables>
+    <equations>
+      <equation>D(y) = -y</equation>
+      <equation>iv = interval(c)</equation>
+      <equation>ft = firstTick(c)</equation>
+      <equation>nc = noClock(x)</equation>
+    </equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="M"/></instances>
+    <schedule><sequence><continueFor time="0.5"/></sequence></schedule>
+  </system></systems>
+</esml>

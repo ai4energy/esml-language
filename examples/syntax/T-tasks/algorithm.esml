@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `<algorithm>`：函数体的另一种写法，内含 `assign` / `if` / `for` / `return` 等语句。
+     实现将其降为单一纯表达式。本例函数 f = 1 + 2·x 以 `<algorithm><assign/></algorithm>` 书写，
+     并由派生模型验证等价。`check` 与 `simulate` 均通过。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="T_Algorithm">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes>
+    <modelType name="F" discipline="generic">
+      <functions>
+        <function name="affine" returns="real">
+          <inputs><input name="x" type="real"/></inputs>
+          <outputs><output name="y" type="real"/></outputs>
+          <algorithm><assign name="y" value="1 + 2*x"/></algorithm>
+        </function>
+      </functions>
+    </modelType>
+    <modelType name="Lin" discipline="generic">
+      <parameters><parameter name="k" type="real" default="0.3"/></parameters>
+      <variables><variable name="x" type="real" role="state" initial="1.0"/></variables>
+      <equations><equation>D(x) = -k * x</equation></equations>
+    </modelType>
+  </modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="Lin"/></instances>
+    <schedule><sequence><continueFor time="1"/></sequence></schedule>
+  </system></systems>
+  <computeTasks name="t-algo" target="S">
+    <task name="sim" kind="simulate">
+      <tspan from="0" to="1"/>
+      <solver name="Tsit5"/>
+    </task>
+  </computeTasks>
+</esml>

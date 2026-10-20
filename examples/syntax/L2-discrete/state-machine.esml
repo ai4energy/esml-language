@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `<stateMachine>`：状态 + 迁移 + activeState()。每个状态有互斥的离散 active 旗标。
+     A→B 在 time > 1，B→A 在 time > 2（两状态 toggle）。
+     `<transition priority=>` 当前不被识别，本例不使用。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L2_StateMachine">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes><modelType name="Fsm">
+    <variables>
+      <variable name="a" type="real" role="algebraic" initial="0.0"/>
+      <variable name="b" type="real" role="algebraic" initial="0.0"/>
+    </variables>
+    <equations>
+      <equation>a = activeState(A)</equation>
+      <equation>b = activeState(B)</equation>
+    </equations>
+    <stateMachine name="fsm">
+      <state name="A" initialState="true"/>
+      <state name="B"/>
+      <transition from="A" to="B" condition="time &gt; 1"/>
+      <transition from="B" to="A" condition="time &gt; 2"/>
+    </stateMachine>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="Fsm"/></instances>
+    <schedule><sequence><continueFor time="3"/></sequence></schedule>
+  </system></systems>
+</esml>

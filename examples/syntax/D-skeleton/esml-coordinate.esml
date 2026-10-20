@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 文档根 `<esml>` 的库坐标属性 `coordinate=`，形如
+     "cn.ai4energy.esml.<域>:<文档>:<版本>"。该属性是文档元数据，不参与求解；
+     `check` 通过，结果不受 `coordinate` 影响。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="D_Coordinate"
+      coordinate="cn.ai4energy.esml.syntax:coordinate-demo:0.1" version="1.0">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes><modelType name="M">
+    <variables><variable name="x" type="real" role="algebraic"/></variables>
+    <equations><equation>x = 1.0</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="M"/></instances>
+    <schedule><sequence><continueFor time="0"/></sequence></schedule>
+  </system></systems>
+</esml>

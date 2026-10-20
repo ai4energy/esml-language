@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 分区（DDM）多块链：3 个分区（`discipline=` 各异，并用 `timeLayer=` 标跨时层 1 / 2）
+     + 实例 `partition="id"` + 两条 `<crosslink>` 串成 a.y ⇒ b.s ⇒ b.t ⇒ c.s。
+     对照：去掉 `<partitions>` / `partition=` / `<crosslink>`、改写为 `<connection>`，结果相同
+     —— 默认路径下分区是可选的解耦标注。
+     id 从 1 起，`id="0"` 报错（0 保留给「未分区」）；`timeLayer` 大于 0 时生效。
+     `check` errors=0；`solve`（system Chain）：a.y = 5.0 · b.s = 5.0 · b.t = 6.0 ·
+     c.s = 6.0 · c.u = 12.0。 -->
+ <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L7_PartitionChain">
+   <modelTypes>
+     <modelType name="Src">
+       <parameters><parameter name="A" type="real" default="5.0"/></parameters>
+       <variables><variable name="y" type="real" role="algebraic"/></variables>
+       <equations><equation>y = A</equation></equations>
+     </modelType>
+     <modelType name="Mid">
+       <variables><variable name="s" type="real" role="algebraic"/>
+         <variable name="t" type="real" role="algebraic"/></variables>
+       <equations><equation>t = s + 1.0</equation></equations>
+     </modelType>
+     <modelType name="Snk">
+       <variables><variable name="s" type="real" role="algebraic"/>
+         <variable name="u" type="real" role="algebraic"/></variables>
+       <equations><equation>u = s * 2.0</equation></equations>
+     </modelType>
+   </modelTypes>
+   <systems>
+     <system name="Chain">
+       <partitions>
+         <partition id="1" name="thermal-src" discipline="thermal" timeLayer="1"/>
+         <partition id="2" name="electrical-mid" discipline="electrical"/>
+         <partition id="3" name="generic-sink" discipline="generic" timeLayer="2"/>
+       </partitions>
+       <instances>
+         <instance name="a" type="Src" partition="1"/>
+         <instance name="b" type="Mid" partition="2"/>
+         <instance name="c" type="Snk" partition="3"/>
+       </instances>
+       <links>
+         <crosslink from="a.y" to="b.s" portType="y s"/>
+         <crosslink from="b.t" to="c.s" portType="t s"/>
+       </links>
+     </system>
+   </systems>
+ </esml>

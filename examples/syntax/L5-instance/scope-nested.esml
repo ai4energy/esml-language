@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `<set path>` 深入复合成员：`path="body.a.k"` 覆盖复合 Body 的成员 a 的参数 k。
+     与 members-composite 例配对，形成「复合 + 嵌套 scope/set」的分层参数化链路。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L5_ScopeNested">
+  <modelTypes>
+    <modelType name="Leaf">
+      <parameters><parameter name="k" type="real" default="0.3"/></parameters>
+      <variables><variable name="x" type="real" role="state" initial="1.0"/></variables>
+      <equations><equation>D(x) = -k * x</equation></equations>
+    </modelType>
+    <modelType name="Body">
+      <members>
+        <instance name="a" type="Leaf"/>
+        <instance name="b" type="Leaf"/>
+      </members>
+      <variables><variable name="y" type="real" role="state" initial="0.0"/></variables>
+      <equations><equation>D(y) = -(a.x + b.x)</equation></equations>
+    </modelType>
+  </modelTypes>
+  <systems><system name="S">
+    <instances><instance name="body" type="Body"/></instances>
+    <sets>
+      <scope instance="body">
+        <set path="a.k" value="0.7"/>
+        <set path="b.k" value="1.2"/>
+      </scope>
+    </sets>
+    <schedule><sequence><continueFor time="1"/></sequence></schedule>
+  </system></systems>
+</esml>

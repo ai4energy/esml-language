@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 负例：`<unitsBase>` 中 `name="K"` 与 `base="T"` 互相矛盾
+     （T 是时间字母，名称却表示开尔文）。`esml check-units <本文件>` 期望报错，
+     消息含 `contradicts`。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L0_UnitsContradiction">
+  <units>
+    <unitsBase>
+      <unit name="s" base="T" scale="1" offset="0"/>
+    </unitsBase>
+    <unitsDerived>
+      <!-- ✗ 矛盾：T=时间 vs name=开尔文 —— 应报 Contradicts -->
+      <unit name="K" base="T" scale="1" offset="0"/>
+    </unitsDerived>
+  </units>
+  <variableTypes>
+    <type name="TempK" unit="K" default="300.0"/>
+  </variableTypes>
+  <modelTypes><modelType name="M">
+    <variables><variable name="T" type="TempK" role="state" initial="300.0"/></variables>
+    <equations><equation>D(T) = 0</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="g" type="M"/></instances>
+  </system></systems>
+</esml>
