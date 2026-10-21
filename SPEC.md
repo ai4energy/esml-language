@@ -500,11 +500,21 @@ instance 的 `type` 指向 `<system>` 时，它按子系统展开，不当作缺
 
 ```xml
 <instances>
+  <!-- `useC` 须是**条件作用域内可见的参数**；该参数的 canonical 声明处
+       **待定**（见下条），今日可机验的只有常量形态。 -->
   <instance name="c" type="CondComp" condition="useC"/>
 </instances>
 ```
 
 - `condition` = **布尔表达式**，操作数为**参数 / 常量 / 序集成员**（构建期可判）；
+  - **作用域**：操作数在**含该 `<instance>` 的模型**（系统级）里解析。
+  - ⚠ **参数形态待定**：`useC` 这类参数操作数**当前没有 canonical 声明处**
+    —— `xsd/` 的 `<system>` 不许 `<parameters>`；实例自身模型的参数在条件
+    求值时尚未落表 ⇒ 今日**只有常量形态与序集成员序号形态可机验**
+    （序集成员按**序号 ≠ 0** 判真）。
+    按 README「文字与 schema 出现分歧时，以 schema 为准」，此处属
+    **文字超前于 schema**；落地要一次规范修订（`SPEC.md` ＋ XSD ＋ 示例），
+    记账见 `docs/coverage.md` §5.9。
 - 语义（建模期求值）：
   - **静态 false** → 实例被**排除**：其实例方程、以其为端点的 `<connect>` 全部丢弃；
   - **恒真 / 缺省** → 正常实例化（等价 `condition="true"`）；
@@ -513,8 +523,8 @@ instance 的 `type` 指向 `<system>` 时，它按子系统展开，不当作缺
 - 与**方程级**条件（§7 `ifelse` / `<if>` / `<case>`）不同：后者改方程右端，
   本条改**实例集合（拓扑）**。
 - 属性写法：实例上写 `condition="…"`（等价 `if="…"`）。
-- 示例：`L5-instance/instance-condition.esml`（三个实例：缺省恒真 / 条件为真 /
-  条件为假——条件为假那个实例连同其实例方程一并消失，模型里**没有**它，
+- 示例：`L5-instance/instance-condition.esml`（**常量形态**；三个实例：缺省恒真 /
+  条件为真 / 条件为假——条件为假那个实例连同其实例方程一并消失，模型里**没有**它，
   不是「解成 0」）；
   负例 `L5-instance/instance-condition-undecidable.esml`（条件写成对参数的
   引用，构建期折叠不出来 ⇒ `solve` / `simulate` 响亮报错）。
