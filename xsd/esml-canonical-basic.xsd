@@ -378,7 +378,7 @@
   </xs:complexType>
   <xs:complexType name="PortInstanceType">
     <xs:attribute name="name" type="esml:Ident" use="required"/>
-    <xs:attribute name="porttype" type="xs:string" use="optional"/>
+    <xs:attribute name="portType" type="xs:string" use="optional"/>
     <xs:attribute name="category" type="xs:string" use="optional"/>
     <xs:attribute name="size" type="xs:string" use="optional"/>
     <xs:attribute name="count" type="xs:string" use="optional"/>
@@ -440,7 +440,7 @@
     <xs:attribute name="kind" type="xs:string" use="optional"/>
     <xs:attribute name="aPart" type="xs:unsignedInt" use="optional"/>
     <xs:attribute name="bPart" type="xs:unsignedInt" use="optional"/>
-    <xs:attribute name="interface" type="xs:string" use="optional"/>
+    <xs:attribute name="portType" type="xs:string" use="optional"/>
     <xs:anyAttribute processContents="lax"/>
   </xs:complexType>
   <!-- 一等 partition（稳定 id + name/discipline + 可选 time layer）。
@@ -561,7 +561,7 @@
             <xs:complexType mixed="true">
               <xs:sequence><xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/></xs:sequence>
               <xs:attribute name="name" type="xs:string" use="optional"/>
-              <xs:attribute name="desc" type="xs:string" use="optional"/>
+              <xs:attribute name="description" type="xs:string" use="optional"/>
               <xs:anyAttribute processContents="lax"/>
             </xs:complexType>
           </xs:element>
@@ -699,7 +699,7 @@
           <xs:element name="equation" minOccurs="0" maxOccurs="unbounded">
             <xs:complexType mixed="true">
               <xs:sequence><xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/></xs:sequence>
-              <xs:attribute name="desc" type="xs:string" use="optional"/>
+              <xs:attribute name="description" type="xs:string" use="optional"/>
               <xs:anyAttribute processContents="lax"/>
             </xs:complexType>
           </xs:element>

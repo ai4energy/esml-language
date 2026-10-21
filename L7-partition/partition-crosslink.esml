@@ -2,10 +2,10 @@
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 分区（DDM）：`<partitions><partition id name discipline/></partitions>` 加实例
-     `partition="id"`，再用 `<links><crosslink from to interface="…"/></links>` 声明跨分区边界。
+     `partition="id"`，再用 `<links><crosslink from to portType="…"/></links>` 声明跨分区边界。
      id 从 1 起，`id="0"` 报错（0 保留给「未分区」）；旧别名 `<link>` 已被拒绝。
      规范条文：§6.4（partition / crosslink）。
-     crosslink 把 a.y（分区 1 输出）并入 b.s（分区 2 输入），`interface=` 声明边界变量。 -->
+     crosslink 把 a.y（分区 1 输出）并入 b.s（分区 2 输入），`portType=` 声明边界变量束。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L7_PartitionCrosslink">
   <modelTypes>
     <modelType name="Src">
