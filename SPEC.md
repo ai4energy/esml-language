@@ -541,23 +541,29 @@ Process/Case 也有 flowsheet 级 `EQUATION`。ESML canonical 对应地允许 `<
 ```xml
 <project name="MyProject" version="1.0">
   <systems>
-    <systemRef src="models/thermal-chain.esml"/>
-    <systemRef src="models/ctrl.sys.esml"/>
+    <systemRef name="chain" src="models/thermal-chain.esml"/>
+    <systemRef name="ctrl" src="models/ctrl.sys.esml"/>
   </systems>
   <computeTasks>
-    <computeTask kind="simulate" target="thermal_chain">
+    <task name="steady" kind="simulate" target="thermal_chain">
+      <tspan from="0" to="60"/>
       <tolerance abstol="1e-6" reltol="1e-3"/>
-      <duration time="60" dt="0.01"/>
-    </computeTask>
-    <computeTask kind="optimize" target="ctrl">
+    </task>
+    <task name="tune" kind="optimize" target="ctrl">
       <method name="ipopt"/>
       <constraints>
         <constraint>x >= 0</constraint>
       </constraints>
-    </computeTask>
+    </task>
   </computeTasks>
 </project>
 ```
+
+> **拼写单轨**：任务条目元素名是 **`<task>`**（`<computeTasks>` 容器内的单数条目），
+> 不是 `<computeTask>`。`xsd/esml-canonical-compute.xsd` 只声明 `<computeTasks>` → `<task>`
+> 一种写法，`<computeTask>` 在任何 schema 里都不存在，按拼写单轨纪律一律拒绝。
+> 段长属性用 `<tspan from to/>`（`TspanType`：`from` 默认 0、`to` 必填），
+> 没有 `<duration>` 这种元素。
 
 **结构**：
 
@@ -565,11 +571,60 @@ Process/Case 也有 flowsheet 级 `EQUATION`。ESML canonical 对应地允许 `<
 |---|---|
 | `<project>` | 属性 `name`、`description`；子元素顺序 `systems` → `computeTasks` → `scenarioChain`，各至多一个 |
 | `<systems>` | 一组 `<systemRef src="…">`；`src` 指向模型文件，`system` 可指定文件内系统名，`libroot` 可加库根 |
-| `<computeTasks>` | 计算任务表（七类 `kind`，见附录 M） |
+| `<computeTasks>` | 计算任务表：容器内一条条 `<task>`，七类 `kind`，见 §6.9 |
 | `<scenarioChain>` | 一组 `<scenario>`，每个可含 `<point>` / `<set>` / `<data>` |
 
 元素名用 camelCase（`systemRef`、`computeTasks`、`scenarioChain`）；
 kebab-case 拼写作为兼容别名接受。
+
+### 6.9 计算任务表（`<computeTasks>` / `<task>`）
+
+**用途**：模型体系与计算体系同处一个文档时，`<computeTasks>` 挂任务表，
+`<task>` 是**单条任务声明** —— 描述层，只说「算什么」，不写算法。
+模型面与任务面可同处一个 `<esml>` 根（`esml-canonical-basic.xsd` include compute）。
+
+```xml
+<computeTasks name="runs" target="thermal_chain">
+  <task name="transient" kind="simulate" target="thermal_chain">
+    <tspan from="0" to="60"/>
+    <solver name="radau"/>
+  </task>
+  <task name="tune" kind="optimize" target="thermal_chain">
+    <decision name="K" lower="1" upper="10"/>
+    <objective>min (K - 4)^2</objective>
+    <constraints><constraint>K &gt;= 0</constraint></constraints>
+  </task>
+</computeTasks>
+```
+
+**结构**：
+
+| 层 | 内容 |
+|---|---|
+| `<computeTasks>` | 任务表容器；属性 `name` / `target` / `schema` 均可选 |
+| `<task>` | 属性 **`kind` 必填**（七类闭集，见附录 M）、**`name` 必填**；`target` / `description` 可选 |
+| 子元素 | 载荷由 `kind` 决定（见下表）；同一 `kind` 可按需重复与扩展元数据并存 |
+
+**七类 `kind` 与其载荷**（`kind` 决定结构，守恒由结构决定）：
+
+| `kind` | 核心载荷 |
+|---|---|
+| `simulate` | `<tspan from to/>`、`<solver>` |
+| `sensitivity` | `<perturb>`（属性式：`name` / `fraction` / `lower` / `upper`）、`<output>`（`<var>` 列表） |
+| `estimation` | `<estimate>`（`<var initial/>` 或属性式 `initial`）、`<data>` |
+| `optimize` | `<decision>`（`<var lower upper/>` 或属性式）、`<objective>`（含 `<expr>`）、`<constraints>`（含 `<constraint>`）、`<solver>` |
+| `control` | `<mpc N dt/>`（滚动时域） |
+| `surrogate` | `<surrogate method degree/>`、`<data>` |
+| `validation` | `<metrics>`（含 `<metric>`）、`<data>` |
+
+**求解约定**：按 `kind` 构造问题再求解（任务声明 → 问题树 → 求解）；
+`kind` 是**闭集**，新增能力走附录 M 的功能层机制与组合，不新增 `kind`。
+
+**示例**：`T-tasks/tasks-seven.esml`（七类各一条的合照）、`T-tasks/task-simulate.esml` /
+`task-sensitivity.esml` / `task-estimation.esml` / `task-optimize.esml` / `task-control.esml` /
+`task-surrogate.esml` / `task-validation.esml`（逐类单跑），以及任务附属元数据族
+（`T-tasks/sensor.esml` / `setpoint.esml` / `targets.esml` / `checks.esml` 等）。
+机验基准：`xsd/esml-canonical-compute.xsd`。
 
 ## 7. 方程类别与语义
 
@@ -1211,7 +1266,7 @@ CASE/多区/滞回：配 SELECTOR + `<events><when>`(STN)，方程用 `ifelse(se
 | 求解角色 | AE / ODE / DAE | 按模型（纯代数/状态/高指标降阶后）自动选 |
 | `schedule` 段 | 运行时编排 | ：多 `<continueFor>` 段 + 段前 `<call method>`；`METHOD/RUN` 逐段 |
 | `METHOD` | 求解流程声明 | 方法脚本式参考 风格；`FIX/VARY`(自由度)、`RUN`(驱动)、`solve` 组合（附录 K） |
-| `<tasks>` / `<computeTask>` XSD | tasks/compute 各层 schema | `esml-canonical-compute.xsd`：kind 决定载荷结构，守恒由结构决定；**按 kind 构造问题再求解**（task 声明 → 问题树 → 求解） |
+| `<tasks>` / `<task>` XSD | tasks/compute 各层 schema | `esml-canonical-compute.xsd`：kind 决定载荷结构，守恒由结构决定；**按 kind 构造问题再求解**（task 声明 → 问题树 → 求解）；条目元素名单轨为 `<task>`（§6.9） |
 
 > 术语原则：**类型 modelType · 实例 instance（component 兼容）· 场景/子系统 system ·
 > 计算任务 task / 问题类七类 · 求解角色 AE/ODE/DAE · 编排 schedule + METHOD** —— 详见附录 L/M。
