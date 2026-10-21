@@ -10,6 +10,7 @@ ESML 是一种声明式、基于方程的物理系统建模语言，文档即 XM
 |---|---|
 | [`SPEC.md`](SPEC.md) | 语言规范：词法、类型系统、组件、端口、系统、方程、展开与求解约定 |
 | [`xsd/`](xsd/) | XML Schema：入口 schema 一份，canonical 子集四份（共享 primitive / 模型体系 / 计算体系 / 项目容器） |
+| [`docs/`](docs/) | 规范 ⇄ 示例 的机验对账：[`validate_examples.py`](docs/validate_examples.py)（五道检查）与 [`coverage.md`](docs/coverage.md)（对账表与逐条裁决） |
 | `D-skeleton/` … `X-use/` | 每个语法点一份可运行文档，按语言层次分目录（见下表） |
 
 canonical XML 是正统语法；XML Schema 描述 canonical XML，是可机验的基准。
