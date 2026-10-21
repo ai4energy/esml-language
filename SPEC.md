@@ -68,15 +68,15 @@
 |---|---|---|
 | 顶层 | `<esml xmlns="https://www.ai4energy.cn/esml/v1" name=...>` | 根（namespace `https://www.ai4energy.cn/esml/v1`） |
 | 类型容器 | `<variableTypes>`、`<portTypes>`、`<modelTypes>` | — |
-| 端口协议 | `<portType name domain>`（旧别名 `<interface>` 弃用） | 连接器"类" |
-| 端口实例 | `<port name portType="X" size? count?/>`（**canonical `portType=`**；`porttype=`/`interface=` 为兼容别名，归一为 `portType`） |  |
+| 端口协议 | `<portType name domain>`（`<interface>` / `<connector>` 旧拼写**报错**） | 连接器"类" |
+| 端口实例 | `<port name portType="X" size? count?/>`（**只有 `portType=`**；`porttype=`/`interface=` **报错**） |  |
 | 端口变量 | `<portVariable name role="potential\|flow\|stream\|input\|output" type/>` | effort 并入 potential；显式域不写 role（详附录 F1）；组件方程用点号 `port.pvar` |
 | 组件 | `<modelType name>` | 组件类型声明；`<members><instance name type/></members>`（§4.1）；`<extendsFrom>Base</extendsFrom>` 继承（§4.0） |
 | 系统/实例 | `<system name>`/`<instances><instance name type/>` | `<system>` 也可作为 instance 的 `type` 引用（子系统，§6.4） |
 | 作用域引用 | `<scope instance=".."><set path value/>`（`unit=` 非法） | `unit` 只表度量单位 |
 | 变量 | `<variable name type role="state\|algebraic\|flow\|parameter" initial default/>` | — |
 | 方程 | `<equation>expr (=\|~) expr</equation>` | — |
-| 连接 | `<connect from=path to=path/>` | 语义见 §8 |
+| 连接 | `<connection from=path to=path/>` | 语义见 §8 |
 | 标准库引用 | `<use library="group:artifact:version"/>` | 合并坐标化组件库（§6.1） |
 | 序集 | `<orderedSet name static="true"><element>...</element></orderedSet>` | 顶层声明；见附录 F |
 | 选择器 | `<selectors><selector name><values><value>...</value></values><default>...</default></selector></selectors>` | 模型级（附录 B（续）— SELECTOR） |
@@ -87,22 +87,23 @@
 
 **收紧规则（canonical 唯一，不向后兼容旧写法）**：
 解析器对旧词法直接报错（解析器）：
-- 端口协议：`<portTypes>/<portType>`；`interfaces/interface/connector/portType` → 报错
-- 端口引用属性：canonical **`portType=`**；`porttype=`/`interface=` 为兼容别名（归一，不报错）；裸 `type=` → 报错
+- 端口协议：`<portTypes>/<portType>`；`interfaces` / `interface` / `connector` → 报错
+- 端口引用属性：canonical **`portType=`**；`porttype=` / `interface=` → **报错**（不归一、不兼容）；裸 `type=` → 报错
 - 组件类型：`<modelTypes>/<modelType>`；`components/component`（类型位）→ 报错
 - 端口变量声明：`<portVariable .../>`（仅 portType 内）；模型变量 `<variable .../>`
 - 容器/单位旧写（variableTypes、min/max、toSI 等）不再接受
 - 实例标签 canonical **`<instance>`**（系统内）；`scope instance=`
 
 > **唯一写法的边界**：实例一律写 `<instance>`；`<component>` 作为元素不是合法语法，
-> 会报错并提示改用 `<instance>`。XSD 为兼容旧文档仍声明该元素，
-> 二者以本规范的收紧规则为准。
-> **属性形态合法**：`<instance name="b" component="M"/>` 与 `type="M"` 等价
-> （优先级：`type=` &gt; `model-type=` &gt; `component=`）。
+> 会报错并提示改用 `<instance>`。**XSD 亦不声明该元素** —— 规范说报错、schema 也
+> 真的拒收，两处一致，不留「嘴上禁了、机器照收」的口子。
+> **属性形态只有 `type=`**：`<instance name="b" type="M"/>`。`component=` /
+> `model-type=` 同样**不是合法语法**（XSD 不声明，报错），没有优先级、没有兼容。
 - **实例必须包在 `<instances>` 内**；裸 `<instance>`（直接挂 `<system>`/`<modelType>`）→ 报错
 - **实例覆盖用 `<set path= value=>`**；`<bind name= value=>` → 报错
 
-> 存量旧写法文档（部分示例/测试）尚未全部迁移，迁移后本规范即为唯一事实。
+> 仓内示例已全部迁移（`tools/check-examples.py` 逐件机验 + `tools/aliases.tsv`
+> 别名闸；退出码 0 = 无一处旧拼写）。仓外存量旧写法文档迁移后，本规范即为唯一事实。
 > **机验基准是 XSD**（`xsd/esml-v1.xsd` + `xsd/esml-canonical-*.xsd`）：规范与本表若与
 > XSD 不一致，以 **XSD 为准**。附录 D 仅说明旧版文档的边界，不构成本线词法。
 
@@ -179,7 +180,7 @@
 ```
 
 **端口变量作者语法**：方程用**点号** `port.pvar`（如 `port_a.T`、`port_a.Q_flow`）；
-实现重写为内部扁平名 `port__pvar` 并**自动物化**端口未知量（仅被 `<connect>` 连接或被点号引用的
+实现重写为内部扁平名 `port__pvar` 并**自动物化**端口未知量（仅被 `<connection>` 连接或被点号引用的
 端口），**作者无需手写 `<variable name="port_a__T"/>`**。状态端口用点号声明覆盖：
 `<variable name="port.T" role="state" initial="300"/>`。`__` 是**内部**命名分隔符（§9），作者层不写。
 
@@ -354,7 +355,7 @@ ESML 原生作者优先**组合（§4.1）/参数覆盖**；`<extendsFrom>` 主�
   数组端口才走隐式域（每元素势相等 + 每元素流守恒）。
 
 **展开**：声明期展开为逐元素端口变量，索引写作 `port.pvar[i]`；
-`<connect>` 对数组端口逐元素建相等约束，流程层无需手工绑定。
+`<connection>` 对数组端口逐元素建相等约束，流程层无需手工绑定。
 
 **`<constant>` 元素形态**：`PortVariableType` 接受 `<constant>` 作为
 portVariable 子元素，语义等价于 `<portVariable role="constant">`。两种写法一致：
@@ -407,7 +408,7 @@ portVariable 子元素，语义等价于 `<portVariable role="constant">`。两�
 ```
 - `scope instance=`：选中一个实例（`unit=` 非法）；
 - `set path=...`：在**该实例内部**按"声明位置路径"覆盖一个量的值；
-  `path` 是属性路径（现在多为参数名，语义上可含 `.` 或下标，与 `<connect>` 的点号
+  `path` 是属性路径（现在多为参数名，语义上可含 `.` 或下标，与 `<connection>` 的点号
   路径同体系），不是随意起名；旧写法 `<set name=` 已收紧报错；
 - 语义 = **实例级参数覆盖**：覆盖实例的值，类型定义里的 default 不变 → 类型可复用。
 - 路径若无匹配声明量，建系时报错（校验）。
@@ -516,7 +517,7 @@ instance 的 `type` 指向 `<system>` 时，它按子系统展开，不当作缺
     **文字超前于 schema**；落地要一次规范修订（`SPEC.md` ＋ XSD ＋ 示例），
     记账见 `docs/coverage.md` §5.9。
 - 语义（建模期求值）：
-  - **静态 false** → 实例被**排除**：其实例方程、以其为端点的 `<connect>` 全部丢弃；
+  - **静态 false** → 实例被**排除**：其实例方程、以其为端点的 `<connection>` 全部丢弃；
   - **恒真 / 缺省** → 正常实例化（等价 `condition="true"`）；
   - **不可静态判定** → **报错**（条件组件必须由参数驱动；不引入运行期
     变结构，保持扁平 DAE 方程数固定）。
@@ -549,7 +550,7 @@ Process/Case 也有 flowsheet 级 `EQUATION`。ESML canonical 对应地允许 `<
 ```
 
 - 方程**引用实例量** `inst.var`（点号路径）；构建期折为扁平名
-  `inst__var` 并入整体残差（与 `<connect>` 端点同体系）。
+  `inst__var` 并入整体残差（与 `<connection>` 端点同体系）。
 - 与 `<modelType>` 的 `<equations>` 语义一致；差别只是这一层没有自己的变量表，
   声明的量来自实例。
 - 本层与 `<modelType>` 级方程同语义，二者可混用。
@@ -1056,7 +1057,7 @@ port := <port name portType size? count?/>
 variable := <variable name type role initial default/>
 equation := <equation> expr (=|~) expr </equation>
 system := <system name> instances connections? sets? schedule? </system>
-connect := <connect from=path to=path/>
+connection := <connection from=path to=path/>
 scope := <scope instance=name><set path value/></scope>
 ```
 
