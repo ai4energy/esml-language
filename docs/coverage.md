@@ -353,6 +353,17 @@ $ grep -n "fn conformance_14_\|fn conformance_83_" reference/conformance.rs
 引擎仓那条「roadmap:51 的『spec 引用 14、83』指的是 spec 正文里引用的 14 与 83」
 的留档见 `docs/design/conformance-residual-adjudication.md`（引擎仓）。
 
+**补充（实测 `origin/main` 的闸门）**：[3] 角**并不因为 14/83 判红**——闸门
+自己的文档写着，`have` 早已改从 **Rust 树**取（`reference/conformance.rs` 是
+上游快照，只当两面对账里的 `on_reference` 侧），所以 14/83 的 `rust=ok` 即算
+「有支撑」；那两行 `reference=缺` 只是说**上游快照里没有同号的用例**。要把这两
+行也变成 `reference=ok`，得动引擎仓的 `reference/conformance.rs`（上游快照），
+属引擎仓的事。
+
+`origin/main` 上闸门整体 `verdict: DISAGREE`，**红在 [2] 角**（引擎仓自己的
+`tests/fixtures/schedule_solver.esml` 与 `tests/fixtures/schedule_until.esml`
+两个 unexpected），不在这两行上。
+
 ### 5.9 §6.5 条件组件：「参数」操作数当前**无处可声明**（规范 ↔ 实现 错位）
 
 `SPEC.md` §6.5 说条件的操作数可以是「参数 / 常量 / 序集成员」，示例却写
