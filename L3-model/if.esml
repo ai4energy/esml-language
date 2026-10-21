@@ -3,6 +3,7 @@
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 模型级条件方程 `<if>`：`<condition>` 给布尔条件，`<then>` / `<else>` 各给一条方程。
      两分支左端须一致，求解前降为 `lhs = ifelse(cond, rhsA, rhsB)`。
+     规范条文：附录 B（续）— 模型级 IF。
      `check` errors=0；`solve`：u = 1.0 > 0.5 走 then 分支 D(x) = −x ⇒ x(1) = e^−1 ≈ 0.368。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L3_If">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

@@ -3,6 +3,7 @@
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 `<systems><system name discipline><instances><instance name type/></instances>`：
      单一 modelType 实例化一次。system 的 `discipline` 与 modelType 的 `discipline`
+     规范条文：§6（系统、实例与参数覆盖）。
      相互独立，可以不同。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L5_InstanceBasic">
   <modelTypes><modelType name="M">

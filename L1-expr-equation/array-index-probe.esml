@@ -4,6 +4,7 @@
 <!-- 语法点 负例（预期失败）：数组维 `"GhostSet"` 未在顶层 `<set>` 声明，也不是参数名，
      因此不是合法维。期望 `check` 报错，并在消息中说明三种合法维形态：
      字面量（如 `"3"`）、已声明序集（如 `"Species"`）、已声明参数名（如 `"N"`）。
+     规范条文：§7（数组下标与切片）。
      非零退出是预期行为；配套正例见 `array-index.esml`。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_ArrayIndexProbe">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

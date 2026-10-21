@@ -2,6 +2,7 @@
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 `<controlled>`：MPC 任务内的被控变量声明（属性 `var=` / `setpoint=` / `tolerance=`）。
+     规范条文：§6.9（计算任务表）。
      实现作为元数据接受并跳过。`check` errors=0，`tasks` exit=0。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="T_Controlled">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

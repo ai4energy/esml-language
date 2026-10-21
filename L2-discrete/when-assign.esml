@@ -3,6 +3,7 @@
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 `<when>` 加 `<assign>`：离散变量在事件时刻被赋值并保持。
      滞回开关：T > Tbar + 1 时 on := 1；T < Tbar − 1 时 on := 0；
+     规范条文：附录 F3（事件语义糖）。
      用 `pre()` 引用上一事件后保持的值。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L2_WhenAssign">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

@@ -2,6 +2,7 @@
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 顶层 `<solutionParameters>` 容器，用于放置求解参数。本例给 solver 子元素
+     规范条文：§6.9（顶层 `<solutionParameters>` 段）。
      （tspan to=60、abstol=1e-6）。`check` 通过。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="D_SolutionParameters">
   <solutionParameters name="sp1">

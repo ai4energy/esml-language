@@ -2,6 +2,7 @@
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 `<recordType>` 记录类型声明：顶层 `<recordTypes>` 内写 `<recordType name>`
+     规范条文：§3（记录类型 `<recordTypes>`）。
      与若干 `<field name type default/>`。本例演示声明形态。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L0_RecordType">
   <recordTypes>

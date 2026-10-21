@@ -3,6 +3,7 @@
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 负例：`<unitsBase>` 中 `name="K"` 与 `base="T"` 互相矛盾
      （T 是时间字母，名称却表示开尔文）。`esml check-units <本文件>` 期望报错，
+     规范条文：附录 J（单位语义）。
      消息含 `contradicts`。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L0_UnitsContradiction">
   <units>

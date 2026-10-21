@@ -5,6 +5,7 @@
      连接节点上的 potential 相等照常生效。
      本例只展示 `<potential>` 这一语法点（i 用已覆盖的 portVariable 角色形声明）：
      10 V 源 — 2 Ω 电阻 — 地，解出 v = 10 / 0。
+     规范条文：§5（端口）。
      `check` errors=0；`solve`（system S）：r.a.v = 10.0、r.b.v = 0.0。 -->
  <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_PotentialElement">
    <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

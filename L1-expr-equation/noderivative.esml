@@ -3,7 +3,11 @@
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 负例：`<noDerivative wrt=>`，函数 `<derivative>` 的子元素，声明对 wrt 的导数为 0。
      `<body>` 与 `<derivative>` 互斥；本件同时给出 `<body>y = x</body>` 与导数声明，
-     因此 `check` 应报错（rc=1）。本件只演示该 token 的拼写，不是可运行样例。 -->
+     因此 **canonical schema 校验应报错**（`xsd/esml-canonical-basic.xsd` 里
+     `<body>` 与 `<derivative>` 同属 `xs:choice maxOccurs=1`，二者互斥）。⚠ 实现侧的 `check`
+     目前**仍放行**（未实现这条互斥）—— 属规范↔实现缺口，见 `docs/coverage.md`。
+     规范条文：§14.2（求导三档）。
+     本件只演示该 token 的拼写，不是可运行样例。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_NoDerivative">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
   <functions><function name="f">

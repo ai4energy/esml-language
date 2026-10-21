@@ -4,6 +4,7 @@
 <!-- 语法点 时钟采样：`<clock name interval/>` 加 `sample` / `previous`。
      yp = previous(y) 在时钟 c 上每 0.1 s 采一次并保持一拍（[0, 0.1) 取初值）；
      ys = sample(y, c) 取 y 在当前拍上的采样值。
+     规范条文：§7.1（状态机与时钟）。
      `check` 通过；`simulate`（system S）exit=0（y = e^(−t) 衰减轨迹）。 -->
  <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L2_ClockSample">
    <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

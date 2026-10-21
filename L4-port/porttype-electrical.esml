@@ -3,6 +3,7 @@
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 `<portTypes><portType name connectorFamily><portVariable role type/></portType></portTypes>`：
      电气 Pin = v（potential）+ i（flow）。端口对连时 potential 相等、flow 守恒；
+     规范条文：§5（端口）。
      模型侧用 `<port name portType="…"/>` 引用。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_PortElectrical">
   <portTypes><portType name="Pin" connectorFamily="electrical">

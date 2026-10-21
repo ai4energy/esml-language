@@ -3,6 +3,7 @@
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 文档根元数据 `<metadata>`：`author` / `license` / `description` 等子元素，
      子结构不固定。`<metadata>` 必须是 `<esml>` 的子元素。metadata 不参与求解，
+     规范条文：§1.1（文档骨架与 `<metadata>`）。
      `check` 通过，`solve` 结果不受影响（本例 x = 1.0）。 -->
  <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="D_Metadata">
    <metadata>

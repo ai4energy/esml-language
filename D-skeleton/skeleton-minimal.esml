@@ -2,6 +2,7 @@
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 最小文档骨架：根 `<esml …>` 加最小的 variableTypes / modelTypes / systems 三段。
+     规范条文：§1.1（文档骨架）。
      `check` 通过；求解时衰减模型稳态趋于 N=0。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="D_Minimal">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

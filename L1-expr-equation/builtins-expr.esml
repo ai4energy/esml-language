@@ -6,6 +6,7 @@
      域安全取值：asin/acos/atanh 要求 |a| < 1，acosh 要求 b ≥ 1，ln/log10 要求 b > 0。
      `solve`（system S）稳态全解；`simulate`（system I）验时间积分
      （I = integral(a=2)，t = 1 → 2.0；integral 无稳态，故走 simulate）。
+     规范条文：§7（表达式内建）＋ 附录 F8（vector 归约内建）。
      延迟与复数用法另见 `builtins-delay.esml`、`builtins-complex.esml`。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_BuiltinsExpr">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

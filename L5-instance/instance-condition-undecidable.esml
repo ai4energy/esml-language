@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 负例（预期失败）：`<instance condition="…">` 的条件**必须**在构建期静态可判定。
+     本件把条件写成对模型参数的引用 `k > 0`——`k` 虽是已声明参数，但它的取值
+     （可被 `<sets>` 覆盖、可被 `<use>` 合并进来的库改写）要到实例展开之后才定，
+     构建期折叠不出来 ⇒ 实现应当**响亮报错**并说明「条件必须是常量表达式」，
+     而不是猜一个值把实例放进或不放进模型。
+     规范条文：§6.5（条件组件）。
+     预期失败：`esml check` **通过**（条件求值在展开期，不在 front 校验期），
+     `esml solve` / `esml simulate` 必须非零退出，并给出
+     「instance condition `k > 0` is not statically decidable」与常量化建议。
+     正例见 `L5-instance/instance-condition.esml`。
+     本件只演示该 token 的拼写，不是可运行样例。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L5_InstanceConditionUndecidable">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes><modelType name="M">
+    <parameters><parameter name="k" type="real" default="2.0"/></parameters>
+    <variables><variable name="y" type="real" role="algebraic"/></variables>
+    <equations><equation>y = k</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances>
+      <instance name="m" type="M" condition="k &gt; 0"/>
+    </instances>
+    <schedule><sequence><continueFor time="0"/></sequence></schedule>
+  </system></systems>
+</esml>

@@ -3,6 +3,7 @@
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 `<setpoint>`：控制器设定点，可写成属性形（`var=` / `value=`）
      或子元素形（`<var name value/>`）。它挂在 control 任务的 controller 下，
+     规范条文：§6.9（计算任务表）。
      实现只做元数据透传、不参与求解。`check` errors=0。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L5_Setpoint">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

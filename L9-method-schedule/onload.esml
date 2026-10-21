@@ -7,6 +7,7 @@
      对本模型参数求值；指向未声明的名字会显式报错。
      本例对照：c（带 onLoad，K 由 1 覆盖为 5）⇒ x = 5 + 6 = 11；
      p（无 onLoad）⇒ x = 1 + 6 = 7；e（表达式 preset，K = 3·W = 6）⇒ x = 12。
+     规范条文：附录 F5（on_load 预设方法）。
      `check` errors=0；`solve`（system Demo）验证这三组值。 -->
  <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L9_OnLoadPreset">
    <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

@@ -3,6 +3,7 @@
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 负例（预期失败）：`array="3"` 的数组用字面索引 `x[4]`，越出 1-based 的合法范围 {1, 2, 3}。
      期望 `check` 报错并指出索引越界；0-based 索引（`x[0]`）与越界一样报错。
+     规范条文：§7（数组下标与切片）。
      非零退出是预期行为；配套正例见 `axis-reduce.esml`。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_OobProbe">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

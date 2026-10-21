@@ -5,6 +5,7 @@
      连接节点守恒与悬空端口钉零照常生效。
      本例只展示 `<flow>` 这一语法点（T 用已覆盖的 portVariable 角色形声明）：
      300 K / 280 K 两恒温源经导体，Q_flow = (300 − 280) / 0.5 = 40 W。
+     规范条文：§5（端口）。
      `check` errors=0；`solve`（system S）cd.port_a.Q_flow = 40.0。 -->
  <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_FlowElement">
    <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

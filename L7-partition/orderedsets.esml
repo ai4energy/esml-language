@@ -2,6 +2,7 @@
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 顶层序集声明用**单数** `<orderedSet>`。复数容器 `<orderedSets>` 无声明，
+     规范条文：附录 B（续）— ORDERED_SET 序集。
      出现时会报错并提示改用单数写法。`check` errors=0。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L7_OrderedSets">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

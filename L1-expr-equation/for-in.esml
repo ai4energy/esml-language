@@ -4,6 +4,7 @@
 <!-- 语法点 方程级 `<for var="i" in="…">` 循环。当前可运行形态是**字面范围** `in="1..3"`
      加 body 内**直接**的 `<equation>`（循环展开）；`in="1..n"`（参数范围）与
      `<body>` 包裹形态目前不展开。`i` 在 body 内按下标使用（`x[i]`）。
+     规范条文：附录 B（续）— FOR 循环。
      `check` errors=0；`solve`（system S）：lo = {1,2,3}、hi = {2,4,6}。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_ForIn">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

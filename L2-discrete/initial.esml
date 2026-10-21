@@ -3,6 +3,7 @@
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 `<initial>`：`<system>` 子元素，内部用 `<scope instance="…">` 包住
      `<equation>lhs = rhs</equation>`，给出初始赋值。
+     规范条文：§6.0（实例参数覆盖：scope / set / path）。
      `check` errors=0；`solve` 验证 initial 覆盖状态初值。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L2_Initial">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

@@ -5,6 +5,7 @@
      实现作为元数据接受并跳过，与 `<benchmark>` / `<verdict>` 同判据。
      本例写 camel 容器，只演示「任务级 vendor 容器被接受并跳过」这一点；
      `param` 子元素当前仍按 legacy 拼法拒收，故暂不给出。
+     规范条文：§6.9（计算任务表）。
      `check` errors=0，`tasks` 的 simulate exit=0（N(60) ≈ 4.98）。 -->
   <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="T_HyperParams">
     <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

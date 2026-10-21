@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 段前方法体（附录 K）：`<methods><method name="ramp"><set path="m.k"
+     value="3.0"/></method></methods>` 声明具名方法体；`<call method="ramp"/>`
+     归属**其后**那个 `<continueFor>` 段，并在该段开始前把 `m.k` 由默认 2.0 改成 3.0。
+     模型 D(y) = -k·y、y(0) = 1 ⇒ 闭式 y(t) = e^{-kt}：整段 2 s 都在这次调用之后
+     ⇒ 全程 k = 3 ⇒ 段末 y(2) = e^{-6} ≈ 0.0024787522。
+     去掉 `<call>` 的同一模型（k 仍取默认 2.0）段末为 e^{-4} ≈ 0.0183156389，
+     两者相差约 7.4 倍 ⇒ 方法体有没有落地一眼可辨，不是「看起来正常」的静默结果。
+     与 methods-run.esml 的分工：那份演示方法表的 `<fix>/<run>` 命令本身，
+     本份演示**方法表 × schedule 的接线**（命令在段前何时生效）。
+     寻址只收作者点号 `m.k`：`__` 是结构分隔符、作者标识符禁含（§3），
+     扁平写法 `m__k` 一律拒收。
+     ⚠ 验证路径：`esml check` 通过；但 `esml simulate` 子命令只按命令行给的 tspan 积分、
+     **不消费 `<schedule>`**（段划分与段前方法体都跳过），拿它跑会得到 e^{-4} 那个值
+     规范条文：附录 K（METHOD × Schedule 编排）。
+     —— 那是校验工具的缺口，不是本例的语义。验这一条要走消费 schedule 的路径。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L9_CallMethodBody">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes><modelType name="Decay" discipline="generic">
+    <parameters><parameter name="k" type="real" default="2.0"/></parameters>
+    <variables><variable name="y" type="real" role="state" initial="1.0"/></variables>
+    <equations><equation>D(y) = -k * y</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="Decay"/></instances>
+    <methods>
+      <method name="ramp"><set path="m.k" value="3.0"/></method>
+    </methods>
+    <schedule><sequence>
+      <call method="ramp"/>
+      <continueFor time="2"/>
+    </sequence></schedule>
+  </system></systems>
+</esml>

@@ -4,6 +4,7 @@
 <!-- 语法点 数组元素引用与切片：`x[i]`（方括号、1-based）、`x[i,j]`（多维，行主序展平）、
      `x[lo:hi]`（切片，含两端点）、`x[i] = v`（元素赋值，逐元素展开）。
      与 `sum/mean/size` 的标量归约正交。`check` errors=0；`solve` 稳态全解
+     规范条文：§7（数组下标与切片）＋ 附录 F8（vector 归约内建）。
      （切片归约示例：sum(T[1:4]) = 0+10+20+30 = 60）。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_ArrayIndex">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

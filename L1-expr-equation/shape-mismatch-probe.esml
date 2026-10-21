@@ -3,6 +3,7 @@
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 负例（预期失败）：`v + M`，v 为 rank-1 [3]，M 为 rank-2 [3, 2]，形状不一致。
      唯一合法的广播是 scalar × array；其余形状不一致一律报错，不做隐式自动广播。
+     规范条文：§7（向量归约内建）。
      非零退出是预期行为；配套正例见 `axis-reduce.esml`。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_ShapeMismatchProbe">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

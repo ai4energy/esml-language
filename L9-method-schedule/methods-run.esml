@@ -4,6 +4,7 @@
 <!-- 语法点 `<methods><method name>…</method></methods>`（系统级方法块）。
      可用命令：`<fix name value/>` 钉住变量、`<free name/>` 释放、`<run name/>` 引入另一具名方法。
      本例 base 把 u.y 钉在 5.0；combo 通过 `<run name="base"/>` 复用 base
+     规范条文：附录 F7（自由度 FREE）＋ 附录 F7b（METHOD RUN 子过程）。
      ⇒ a = (5 − 1) / 2 = 2。模型级 `<onLoad>` 见 `onload.esml`。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L9_MethodsRun">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

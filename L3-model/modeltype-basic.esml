@@ -3,6 +3,7 @@
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 `<modelType name [discipline]>` 加 `<description>`，内嵌 `<parameters>` /
      `<variables>` / `<equations>`。`discipline` 表示物理领域（thermal / electrical 等），
+     规范条文：§4（组件）。
      省略时取默认。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L3_ModelBasic">
   <modelTypes><modelType name="FirstOrder" discipline="generic">

@@ -3,6 +3,7 @@
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 选择器：`<selectors><selector name>…</selector></selectors>` 加可选值域 `<values>`，
      以及系统级 `<initialSelectors><scope instance="…"><initialSelector path value/>` 设初值。
+     规范条文：附录 B（续）— SELECTOR。
      `check` 通过；`solve`（system S）稳态解。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L3_Selector">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

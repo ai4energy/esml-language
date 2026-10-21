@@ -3,7 +3,11 @@
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 端口角色 `input` / `output`：portType 用 `domain=` 标领域，端口变量用
      `role="input"` / `role="output"`（与 potential / flow / stream 并列）。
-     `check` 通过。input 端口的取值由流程层的方程给定——`<set>` 只给参数，不能替代方程。 -->
+     规范条文：§5（端口）＋ §6.6（系统级方程）。
+     `check` 通过。input 端口的取值由流程层的方程给定——`<set>` 只给参数，不能替代方程。
+     本件的 `<system>` 级 `<equations><equation>m.p.u = 1.0</equation></equations>`
+     即 §6.6 的系统级方程（流程层方程，非 `<set>`）。
+     跨 PortType 的信号连接见 `L4-port/signal-causal.esml`（附录 F2）。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_PortRolesIO">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
   <portTypes><portType name="IO" domain="electrical">

@@ -3,6 +3,7 @@
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 探针：optimize 任务的 `<objective>` 里用 `<expr>` 包住表达式。
      当前实现只读 `<objective>` 的文本体、不读 `<expr>` 子元素，因此 `check` 通过而
+     规范条文：§6.9（计算任务表）。
      `tasks` 报错（objective 文本体为空）。工作形态是把表达式直接写成文本体。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_Expr">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

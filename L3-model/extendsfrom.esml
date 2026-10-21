@@ -3,6 +3,7 @@
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 `<extendsFrom>` 文本形态：Base 带参数 k，Child 与 Child2 两个子模型都以
      `<extendsFrom>` 继承 Base 并增加参数 u 与方程 y' = −k·y + u，同 system 内两实例并列。
+     规范条文：§4.0（继承 `<extendsFrom>`）。
      canonical 拼法是 camelCase `extendsFrom`，kebab 写法会被拒绝。`check` errors=0。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L3_ExtendsFrom">
   <modelTypes>

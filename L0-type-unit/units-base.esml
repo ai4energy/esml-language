@@ -2,6 +2,7 @@
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 `<unitsBase>` 单位库基量容器：用 `base` / `scale` / `offset` 给出
+     规范条文：附录 J（单位语义）。
      degC 与 K 的仿射换算。`check` 通过；求解得 T = 298.15 K。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L0_UnitsBase">
   <units>

@@ -3,6 +3,7 @@
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 `<connectRules><rule from="…" to="…"/></connectRules>`：带 `category=` 的连接规则。
      feed（producer.out）只允许接 primary / secondary（consumer.in_a / in_b）；
+     规范条文：附录 F4（连接规则表）。
      未列出的类别对在编译期报错。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L6_ConnectRules">
   <variableTypes><typesDimensionless discipline="generic">

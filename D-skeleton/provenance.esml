@@ -2,6 +2,7 @@
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 `<metadata>` 下的 `<provenance>` 子元素，用于声明文档出处。
+     规范条文：§1.1（文档骨架与 `<metadata>`）。
      它与 `author` / `description` 同处 `<metadata>`，不参与求解。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="D_Provenance">
   <metadata>

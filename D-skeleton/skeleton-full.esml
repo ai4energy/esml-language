@@ -3,6 +3,7 @@
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 完整文档骨架：按 canonical 顶层顺序（units → variableTypes → portTypes →
      functions → modelTypes → systems）铺满可写的顶层段，每段放一个最小真实内容。
+     规范条文：§1.1（文档骨架）。
      函数用纯表达式形态（无 `<outputs>`，`<body>` 是表达式），可内联求解。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="D_FullSkeleton">
   <units>

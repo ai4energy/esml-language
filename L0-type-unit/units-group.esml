@@ -2,6 +2,7 @@
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 `<units>` 内的 `<group>`：单位分组包装。`<group>` 内的 `<unit>` 照常可用。
+     规范条文：§3（单位表分组）。
      `check` errors=0。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L7_Group">
   <units>

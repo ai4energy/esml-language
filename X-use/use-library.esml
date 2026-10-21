@@ -8,6 +8,7 @@
      与 HeatPort 端口（port / port_a / port_b）。
      检查阶段只做坐标审计、不合并库内容（库内模型会报未找到）；
      `solve <本文件> -L <库根>` 才做全闭包合并：FixedT(Tset=350) — Conductor(R=0.5) — Body，
+     规范条文：§6.1（标准库坐标引用）。
      稳态全链 350 K，Q_flow = 0。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="X_UseLibrary">
   <use library="cn.ai4energy.esml.thermal:heat-elements:0.1"/>

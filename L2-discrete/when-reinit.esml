@@ -3,6 +3,7 @@
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 `<events><when condition><reinit name value/></when></events>`：连续状态在事件时刻被重置。
      弹球触地（h < 0）时速度反向并乘回弹系数；reinit 到 h = 1e-5 是「抬离触面」的惯例
+     规范条文：附录 F3（事件语义糖）。
      （相切不触发）。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L2_WhenReinit">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

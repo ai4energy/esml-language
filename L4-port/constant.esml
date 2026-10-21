@@ -4,6 +4,7 @@
 <!-- 语法点 portType 内的端口变量**元素**形态 `<constant name type/>`：直接挂在 `<portType>` 下，
      不经 `<variables>` 容器；元素名即 role=constant（等价 `role="constant"`，
      显式 role= 属性优先）。本例端口常量 c 由模型以 p.c = 3.0 定值，y = 2·c。
+     规范条文：§5（端口）。
      `check` errors=0；`solve` y = 6.0。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_PortVarConstant">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

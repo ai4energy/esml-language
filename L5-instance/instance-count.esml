@@ -5,6 +5,7 @@
      count 值可以是参数引用或表达式（例如 `count="n-1"`），副本可配合
      `<for var="i" in="1..n">` 做连接展开。
      本例 Row 内含 Node 数组实例（count="n"，n = 3），展开为 3 份独立副本。
+     规范条文：§6（系统、实例与参数覆盖）。
      `check` errors=0；`solve`（system S）：row.node_1.v = row.node_2.v = row.node_3.v = 1.0。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L5_InstanceCount">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
