@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 子系统间边界耦合（§6.4）：`<system>` 作 instance 的 type 即得子系统，
+     父系统的 `<links><crosslink from to/></links>` 端点写**限定路径**
+     `子系统实例.成员.量`，展开时重映射为扁平名并入连接（相等约束），
+     即「系统 = 子系统 × crosslink × 子系统」整体联立。
+     与 partition-crosslink.esml 的分工：那份演示显式 `<partitions>` 上的
+     跨分区边界，本份演示**未分区**时的子系统联立（结果与不写 crosslink 一致）。
+     solve（system Root）：Src 出 5.0 ⇒ A.u.y = 5.0 经 crosslink ⇒ B.v.s = 5.0
+     ⇒ B.v.y = 5.0。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L7_SubsystemCrosslink">
+  <modelTypes>
+    <modelType name="Src">
+      <parameters><parameter name="A" type="real" default="5.0"/></parameters>
+      <variables><variable name="y" type="real" role="algebraic"/></variables>
+      <equations><equation>y = A</equation></equations>
+    </modelType>
+    <modelType name="Recv">
+      <variables>
+        <variable name="s" type="real" role="algebraic"/>
+        <variable name="y" type="real" role="algebraic"/>
+      </variables>
+      <equations><equation>y = s</equation></equations>
+    </modelType>
+  </modelTypes>
+  <systems>
+    <system name="SubA"><instances><instance name="u" type="Src"/></instances></system>
+    <system name="SubB"><instances><instance name="v" type="Recv"/></instances></system>
+    <system name="Root">
+      <instances>
+        <instance name="A" type="SubA"/>
+        <instance name="B" type="SubB"/>
+      </instances>
+      <links><crosslink from="A.u.y" to="B.v.s"/></links>
+    </system>
+  </systems>
+</esml>
