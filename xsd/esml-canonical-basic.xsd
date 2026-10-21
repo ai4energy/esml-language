@@ -3,14 +3,15 @@
   ESML canonical — model-system basic subset。
 
   自包含、可被 XSD 校验器编译的 canonical 子集：覆盖模型体系逐层基本件
-  单位 units → 变量类型 variable-types(类别 wrapper) → 模型/变量/参数
-  (model-type: parameters/variables/equations) → 端口 port-types/port + connect →
+  单位 units → 变量类型 variableTypes(类别 wrapper) → 模型/变量/参数
+  (modelType: parameters/variables/equations) → 端口 portTypes/port + connection →
   复合 <members>(instance) → 系统 systems(instances/sets/initial/connections)
   → 坐标库 <use library="g:a:v"/>。
 
   注意：
   - 求解/计算任务(schedule/tasks/solver)属计算求解体系，不在本 schema。
-  - instance 为主词（系统与 <members> 内），<component> 为兼容别名。
+  - instance 为主词（系统与 <members> 内）；旧拼写 <component> **不是合法语法**，
+    本 schema 只认 <instance>（同一语义只留一个名字，SPEC §2）。
   - 子系统间边界写作 <crosslink>（容器为 <links>）；旧拼写 <link> 不是合法语法，
     本 schema 只认 <crosslink>。
   - 严格子集：仅列出的模型体系元素可校验；其他顶层段不在本 schema 覆盖范围内
@@ -65,7 +66,7 @@
       <xs:element name="unit" type="esml:UnitDeclType" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
-  <!-- <units-derived> may carry either loose <unit> leaves or
+  <!-- <unitsDerived> may carry either loose <unit> leaves or
        <group name="..."> sub-buckets; leaves are collected depth-first. -->
   <xs:complexType name="UnitsDerivedType">
     <xs:sequence>
@@ -110,7 +111,7 @@
     </xs:complexContent>
   </xs:complexType>
 
-  <!-- 序集：top-level `<ordered-set name="..." static="...">`
+  <!-- 序集：top-level `<orderedSet name="..." static="...">`
        包装 `<element>` 子项。 -->
   <xs:complexType name="OrderedSetElementType">
     <xs:simpleContent>
@@ -341,10 +342,12 @@
   </xs:complexType>
   <xs:complexType name="PortTypeDef">
     <xs:sequence>
-      <!-- 端口变量可直接声明在 <port-type> 下（不限于 <variables> 内）；识别的标签：
+      <!-- 端口变量可直接声明在 <portType> 下（不限于 <variables> 内）；识别的标签：
              var, variable, port-variable, portVariable, flow, potential,
              stream, constant, discrete. 宽松形式
-           `<port-type><var .../></port-type>` 同样被接受。 -->
+           `<portType><var .../></portType>` 同样被接受。
+           —— 这一族是**有意的并行写法**（元素名即角色声明，SPEC §5 + §2 例外说明），
+           不是同义改名：角色由元素名给出，或由 role= 属性给出。 -->
       <xs:choice minOccurs="0" maxOccurs="unbounded">
         <!-- 端口类型的就地短文档（`parse_doc_ref`，与 metadata 里的 `<doc>` 同型）。 -->
         <xs:element name="doc" type="esml:DocRefType"/>
@@ -898,7 +901,7 @@
     </xs:complexType>
   </xs:element>
 
-  <!-- 独立根 `<port-types>` / `<portTypes>`。 -->
+  <!-- 独立根 `<portTypes>`。 -->
   <xs:element name="portTypes">
     <xs:complexType><xs:sequence>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
