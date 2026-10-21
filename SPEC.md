@@ -254,11 +254,10 @@ ESML 原生作者优先**组合（§4.1）/参数覆盖**；`<extendsFrom>` 主�
 可选显式标记 `redeclare="true"`：名字必须在基类存在（否则**响亮报错**，
 防拼写错静默新增）。`replaceable="true"` 为元数据（未被替换时行为等同普通声明）。
 
-**`<extends>`（类级继承的 canonical 子元素形态）**：`<modelType>` 内可写
-`<extends name="Base"/>`（等价属性写法 `extends="Base"`），声明**同一文档内**声明的
-基类。它与 `<extendsFrom>` **并列**、不是同一件事：`<extendsFrom>` 合并的是
-**第三方转换库**的基类，`<extends>` 合并的是**本文档内**的基类；两者合并规则同为
-**派生同名优先**。示例：`L3-model/extends.esml`（子类型继承基类参数 `k`）。
+**拼写单轨**：类级继承的 canonical 写法只有 `<extendsFrom>`（§16 已删同义元素
+`<extends>` 与属性 `extends=`）。基类声明在**同一文档内**还是来自**第三方转换库**
+不改变拼写，两者都用 `<extendsFrom>`，合并规则同为**派生同名优先**。
+示例：`L3-model/extendsfrom.esml`（子类型继承基类参数 `k`）。
 
 ### 4.1 复合组件
 
@@ -1425,16 +1424,15 @@ CASE/多区/滞回：配 SELECTOR + `<events><when>`(STN)，方程用 `ifelse(se
   </sequence></schedule>
   ```
   多段（按时间段切分）求解，把末状态写回作下段初值，`preset` 在第 i≥2 段前
-  多段（按时间段切分）求解，把末状态写回作下段初值，`preset` 在第 i≥2 段前
   运行（可 `_set_param_default!` 段间改参数 = piecewise 阶跃操作）。
 - **调度步类型**：`<sequence>` 里的步有三种——
   - `<continueFor time="2"/>`：**推进**一段时长（连续时间顺序拼接）；
-  - `<reassign path="g.N" value="50.0"/>`：在**该步的累计时刻**（前面 `<continueFor time=>`
+  - `<reset path="g.N" value="50.0"/>`：在**该步的累计时刻**（前面 `<continueFor time=>`
     之和）把 `path` 置为 `value`；`path` 必须指向状态或变量（指到参数会显式告警且不改值）；
   - `<stop time="10"/>`：**记录 STOP 边界**——其后若再跟 `<continueFor>` 会被校验拒绝。
     它是**结构校验标记，不是运行时截断**：求解时长仍由 tspan 决定。
 
-  示例：`L9-method-schedule/reassign.esml`（段间重赋值）、`L9-method-schedule/stop.esml`（STOP 标记）。
+  示例：`L9-method-schedule/reset.esml`（段间重置）、`L9-method-schedule/stop.esml`（STOP 标记）。
 - v0 边界：仅**纯 ODE**（无 algebraic/discrete）；段时长总和 = tspan 长度（否则报错）；
   **控制器 / 无定模型 = 普通 simulate**（为单元测试注入，不改 ESMLModel 结构本身）
 - 示例：段解析、多段拼接等价单次连续求解、段间改 k ⇒ H=6.8。

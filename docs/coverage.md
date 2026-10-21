@@ -192,7 +192,7 @@ BEFORE 状态有 **54 / 136** 份示例在本仓 `SPEC.md` 里查无点名依据
 | 10 | `L2-discrete/clock-sample.esml` | `clock` | 补规范条文 | §7.1 |
 | 11 | `L2-discrete/reset-transition.esml` | `stateMachine` `state` | 补规范条文 | §7.1 |
 | 12 | `L2-discrete/state-machine.esml` | `stateMachine` `state` | 补规范条文 | §7.1 |
-| 13 | `L3-model/extends.esml` | `extends` | 补规范条文 | §4.0 继承（`SPEC.md:233`） |
+| 13 | `L3-model/extendsfrom.esml` | `extendsFrom` | 补规范条文 | §4.0 继承（`SPEC.md:233`） |
 | 14 | `L3-model/selector-values.esml` | `initialSelectors` `initialSelector` | 补规范条文 | 附录 B（续）SELECTOR（`SPEC.md:1107`） |
 | 15 | `L6-connect/connect-rules.esml` | `typesDimensionless` | **误报**（见注 1） | §3 类型按类别包裹 |
 | 16 | `L7-partition/domain.esml` | `domains` `discretization` | 补规范条文 | §6.4 计算域声明（`SPEC.md:448`） |
@@ -202,7 +202,7 @@ BEFORE 状态有 **54 / 136** 份示例在本仓 `SPEC.md` 里查无点名依据
 | 20 | `L8-function/foreign-object.esml` | `foreignObjects` `foreignObject` | 补规范条文 | 附录 I（`SPEC.md:1315`） |
 | 21 | `L8-function/locals.esml` | `locals` `local` | 补规范条文 | 附录 I |
 | 22 | `L9-method-schedule/fixed-preset.esml` | `presets` | 补规范条文 | §6.10 |
-| 23 | `L9-method-schedule/reassign.esml` | `reassign` | 补规范条文 | 附录 K（`SPEC.md:1354`） |
+| 23 | `L9-method-schedule/reset.esml` | `reset` | 补规范条文 | 附录 K（`SPEC.md:1354`） |
 | 24 | `L9-method-schedule/stop.esml` | `stop` | 补规范条文 | 附录 K |
 | 25 | `T-tasks/solutionparameters.esml` | `solutionParameters` | 补规范条文 | §6.9 顶层 `<solutionParameters>` 段 |
 

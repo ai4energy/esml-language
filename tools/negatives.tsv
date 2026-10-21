@@ -15,3 +15,4 @@ L1-expr-equation/noderivative.esml	schema	同上（<noDerivative>）
 L1-expr-equation/partial-derivative.esml	schema	同上（<partial>）
 L1-expr-equation/zeroderivative.esml	schema	同上（<zeroDerivative>）
 L3-model/component-probe.esml	schema	legacy <component> 元素形态，canonical 只收 <instance>（SPEC §2 收紧词法）
+L5-instance/instance-condition-undecidable.esml	semantic	instance condition 引用模型参数，构建期不可静态判定；check 过、solve/simulate 必须报「not statically decidable」（SPEC §6.5）
