@@ -1191,7 +1191,11 @@ CASE/多区/滞回：配 SELECTOR + `<events><when>`(STN)，方程用 `ifelse(se
   连接只许 **output↔input**：input↔input（无驱动源）与 output↔output（双驱动）在编译期报错
   （`signal_causal_guard`）。逐 pvar 命名须一致。
 - 组件侧同样须显式声明 `<leaf>__<pvar>` 变量（非 autovivify）。
-- 示例：信号口跨 PortType 的因果连接。
+- 示例：信号口跨 PortType 的因果连接 —— `L4-port/signal-causal.esml`
+  （`SigOut.y`(output) ↔ `SigIn.y`(input)，两份 portType 的 pvar 同名 `y`；
+  组件侧显式声明 `p.y` / `q.y`）。
+  ⚠ 护栏本身（`signal_causal_guard`）**实现侧未落地**：input↔input、output↔output、
+  pvar 命名不一致这三种写法现实现一律放行，详见 `docs/coverage.md`。
 
 ### 附录 F5 — on_load 预设方法
 - 模型级 `<methods><onLoad><set path="X" value="v"/>*</onLoad></methods>`：求解前覆盖
