@@ -803,10 +803,15 @@
         <!-- 顶层声明序集，供 array 下标。 -->
         <xs:element name="orderedSet" type="esml:OrderedSetType"
                     minOccurs="0" maxOccurs="unbounded"/>
-        <!-- Case-separated names are accepted as aliases (naming migration). -->
-        <xs:choice minOccurs="0" maxOccurs="1">
-          <xs:element name="variableTypes" type="esml:VariableTypesType"/>
-        </xs:choice>
+        <!-- 拼写单轨：`variableTypes` 只有 camelCase 这一种名字。
+             此处原先是一个包着单元素的 `<xs:choice minOccurs="0" maxOccurs="1">`，
+             配注释「Case-separated names are accepted as aliases (naming migration)」。
+             那段脚手架是死的：XSD 大小写敏感，`<xs:choice>` 里只有一个分支时与直接写
+             元素完全等价，**它并没有、也不可能接受 `<variable-types>` 之类的别名**。
+             注释却让人以为大小写别名还在 —— 同一语义两种名的错觉就是这么来的。
+             故拆掉，只留元素本身。SPEC §2「canonical 唯一，不向后兼容旧写法」。 -->
+        <xs:element name="variableTypes" type="esml:VariableTypesType"
+                    minOccurs="0" maxOccurs="1"/>
         <!-- record-type 目录（可选）。 -->
         <xs:element name="recordTypes" minOccurs="0" maxOccurs="1">
           <xs:complexType><xs:sequence>
@@ -818,18 +823,17 @@
           <xs:anyAttribute processContents="lax"/>
           </xs:complexType>
         </xs:element>
-        <xs:choice minOccurs="0" maxOccurs="1">
-          <xs:element name="portTypes">
-            <xs:complexType><xs:sequence>
-              <xs:choice minOccurs="0" maxOccurs="unbounded">
-                <xs:element name="portType" type="esml:PortTypeDef"/>
-              </xs:choice>
-            </xs:sequence>
-            <xs:attribute name="name" type="xs:string" use="optional"/>
-            <xs:anyAttribute processContents="lax"/>
-            </xs:complexType>
-          </xs:element>
-        </xs:choice>
+        <!-- 同上：单分支 choice 是死脚手架，`portTypes` 只有 camelCase 一种拼写。 -->
+        <xs:element name="portTypes" minOccurs="0" maxOccurs="1">
+          <xs:complexType><xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+              <xs:element name="portType" type="esml:PortTypeDef"/>
+            </xs:choice>
+          </xs:sequence>
+          <xs:attribute name="name" type="xs:string" use="optional"/>
+          <xs:anyAttribute processContents="lax"/>
+          </xs:complexType>
+        </xs:element>
         <xs:element name="functions" minOccurs="0">
           <xs:complexType><xs:sequence>
             <xs:element name="function" type="esml:FunctionType" minOccurs="0" maxOccurs="unbounded"/>
@@ -839,18 +843,17 @@
         <!-- 宿主对象（`<foreignObject name class><method name><set …>`）。 -->
         <xs:element name="foreignObjects" type="esml:ForeignObjectsType"
                     minOccurs="0" maxOccurs="1"/>
-        <xs:choice minOccurs="0" maxOccurs="1">
-          <xs:element name="modelTypes">
-            <xs:complexType><xs:sequence>
-              <xs:choice minOccurs="0" maxOccurs="unbounded">
-                <xs:element name="modelType" type="esml:ModelType"/>
-              </xs:choice>
-            </xs:sequence>
-            <xs:attribute name="name" type="xs:string" use="optional"/>
-            <xs:anyAttribute processContents="lax"/>
-            </xs:complexType>
-          </xs:element>
-        </xs:choice>
+        <!-- 同上：单分支 choice 是死脚手架，`modelTypes` 只有 camelCase 一种拼写。 -->
+        <xs:element name="modelTypes" minOccurs="0" maxOccurs="1">
+          <xs:complexType><xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+              <xs:element name="modelType" type="esml:ModelType"/>
+            </xs:choice>
+          </xs:sequence>
+          <xs:attribute name="name" type="xs:string" use="optional"/>
+          <xs:anyAttribute processContents="lax"/>
+          </xs:complexType>
+        </xs:element>
         <xs:element name="systems" minOccurs="0" maxOccurs="1">
           <xs:complexType><xs:sequence>
             <xs:element name="system" type="esml:SystemType" minOccurs="0" maxOccurs="unbounded"/>
