@@ -90,6 +90,12 @@ python3 -m venv .venv && .venv/bin/pip install lxml   # 只需一次
 **红在哪一层**：`schema` 表示 XSD 必须拒收它，`semantic` 表示拼写合法、红在求解层。
 标成 `schema` 的负例哪天被 XSD 收下了，门就红——那说明判据漏了，不是件变好了。
 
+「哪些写法算 legacy」这条知识落在 [`tools/aliases.tsv`](tools/aliases.tsv)，
+门据此逐条机验：legacy 元素名/属性名不得被任何 `xsd/*.xsd` 声明、不得出现在示例里；
+别名表里指认的 canonical 拼法必须真的在 XSD 里有声明（表与 schema 不得脱节）；
+入口 schema 的**根清单**必须与 canonical 层的全局元素集**完全一致**——入口多收一个
+根，等于放行一份 canonical 必然拒收的文档（假绿）；入口少收一个，则是误拒。
+
 ## 贡献
 
 语言变更先落为规范修订：一处改动同时涉及 `SPEC.md`、它蕴含的 XSD 变更，以及

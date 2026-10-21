@@ -1,0 +1,112 @@
+# tools/aliases.tsv · 词法别名裁决表（legacy 拼写 → canonical 拼写）
+#
+# 为什么要有这张表：规范 §2 定的是「canonical 唯一，不向后兼容旧写法」，
+# README 写的是「同一语义只有一种写法，其余写法一律报错，不做静默兼容」。
+# 但「哪些写法是 legacy」这条知识散落在各处的注释里 —— 只要它只活在注释里，
+# 下次有人把 legacy 名加回 XSD，机器是拦不住的。这张表把它落成数据，
+# `tools/check-examples.py` 据此逐条机验：
+#
+#   1. legacy 元素名不得被任何 xsd/*.xsd **声明**（豁免行除外）
+#   2. legacy 属性名不得被任何 xsd/*.xsd **声明**（豁免行除外）
+#   3. legacy 名字不得出现在任何示例文档里（豁免行除外）
+#   4. 非「待入」行的 canonical 拼法**必须在 XSD 里有同名声明**（元素/属性各按各的）
+#
+# 列：kind<TAB>legacy<TAB>canonical<TAB>说明
+#   kind = element | attribute
+#   说明列的三种前缀，各自带机器含义：
+#     （无前缀）  canonical 拼法已在本仓 XSD 里声明 —— 表与 schema 必须对得上。
+#     待入：      canonical 拼法**本仓 XSD 尚未声明**（该语法点本仓还没收，
+#                 或只活在 SPEC 正文里）。这类行不参与第 4 条机验，但仍参与
+#                 第 1/2/3 条 —— 拼法照样是 legacy，写进示例一样红。
+#     豁免：      该名字在某个**别的**语境里仍是合法拼法，整条不参与任何一条
+#                 机验。豁免不等于「legacy 名通行证」：那个别的语境由 XSD
+#                 自己的结构管着，写错地方一样过不了 canonical 校验。
+#
+# 判据来源：本仓 XSD 声明 + SPEC.md §2 收紧集 + 实现侧（esml 仓）
+# `crates/esml-syntax/src/parser/aliases.rs` 里已裁决的 legacy 表。
+# 裁决口径：**同一语义只留 canonical 那一个名字**，legacy 名一律不收。
+#
+# --- element ---
+element	component	instance	复合成员 / 实例位的 legacy 元素名
+element	components	modelTypes	复数容器另有其名
+element	compute-tasks	computeTasks	kebab 容器
+element	connect	connection	连接元素的 legacy 元素名
+element	connect-block	connectBlock	待入：kebab 容器（实现侧 owner 裁决；本仓 XSD 尚未收）
+element	connect-port	connectPort	待入：kebab 拼写（无连字符的 connectport 是另一条 legacy）
+element	connect-rule	connectRules	待入：SPEC 附录 F4 的容器拼法是复数 <connectRules>
+element	connect-rules	connectRules	待入：kebab 复数容器
+element	connectRule	connectRules	待入：camelCase 单数同样不是合法拼法（容器是复数）
+element	connectport	connection	无连字符的 legacy 元素名
+element	continue-for	continueFor	kebab 拼写
+element	control-vars	controlVars	kebab 容器
+element	design-vars	designVars	kebab 容器
+element	extends	extendsFrom	ModelType 类级继承的第二种元素名
+element	extends-from	extendsFrom	kebab 元素名
+element	foreign-objects	foreignObjects	kebab 容器
+element	hyper-params	hyperParams	kebab 容器
+element	initialisation-procedure	initialisationProcedure	待入：kebab 拼写
+element	initialisation-procedures	initialisationProcedures	待入：kebab 容器
+element	initialisationprocedure	initialisationProcedure	待入：全小写拼写
+element	interfaces	portTypes	复数容器另有其名
+element	jump-to	jumpTo	待入：kebab 拼写
+element	jumpto	jumpTo	待入：全小写拼写
+element	link	crosslink	跨分区边界边的 legacy 元素名
+element	model-instance	instance	实例元素的 legacy 元素名
+element	model-instances	instances	复合成员容器的 legacy 拼写
+element	model-type	modelType	类型声明的 legacy 元素名
+element	model-types	modelTypes	kebab 容器
+element	modelinstance	instance	实例元素的 legacy 元素名
+element	models	modelTypes	复数容器另有其名
+element	move-to	moveTo	待入：kebab 拼写
+element	moveto	moveTo	待入：全小写拼写
+element	ordered-set	orderedSet	单数容器
+element	ordered-sets	orderedSet	kebab 拼写；本仓序集只有单数拼法
+element	orderedSets	orderedSet	复数容器不是合法语法（入口 schema 明写）
+element	param	parameter	豁免：vendor <hyperParams> 内的 <param> 是「vendor 超参」，与模型级 <parameter> 不同容器不同义，保留
+element	port-type	portType	端口类型声明的 legacy 元素名
+element	port-types	portTypes	kebab 容器
+element	port-variable	portVariable	端口变量声明的 legacy 元素名
+element	record-type	recordType	记录类型声明的 legacy 元素名
+element	record-types	recordTypes	kebab 容器
+element	reassign	reset	调度 sequence 里 step 的第二个别名
+element	solution-parameters	solutionParameters	kebab 容器
+element	state-machine	stateMachine	待入：状态机声明的 legacy 元素名
+element	state-machines	stateMachines	待入：kebab 容器
+element	test-data	testData	kebab 拼写
+element	topology	connections	复数容器另有其名
+element	types-dimensionless	typesDimensionless	待入：kebab 容器
+element	types-generic	typesGeneric	待入：kebab 容器
+element	types-hydraulic	typesHydraulic	待入：kebab 容器
+element	types-thermal	typesThermal	待入：kebab 容器
+element	types-water	typesWater	待入：kebab 容器
+element	units-base	unitsBase	kebab 容器
+element	units-derived	unitsDerived	kebab 容器
+element	units-instance	unitsInstance	待入：kebab 容器
+element	variable-types	variableTypes	kebab 容器
+# --- attribute ---
+attribute	a-part	aPart	kebab 属性
+attribute	b-part	bPart	kebab 属性
+attribute	component	type	实例属性形态：<instance component="M"> 已移除，只认 type=
+attribute	control-horizon	controlHorizon	kebab 属性
+attribute	desc	description	legacy 缩写属性
+attribute	dir	category	legacy 属性
+attribute	extends	extendsFrom	legacy 属性形态（<modelType extends="Base">）；canonical 形态见 SPEC §4.0
+attribute	extends-from	extendsFrom	kebab 属性
+attribute	from_state	fromState	待入：snake 属性
+attribute	interface	portType	legacy 属性（只在 <crosslink> 上曾被容忍；canonical 拼法是 portType）
+attribute	lower-bound	lowerBound	kebab 属性
+attribute	lower_bound	lowerBound	snake 属性
+attribute	max-time	maxTime	kebab 属性
+attribute	model-type	type	实例属性形态：<instance model-type="M"> 已移除，只认 type=
+attribute	out_kind	outKind	待入：snake 属性
+attribute	out_state	outState	待入：snake 属性
+attribute	out_system	outSystem	待入：snake 属性
+attribute	port-set	portSet	待入：kebab 属性
+attribute	porttype	portType	小写 legacy 属性
+attribute	sample-time	sampleTime	kebab 属性
+attribute	time-layer	timeLayer	kebab 属性
+attribute	time_layer	timeLayer	snake 属性
+attribute	to_state	toState	待入：snake 属性
+attribute	tolerance_pct	tolerancePct	snake 属性
+attribute	upper-bound	upperBound	kebab 属性
+attribute	upper_bound	upperBound	snake 属性
