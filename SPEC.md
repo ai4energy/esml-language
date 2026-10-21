@@ -577,6 +577,16 @@ Process/Case 也有 flowsheet 级 `EQUATION`。ESML canonical 对应地允许 `<
 元素名用 camelCase（`systemRef`、`computeTasks`、`scenarioChain`）；
 kebab-case 拼写作为兼容别名接受。
 
+**`<tasks>` 外层壳**：`<computeTasks>` 之外的**可选外包装**，可与顶层其它元素并列。
+壳内子元素按松散规则透传（不另设结构约束）—— 它不引入新语义，只是给任务表
+套一层名字，便于同一文档放多张任务表。解析按 descendants() 找规范名
+`computeTasks` ⇒ **壳内嵌套的 `<computeTasks>` 被实读**，`<tasks>` 与
+`<computeTasks>` 不是两个平级概念，是同一个东西包了一层。
+canonical 声明：`xsd/esml-canonical-compute.xsd` 的 `<tasks>` 全局元素，
+`esml-canonical-basic.xsd` 的 `<esml>` 子元素表引用之（入口 schema
+`esml-v1.xsd` 早已声明同名根）。
+示例：`T-tasks/tasks.esml`。
+
 ### 6.9 计算任务表（`<computeTasks>` / `<task>`）
 
 **用途**：模型体系与计算体系同处一个文档时，`<computeTasks>` 挂任务表，
@@ -620,10 +630,38 @@ kebab-case 拼写作为兼容别名接受。
 **求解约定**：按 `kind` 构造问题再求解（任务声明 → 问题树 → 求解）；
 `kind` 是**闭集**，新增能力走附录 M 的功能层机制与组合，不新增 `kind`。
 
+**任务级元数据元素**（附录 M「metadata 参数」的落地清单）：`<task>` 除上表的
+`kind` 载荷外，还可带**任务附属元数据** —— 只承载声明性信息（数据源引用、
+目标/基准/验收、控制器与增益、执行器/传感器/被控量、超参），
+**不参与求解语义**。清单与 `esml-canonical-compute.xsd` 的 `TaskType` 子元素
+一一对应：
+
+| 元数据元素 | 载荷 | 示例 |
+|---|---|---|
+| `<verdict>` / `<status>` | 自由文本 | `T-tasks/task-vendor-text.esml` / `T-tasks/status.esml` |
+| `<tolerance>` | 自由文本 | `T-tasks/tolerance.esml` |
+| `<dataset>` / `<testData>` / `<reference>` | 数据源引用（`source` / `cols` / `format`） | `T-tasks/dataset.esml` / `test-data.esml` / `reference.esml` |
+| `<target>` / `<targets>` | 目标引用 | `T-tasks/target.esml` / `targets.esml` |
+| `<features>` / `<feature>` | 特性声明 | `T-tasks/features.esml` / `feature.esml` |
+| `<checks>` / `<check>` | 验收断言 | `T-tasks/checks.esml` / `check.esml` |
+| `<constraints>` / `<constraint>` | 约束 | `T-tasks/task-constraint.esml` |
+| `<hyperParams>` | 超参（`<param name value/>`） | `T-tasks/hyperparams.esml` |
+| `<benchmarks>` / `<benchmark>` | 基准 | `T-tasks/benchmarks.esml` / `task-vendor-text.esml` |
+| `<controller>`（内含 `<setpoint>` / `<gains>`） | 控制器声明 | `T-tasks/controller.esml` / `controller-gains.esml` / `gains.esml` |
+| `<setpoint>` | 设定点 | `T-tasks/setpoint.esml` |
+| `<actuator>` / `<sensor>` / `<controlled>` | 执行器 / 传感器 / 被控量 | `T-tasks/actuator.esml` / `sensor.esml` / `controlled.esml` |
+| `<controlVars>` / `<designVars>` | 控制变量 / 设计变量（`<var name/>`） | `T-tasks/control-vars.esml` / `design-vars.esml` / `controlled-control-vars.esml` |
+| `<outputList>` | 输出列表（`<var name/>`） | `T-tasks/outputlist.esml` |
+| `<description>` | 自由文本 | （暂缺示例） |
+
+⚠ **拼写**：这批元素在 schema 里是 camelCase（`hyperParams`、`testData`、
+`outputList`、`controlVars`、`designVars`），不是 kebab-case；
+`<task>` 另有同名**属性** `description`（`xs:string`），与 `<description>` 元素并存。
+
 **示例**：`T-tasks/tasks-seven.esml`（七类各一条的合照）、`T-tasks/task-simulate.esml` /
-`task-sensitivity.esml` / `task-estimation.esml` / `task-optimize.esml` / `task-control.esml` /
-`task-surrogate.esml` / `task-validation.esml`（逐类单跑），以及任务附属元数据族
-（`T-tasks/sensor.esml` / `setpoint.esml` / `targets.esml` / `checks.esml` 等）。
+`T-tasks/task-sensitivity.esml` / `T-tasks/task-estimation.esml` / `T-tasks/task-optimize.esml` /
+`T-tasks/task-control.esml` / `T-tasks/task-surrogate.esml` / `T-tasks/task-validation.esml`
+（逐类单跑），以及上表的任务附属元数据族。
 机验基准：`xsd/esml-canonical-compute.xsd`。
 
 ## 7. 方程类别与语义
@@ -936,12 +974,21 @@ canonical 语法对旧词法直接报错（§2）。
 
 这类文档的典型特征：
 
-- 带 MathML 或混合状态机结构（`<discretes>/<case>/<switch-to>`），
-- 带 `<constants>` / `<algorithm>` / `<initialisation-procedures>` 等旧容器，
+- 带 MathML 或混合状态机结构（`<discretes>/<switch-to>`），
+- 带 `<constants>` / `<initialisation-procedures>`（kebab）等旧容器，
 - 由早期研究模型或优化模型改用而来。
 
+⚠ **别把 canonical 元素误当 legacy**：`<case>`（方程块内条件分支）与
+`<algorithm>`（函数体的一种写法）**是 canonical 的** —— `esml-canonical-basic.xsd`
+声明了它们，仓内 `L2-discrete/case-branch.esml` / `T-tasks/algorithm.esml` 即其
+可运行示例。旧文档里的 legacy 形态是 `<discretes>` 这类**容器**与
+`<initialisation-procedures>` 这种 **kebab 拼写**，不是 `<case>` / `<algorithm>` 本身。
+旧容器名一律以 `esml-canonical-*.xsd` 的声明为准（README：「文字与 schema 出现
+分歧时，以 schema 为准」）。
+
 如需 canonical 表达，请按本规范重写或经转换器归一化，不要把旧文件改头换面
-当作 canonical。canonical 案例以 `examples/` 下按本规范书写的文档为准。
+当作 canonical。canonical 案例以本仓按语言层次分目录的示例为准（`D-skeleton/`、
+`L0-type-unit/` … `L9-method-schedule/`、`T-tasks/`、`X-use/`；见 README「示例目录」）。
 
 ## 附录 B（续）— 端口/角色规范词（canonical）
 
@@ -973,7 +1020,10 @@ canonical 语法对旧词法直接报错（§2）。
 `<equations><if><condition>c</condition><then><equation>lhs = rhsA</equation></then>
 <else><equation>lhs = rhsB</equation></else></if></equations>`
 两分支 lhs 须一致 → 降级 `lhs = ifelse(c, rhsA, rhsB)`（XSD `EquationSectionType` 已含 `<if>`）。
-CASE/多区/滞回：配 SELECTOR + `<events><when>`(STN)，方程用 `ifelse(sel==k,…)`。示例：examples/basic/weir_if.esml。
+CASE/多区/滞回：配 SELECTOR + `<events><when>`(STN)，方程用 `ifelse(sel==k,…)`。
+示例：`L1-expr-equation/ifelse.esml`（`ifelse` 分段表达式）、
+`L3-model/if.esml`（模型级 `<if>`）、`L2-discrete/case-branch.esml`（`<case on>` 多分支）、
+`L3-model/selector-values.esml`（SELECTOR 值域与初值）。
 
 ### FOR 循环
 - `<equations><for var="i" in="lo..hi"><body><equation>...i...</equation></body></for></equations>`
@@ -1235,7 +1285,7 @@ CASE/多区/滞回：配 SELECTOR + `<events><when>`(STN)，方程用 `ifelse(se
 |---|---|---|
 | `modelType` | **类型（class）** | 唯一类型容器/词（`<modelTypes>/<modelType>`）；带 `type` 后缀以别实例 |
 | `instance` | **实例（主词）** | `<instances>/<members>` 内的实例元素 `<instance name type/>` |
-| `component` | 实例的**兼容别名** | XSD 接受；新写用 `instance`；"曾经当类型容器"的用法已取消 |
+| `component` | 实例的**兼容别名** | XSD **仅在 `<members>` 内接受**；`<instances>` 内拒绝（负例 `L3-model/component-probe.esml`）。新写一律用 `instance`；"曾经当类型容器"的用法已取消 |
 | `system` | **场景/装配**（实例树顶层），兼作**子系统类型** | 作为 `type=` 引用目标时按子系统展开（§6.4） |
 | `members` | 复合 modelType 的**成员实例**（instance） | ：members 内 instance=成员实例，非子类型 |
 | `model-instance` / `unit` | 更旧的实例别名 | 不推荐；新写一律用 `instance` |

@@ -588,4 +588,24 @@
       <xs:anyAttribute processContents="lax"/>
     </xs:complexType>
   </xs:element>
+
+  <!--
+    `<tasks>`：`<computeTasks>` 之外的**可选外层壳**。
+    壳内子元素按松散规则透传（`##targetNamespace` + lax），不另设结构约束。
+    为什么在这里补：入口 schema `esml-v1.xsd` 早已声明同名根；引擎解析层
+    `parse_tasks` 按 descendants() 找规范名 `computetasks` ⇒ 壳内嵌套的
+    `<computeTasks>` 被实读（不是两个平级概念，是同一个东西包一层）。
+    本 schema 此前只声明了 `<computeTasks>`，canonical 校验器不认这个壳，
+    于是 `T-tasks/tasks.esml`（唯一用它的示例）机验失败 —— 规范正文 §6.8
+    已经把 `<tasks>` 写成顶层壳，schema 落后于正文。
+  -->
+  <xs:element name="tasks">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:any namespace="##targetNamespace" processContents="lax"
+                minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:anyAttribute processContents="lax"/>
+    </xs:complexType>
+  </xs:element>
 </xs:schema>
