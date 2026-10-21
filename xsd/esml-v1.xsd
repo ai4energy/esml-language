@@ -1,7 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- ESML v1 — 单一 schema。
      规范入口：校验文档为合法 ESML（namespace / 根元素 / 基本属性）。
-     本 schema 不约束内部结构，需更强内容校验时用 esml-canonical-basic.xsd。 -->
+     本 schema 不约束内部结构，需更强内容校验时用 esml-canonical-basic.xsd。
+
+     本层是**根合法性闸**：它只回答「这份文档的根是不是合法 ESML 根」，
+     内部结构一律交给 canonical 层。因此本层的**根集合必须恒等于
+     canonical 层的全局元素集合**（唯一真相 = canonical XSD）：
+     少一个 ⇒ 一份合法的 canonical 文档被本层判非法（假拒）；
+     多一个 ⇒ 本层放行一份没有任何 canonical schema 能校验的文档（假收）。
+     下方根矩阵块由 `docs/validate_roots.py` 的 sync 模式生成、逐字复核，
+     **不是手抄的清单**。裁决记录：docs/design/root-matrix-adjudication.md
+
+     ROOT-MATRIX:BEGIN
+     根清单 = canonical 层的全局元素（唯一真相 = canonical XSD）。
+     入口层的根集合必须与 canonical 层的全局元素集合**相等**：
+     少一个 ⇒ 合法文档被入口层判非法；多一个 ⇒ 根合法性闸有洞。
+     本块由 `docs/validate_roots.py` 的 sync 模式生成，**勿手工编辑**；
+     `docs/validate_roots.py` 逐字复核本块（漂移即判红）。
+     裁决记录：docs/design/root-matrix-adjudication.md
+     根 | 入口层 | canonical 声明处 | 裁定
+     computeTasks | 是 | esml-canonical-compute.xsd | —
+     esml | 是 | esml-canonical-basic.xsd | —
+     metadata | 是 | esml-canonical-basic.xsd | —
+     modelTypes | 是 | esml-canonical-basic.xsd | —
+     orderedSet | 是 | esml-canonical-basic.xsd | —
+     portTypes | 是 | esml-canonical-basic.xsd | —
+     project | 是 | esml-canonical-project.xsd | —
+     system | 是 | esml-canonical-basic.xsd | —
+     systems | 是 | esml-canonical-basic.xsd | —
+     tasks | 是 | esml-canonical-compute.xsd | —
+     units | 是 | esml-canonical-basic.xsd | —
+     variableTypes | 是 | esml-canonical-basic.xsd | —
+     ROOT-MATRIX:END
+     -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
            xmlns:esml="https://www.ai4energy.cn/esml/v1"
            targetNamespace="https://www.ai4energy.cn/esml/v1"
@@ -22,42 +53,23 @@
     </xs:complexType>
   </xs:element>
 
-  <!-- 独立库文件根（units/types/ports/components/processes/schedules/tasks 等） -->
+  <!-- 独立库文件根（units / variableTypes / systems / portTypes / system /
+       orderedSet / metadata / modelTypes）与顶层壳（computeTasks / tasks /
+       project）—— 名单见上方根矩阵块，由 `docs/validate_roots.py` 机判。 -->
   <xs:element name="units">
     <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
   </xs:element>
   <xs:element name="variableTypes">
     <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
   </xs:element>
-  <xs:element name="portTypes">
-    <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
-  </xs:element>
-  <xs:element name="modelTypes">
-    <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
-  </xs:element>
   <xs:element name="systems">
+    <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
+  </xs:element>
+  <xs:element name="portTypes">
     <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
   </xs:element>
   <!-- `<system>` 也可作为文档根出现（少见但合法）。 -->
   <xs:element name="system">
-    <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
-  </xs:element>
-  <xs:element name="schedule">
-    <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
-  </xs:element>
-  <xs:element name="solutionParameters">
-    <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
-  </xs:element>
-  <xs:element name="computeTasks">
-    <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
-  </xs:element>
-  <xs:element name="tasks">
-    <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
-  </xs:element>
-  <xs:element name="variables">
-    <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
-  </xs:element>
-  <xs:element name="domain">
     <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
   </xs:element>
   <!-- 序集写作单数 `<orderedSet>`，复数容器 `<orderedSets>` 不是合法语法：
@@ -75,6 +87,25 @@
       <xs:attribute name="static" type="xs:string" use="optional"/>
       <xs:anyAttribute processContents="lax"/>
     </xs:complexType>
+  </xs:element>
+  <!-- 独立根 `<metadata>` 块（文档根元数据；子结构不被消费，lax 通过）。 -->
+  <xs:element name="metadata">
+    <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
+  </xs:element>
+  <xs:element name="modelTypes">
+    <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
+  </xs:element>
+  <!-- 顶层计算壳（`<computeTasks>` / `<tasks>`）：内容 lax 透传，结构由
+       esml-canonical-compute.xsd 校验。 -->
+  <xs:element name="computeTasks">
+    <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
+  </xs:element>
+  <xs:element name="tasks">
+    <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
+  </xs:element>
+  <!-- 工程壳（`<project>`）：结构由 esml-canonical-project.xsd 校验。 -->
+  <xs:element name="project">
+    <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
   </xs:element>
 
 </xs:schema>
