@@ -735,10 +735,12 @@
                                          `condition` holds (spec:1319). Not a
                                          `<continueFor>` spelling: `for` exits
                                          on duration, `until` on a predicate.
-             * `<reset path="…" value="…"/>` (alias `<reassign>`) — at this
+             * `<reset path="…" value="…"/>` — at this
                                          step's cumulative clock time, assign
                                          `path := value`。
                                          扁平化时降为 FlatEvent::Time。
+                                         canonical 拼法只有 `<reset>` 一个，
+                                         同语义的别名写法不在此声明。
              * `<stop time="…"/>`       — STOP。Segment totals encode
                                          the end-time; this records the STOP
                                          boundary for validation.
@@ -753,7 +755,6 @@
                 <xs:element name="continueFor" type="esml:ScheduleContinueForType"/>
                 <xs:element name="continueUntil" type="esml:ScheduleContinueUntilType"/>
                 <xs:element name="reset" type="esml:ScheduleResetType"/>
-                <xs:element name="reassign" type="esml:ScheduleResetType"/>
                 <xs:element name="stop" type="esml:ScheduleStopType"/>
               </xs:choice>
             </xs:complexType>
@@ -1056,7 +1057,7 @@
   <!-- `<continueFor time="…"/>` — advance the
        simulation clock by `time` seconds. The cumulative clock is the
        sum of `time` across all `<continueFor>` steps in the sequence;
-       `<reset>` / `<reassign>` / `<stop>` fire at that boundary.
+       `<reset>` / `<stop>` fire at that boundary.
 
        `solver="…"` names the integrator for
        **this segment only** — `tsit5` / `rodas5p` / `fbdf` / `ida` / `dfbdf`
@@ -1092,7 +1093,7 @@
     <xs:anyAttribute processContents="lax"/>
   </xs:complexType>
 
-  <!-- `<reset path="…" value="…"/>` (alias `<reassign>`) —
+  <!-- `<reset path="…" value="…"/>` —
        `RESET WITHIN … DO var := v`. At this step's cumulative clock time,
        assign `path := value`. Lowered to a FlatEvent with `trigger: Time
        { at }` and `actions: [(target, value, Assign)]` at flatten time.
