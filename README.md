@@ -91,6 +91,21 @@ python3 -m venv .venv && .venv/bin/pip install lxml   # 只需一次
 **红在哪一层**：`schema` 表示 XSD 必须拒收它，`semantic` 表示拼写合法、红在求解层。
 标成 `schema` 的负例哪天被 XSD 收下了，门就红——那说明判据漏了，不是件变好了。
 
+引擎 G16 语料门白名单里落在本仓示例目录的 10 行，逐行处置在
+[`tools/neg-debt.tsv`](tools/neg-debt.tsv)（改件 / 转 negative / 删孤儿，各带一行证据）。
+[`tools/check-neg-debt.py`](tools/check-neg-debt.py) 把关：
+
+```sh
+.venv/bin/python tools/check-neg-debt.py                        # 台账 + XSD 复核
+.venv/bin/python tools/check-neg-debt.py --engine <esml 二进制>  # 附引擎实测错误码复核
+.venv/bin/python tools/check-neg-debt.py --self-test             # 2 好 2 坏 + 反向自证
+```
+
+它当场重算两本台账的登记条数（对不上就红），核对每行的件、登记层与证据行，
+并盯住导数 token 的**位置**判据：新增的负例必须把 token 放在合法位
+（`<derivative>` 之内、canonical 拼写）且整件不写 `<body>`——这样引擎的同一个
+失败码 F1 才归因于**位置**（缺 `<extern>`），而不是 body 形态。
+
 「哪些写法算 legacy」这条知识落在 [`tools/aliases.tsv`](tools/aliases.tsv)，
 门据此逐条机验：legacy 元素名/属性名不得被任何 `xsd/*.xsd` 声明、不得出现在示例里；
 别名表里指认的 canonical 拼法必须真的在 XSD 里有声明（表与 schema 不得脱节）；

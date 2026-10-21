@@ -1,0 +1,36 @@
+# tools/neg-debt.tsv · G16 语料门白名单落在本仓的 10 行 · 逐行处置台账
+#
+# 引擎仓 `scripts/gate-baselines/corpus-neg.tsv`（G16 语料门白名单，棘轮：只许缩小）
+# 里有 10 行的路径落在本仓的示例目录（`L1-expr-equation/` / `L3-model/` / `X-use/`）。
+# 这张表把这 10 行**逐行处置**下来：谁改、谁留、谁删，各自的证据是哪一行。
+#
+# 列：g16_path <TAB> code <TAB> verdict <TAB> repo_path <TAB> evidence
+#   g16_path  = 引擎仓白名单里的 path（`examples/syntax/…`）；本轮新增的件记
+#               `-（引擎仓白名单待登记）` —— 那一行还没进白名单，须引擎仓那边补
+#   code      = 白名单登记的引擎错误码（I25a / I25b / I25c / I25d / F1 / F12）
+#   verdict   = 改件 / 转negative / 删孤儿（三选一）；本轮新立的负例记「新增」
+#   repo_path = 本仓对应的示例路径；`-` = 本仓无对应件
+#   evidence  = 证据行（必填；**必须含该行的 code**，否则 tools/check-neg-debt.py 判红）
+#
+# verdict 的判别式（都能机械复核）：
+#   改件       = 这件（或它的台账列义）写错了，本轮已改；改完仍然红，改的理由写在 evidence
+#   转negative = 它是刻意的负例，原样保留；白名单 kind 维持 negative，登记已在 tools/negatives.tsv
+#   删孤儿     = 本仓没有对应物 / 已失去承重 ⇒ 删件，并请引擎仓删掉对应白名单行
+#   新增       = 本轮新立的负例（引擎仓白名单待登记）
+#
+# 登记条数：14 行（G16 落在本仓 10 行 + 本轮新增 4 行）—— 改表即改这一行；
+# tools/check-neg-debt.py 每次跑都重算并核对，对不上就红（台账写错就改台账）。
+examples/syntax/L1-expr-equation/array-index-probe.esml	I25a	改件	L1-expr-equation/array-index-probe.esml	esml check ⇒ I25a[]: array dim `GhostSet` is neither a literal, nor a declared ordered set, nor a parameter ⇒ 报的是**维未声明**，不是下标越界（下标越界是 I25d）；台账原列「数组下标越界」已改，件本身不动
+examples/syntax/L1-expr-equation/axis-reduce-probe.esml	I25b	改件	L1-expr-equation/axis-reduce-probe.esml	esml check ⇒ I25b[]: axis 1 out of range for `sum(x, …)`: array rank is 1 (valid axes: 0..0) ⇒ 台账原列「沿 axis 归约维度不匹配」已收紧为「axis 1 越界（合法 0..0）」，件本身不动
+examples/syntax/L1-expr-equation/oob-probe.esml	I25d	改件	L1-expr-equation/oob-probe.esml	esml check ⇒ I25d[]: array index 4 out of range for `x[axis 0]` (1-based, size=3): valid range is 1..=3 ⇒ 是**数组字面下标**越界，不是序集下标；台账原列「序集下标越界」已改，件本身不动
+examples/syntax/L1-expr-equation/shape-mismatch-probe.esml	I25c	转negative	L1-expr-equation/shape-mismatch-probe.esml	esml check ⇒ I25c[]: shape mismatch in `+`: lhs is [3], rhs is [3, 2] ⇒ 登记码与台账列义都与实测一致，件原样保留为刻意负例（XSD 收下，红在求解层）
+examples/syntax/X-use/use-f12-mismatch.esml	F12	改件	X-use/use-f12-mismatch.esml	esml check <件> -L <libroot> ⇒ F12[]: `<use library="…:9.9.9">` is not listed in any provided libroot's `registry.tsv`（同次另报 F17 库闭包合并失败；不带 -L 时 check 为 ok，rc=0）⇒ F12 是**库坐标**审计，不是端口类别/连接方向；台账原列已改，件本身不动
+examples/syntax/L1-expr-equation/derivativesymbol.esml	F1	转negative	L1-expr-equation/derivativesymbol.esml	esml check ⇒ F1[]: parser rejected … `<body>` … is not a right-hand-side expression ⇒ 归因是 `<body>` 的方程写法（ParseError::Expr），**不是导数位置** ⇒ 旧件原样保留（不改已发布的旧负例），台账已补记该归因；位置归因另立 L1-expr-equation/derivativesymbol-noextern-probe.esml
+examples/syntax/L1-expr-equation/noderivative.esml	F1	转negative	L1-expr-equation/noderivative.esml	esml check ⇒ F1[]: parser rejected … `<body>` … is not a right-hand-side expression ⇒ 归因是 `<body>` 的方程写法（ParseError::Expr），**不是导数位置** ⇒ 旧件原样保留（不改已发布的旧负例），台账已补记该归因；位置归因另立 L1-expr-equation/noderivative-noextern-probe.esml
+examples/syntax/L1-expr-equation/partial-derivative.esml	F1	转negative	L1-expr-equation/partial-derivative.esml	esml check ⇒ F1[]: parser rejected … `<body>` … is not a right-hand-side expression ⇒ 归因是 `<body>` 的方程写法（ParseError::Expr），**不是导数位置** ⇒ 旧件原样保留（不改已发布的旧负例），台账已补记该归因；位置归因另立 L1-expr-equation/partial-noextern-probe.esml
+examples/syntax/L1-expr-equation/zeroderivative.esml	F1	转negative	L1-expr-equation/zeroderivative.esml	esml check ⇒ F1[]: parser rejected … `<body>` … is not a right-hand-side expression ⇒ 归因是 `<body>` 的方程写法（ParseError::Expr），**不是导数位置** ⇒ 旧件原样保留（不改已发布的旧负例），台账已补记该归因；位置归因另立 L1-expr-equation/zeroderivative-noextern-probe.esml
+examples/syntax/L3-model/component-probe.esml	F1	转negative	L3-model/component-probe.esml	esml check ⇒ F1[]: parser rejected the document: legacy spelling `<component>` … — use `<instance>` ⇒ 登记码与台账列义都与实测一致，件原样保留为刻意负例（XSD 拒收）
+-（引擎仓白名单待登记）	F1	新增	L1-expr-equation/derivativesymbol-noextern-probe.esml	esml check ⇒ F1[]: `<function name="f">` declares `<derivative>` … without an `<extern>`（判据 C：拒的是**位**，不是拼写）⇒ 与旧件同一个失败码 F1，归因不同（旧件＝body 方程形态，本件＝位置）；XSD 亦拒收（Element 'derivative': This element is not expected）；token 在 `<derivative>` 内、拼写 canonical ⇒ 同一 token 加 `<extern>` 即被 XSD 与引擎双双放行
+-（引擎仓白名单待登记）	F1	新增	L1-expr-equation/noderivative-noextern-probe.esml	esml check ⇒ F1[]: `<function name="f">` declares `<derivative>` … without an `<extern>`（判据 C：拒的是**位**，不是拼写）⇒ 与旧件同一个失败码 F1，归因不同（旧件＝body 方程形态，本件＝位置）；XSD 亦拒收（Element 'derivative': This element is not expected）；token 在 `<derivative>` 内、拼写 canonical ⇒ 同一 token 加 `<extern>` 即被 XSD 与引擎双双放行
+-（引擎仓白名单待登记）	F1	新增	L1-expr-equation/partial-noextern-probe.esml	esml check ⇒ F1[]: `<function name="sq">` declares `<derivative>` … without an `<extern>`（判据 C：拒的是**位**，不是拼写）⇒ 与旧件同一个失败码 F1，归因不同（旧件＝body 方程形态，本件＝位置）；XSD 亦拒收（Element 'derivative': This element is not expected）；token 在 `<derivative>` 内、拼写 canonical ⇒ 同一 token 加 `<extern>` 即被 XSD 与引擎双双放行
+-（引擎仓白名单待登记）	F1	新增	L1-expr-equation/zeroderivative-noextern-probe.esml	esml check ⇒ F1[]: `<function name="sq">` declares `<derivative>` … without an `<extern>`（判据 C：拒的是**位**，不是拼写）⇒ 与旧件同一个失败码 F1，归因不同（旧件＝body 方程形态，本件＝位置）；XSD 亦拒收（Element 'derivative': This element is not expected）；token 在 `<derivative>` 内、拼写 canonical ⇒ 同一 token 加 `<extern>` 即被 XSD 与引擎双双放行
