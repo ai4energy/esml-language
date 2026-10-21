@@ -4,7 +4,7 @@
 <!-- 语法点 条件组件（§6.5）：`<instance … condition="…">` 按条件实例化——条件为假时
      该**实例、其实例方程与以其为端点的连接**都不进模型；缺省 = 恒真。
      条件在**构建期静态求值**，只能是常量布尔表达式（常量、比较、序集成员序号）；
-     不可静态判定 → 响亮报错（见 `instance-condition-probe.esml`）。
+     不可静态判定 → 响亮报错（见 `instance-condition-undecidable.esml`）。
      规范条文：§6.5（条件组件）。
      `check` errors=0；`solve`（system S）只解出**两个**未知量：
        a.y  = 2.0（无 condition ⇒ 恒真，<sets> 覆盖为 2.0）
