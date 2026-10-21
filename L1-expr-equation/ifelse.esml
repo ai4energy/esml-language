@@ -2,6 +2,7 @@
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 `ifelse(c, t, f)`：分段表达式（光滑分段，不是事件）。
+     规范条文：§7（分段表达式）。
      c ≠ 0 取 t，否则取 f；分支切换精度由积分器容差决定。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_IfElse">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

@@ -5,6 +5,7 @@
      其后再跟 `<continueFor>` 会被校验拒绝——它是结构校验标记，不是运行时截断。
      simulate 的时长由 tspan 参数给定（给 tspan 0–20 仍跑满 20 s，不截断）。
      `check` errors=0；`solve`（system S）exit=0（g.N = 0 是 D(N) = 0 的平衡点）；
+     规范条文：附录 K（METHOD × Schedule 编排）。
      `simulate`：N(10) = 60.74（衰减照常）。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L9_Stop">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

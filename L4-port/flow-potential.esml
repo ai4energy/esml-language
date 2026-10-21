@@ -3,6 +3,7 @@
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 portType 内端口变量的两种写法：属性形态 `<portVariable role="…">`
      与元素形态 `<flow>` / `<potential>`（直接挂在 `<portType>` 下）。两者等价，
+     规范条文：§5（端口）。
      元素名即角色。`check` errors=0。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_FlowPotential">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

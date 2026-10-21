@@ -5,6 +5,7 @@
      降为隐藏滞后态 d：T·D(d) = u − d，d(0) = u(0)。
      `solve`（system S）：常数输入的延迟仍是常数，y = u = 5.0。
      `simulate`（system R，tspan 0–2）：斜坡 u = 2t、T = 0.5 时
+     规范条文：§7（表达式内建）。
      y(t) = 2t − 1 + e^(−2t)，t = 0.5 → 0.36788。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_BuiltinsDelay">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

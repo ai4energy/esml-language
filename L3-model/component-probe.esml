@@ -4,6 +4,7 @@
 <!-- 语法点 负例（预期失败）：模型内使用 `<component>` 元素形态。它属 legacy 写法，
      解析层应报错并提示改用 `<instance>`。非零退出是预期行为；
      属性形态 `<instance component="M"/>` 与 `type="M"` 等价，见
+     规范条文：§2（收紧词法）。
      `L5-instance/component-alias.esml`。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L3_ComponentProbe">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

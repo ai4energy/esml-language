@@ -2,6 +2,7 @@
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 常用数学内建：三角/指数/取整/夹取、min/max/mid 等，每个各用一次。
+     规范条文：§7（表达式内建）。
      实现遇到未注册的函数名会显式报错，不会静默忽略。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_Builtins">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

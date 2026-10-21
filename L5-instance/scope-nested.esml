@@ -2,6 +2,7 @@
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 `<set path>` 深入复合成员：`path="body.a.k"` 覆盖复合 Body 的成员 a 的参数 k。
+     规范条文：§6.0（实例参数覆盖：scope / set / path）。
      与 members-composite 例配对，形成「复合 + 嵌套 scope/set」的分层参数化链路。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L5_ScopeNested">
   <modelTypes>

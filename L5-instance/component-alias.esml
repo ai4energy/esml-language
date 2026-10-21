@@ -4,6 +4,7 @@
 <!-- 语法点 同一系统内两个实例（canonical `type=` 写法）：a 与 b 均实例化 M，同参数同行为，
      a.x 与 b.x 同轨（1.0·e^(−0.2t)，稳态 0）。
      旧 `component=` / `model-type=` 别名已移除，出现时会报错并提示改用 `type=`。
+     规范条文：§6（系统、实例与参数覆盖）。
      `check` errors=0；`solve`（system S）exit=0。 -->
  <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L5_ComponentAlias">
    <modelTypes><modelType name="M">

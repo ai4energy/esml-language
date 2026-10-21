@@ -2,6 +2,7 @@
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 多个并列 `<when>`：同一时刻按声明序应用。
+     规范条文：附录 F3（事件语义糖）。
      此形态用于表达互斥的多分支语义；`<elsewhen>` 见 `elsewhen.esml`。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L2_MultipleWhen">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

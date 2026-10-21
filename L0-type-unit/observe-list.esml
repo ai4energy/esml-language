@@ -2,6 +2,7 @@
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 `<observe>` 观察列表：`<observe name=><var path= name=/></observe>`。
+     规范条文：§6.10（系统级观察与预设）。
      `check` 通过；稳态解 x→0、y = 2x。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L0_Observe">
   <modelTypes><modelType name="Decay">

@@ -3,6 +3,7 @@
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 单位锚点定义式：`name=` 是标签，`base=` 是定义式，`scale` / `offset`
      给出到相干 SI 的仿射映射 `v_SI = v·scale + offset`。
+     规范条文：附录 J（单位语义）。
      验证方式为 `esml check-units <本文件>`，期望 errors=0、unknown_anchors=0。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L0_UnitsAnchoring">
   <units name="anchoring">

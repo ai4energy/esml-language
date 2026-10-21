@@ -5,6 +5,7 @@
      `complex( , )` / `conj` 与复数四则运算在求解前降为实数方程。
      方程形态须**复数 = 复数**：一侧是实变量时会降为「实方程 + 0 = 0 虚方程」，导致过定。
      `check` errors=0；`solve` 稳态全解：Z = 3+1j · V = 1+0j · I = 0.3−0.1j ·
+     规范条文：§7（表达式内建）。
      J = −0.1+0.3j（J 的实部 = imag(I)、虚部 = real(I)）。 -->
  <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_BuiltinsComplex">
    <modelTypes><modelType name="Impedance" discipline="generic">

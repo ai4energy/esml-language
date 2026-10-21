@@ -7,6 +7,7 @@
        · optc_nb（非绑定）：x ≥ 2.0 不触及最优 ⇒ 解保持 x = 3.0、objective ≈ 0
          （非绑定约束只罚违约量，不把解拉向边界）。
      `tasks`（system S，依次跑文档内全部任务）：optc x = 5.0 / obj = 4.0 ·
+     规范条文：§6.9（计算任务表）。
      optc_nb x = 3.0 / obj ≈ 0 · exit=0。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="T_Constraint">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

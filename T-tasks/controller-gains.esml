@@ -4,6 +4,7 @@
 <!-- 语法点 任务附属的控制器 `<controller>`：属性 `kind=` / `horizon=` / `sampleTime=` /
      `controlHorizon=`，子元素 `<setpoint var value/>` 与 `<gains Kp Ki Kd/>`。
      实现作为元数据接受并跳过，不做 MPC。`check` errors=0，`tasks` exit=0。
+     规范条文：§6.9（计算任务表）。
      单看 `gains` 子元素的例子见 `gains.esml`。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="T_TaskController">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

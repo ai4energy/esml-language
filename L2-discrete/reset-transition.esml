@@ -4,6 +4,7 @@
 <!-- 语法点 `<transition reset="true">`：状态机迁移上的复位标记，迁移触发时复位相关状态。
      与 stateMachine / state / transition 诸例互补，本例专补 `reset=` 属性。
      `check` 通过；`simulate`（system S）exit=0（D(y) = 1 无稳态，故走 simulate；
+     规范条文：§7.1（状态机与时钟）。
      t = 3 时 A→B→A 两次迁移，B→A 带 reset）。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L2_ResetTransition">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

@@ -3,6 +3,7 @@
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 estimation 任务：`<task kind="estimation">`，载荷为 `<tspan/>`、
      `<estimate name initial/>` 与**内联** `<samples><sample x y/></samples>`，
+     规范条文：§6.9（计算任务表）。
      由观测数据拟合 g.lambda。`tasks`（system S）⇒ EstimationResult{theta ≈ 0.0500}。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="T_Estimation">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

@@ -3,6 +3,7 @@
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 `<schedule><sequence><continueFor time=/><call method="label"/></sequence></schedule>`：
      `<call method="ramp"/>` 给**下一段**打标签（段名 ramp）；
+     规范条文：附录 K（METHOD × Schedule 编排）。
      两个 5 s 段合起来是一次 10 s 运行。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L9_ScheduleCall">
   <variableTypes>

@@ -2,6 +2,7 @@
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 `<unitsDerived>` 派生单位容器：`base` 引用基本单位，`scale` 给出
+     规范条文：附录 J（单位语义）。
      min 与 s 的换算。`check` 通过；求解得 T = 350 K。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L0_UnitsDerived">
   <units>

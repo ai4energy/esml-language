@@ -3,6 +3,7 @@
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 `<locals><local name=/>` 声明函数内局部量，在 `<algorithm>` 内被内联展开：
      `<assign name="t" value="x*2"/>` 之后 `<assign name="y" value="t+1"/>`。
+     规范条文：附录 I（用户函数与黑盒）。
      `check` errors=0；`solve` 验证 f(3) = 3·2 + 1 = 7。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L8_Locals">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

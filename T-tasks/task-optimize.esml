@@ -3,6 +3,7 @@
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 optimize 任务：`<task kind="optimize">`，载荷为 `<tspan/>`、
      `<decision name lower upper/>` 与 `<objective direction>`（独立决策变量 x）。
+     规范条文：§6.9（计算任务表）。
      `tasks`（system S）⇒ min (x − 3)² 得 x = 3.0。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="T_Optimize">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

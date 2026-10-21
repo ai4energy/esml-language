@@ -2,6 +2,7 @@
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 `<case on=>`：方程块内的条件分支，按 on 表达式的值选择 `<branch value=>`，
+     规范条文：附录 B（续）— CASE 多分支。
      可与普通 `<equation>` 混排。`check` 通过；s = 1 时取 branch value="1" ⇒ y = s + 1 = 2。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L2_Case">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

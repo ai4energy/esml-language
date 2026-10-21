@@ -12,6 +12,7 @@
        surrogate → SurrogateResult{coeffs = [1,2,3], r2 = 1.0}（复原 y = 1 + 2x + 3x²）。
      载荷要求：estimation / validation / surrogate 须**内联** `<samples><sample x y/>`；
      optimize 须 `<tspan>`；control 须 `<mpc N dt/>` 加 `<estimate name initial/>`。
+     规范条文：§6.9（计算任务表）。
      本例只使用实现已接受的属性。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L9_TasksSeven">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

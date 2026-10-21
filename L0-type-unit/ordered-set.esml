@@ -2,6 +2,7 @@
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 文档级序集 `<orderedSet name static="true"><element>…</element></orderedSet>`。
+     规范条文：附录 B（续）— ORDERED_SET 序集。
      本例把序集用作 `<for>` 的枚举维，每个 `<element>` 对应一个取序位值的整数参数。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L0_OrderedSet">
   <orderedSet name="comp" static="true">

@@ -2,6 +2,7 @@
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 文档骨架：根 `<esml xmlns=… schema=… name=…>`（`name` 是**属性**），
+     规范条文：§1.1（文档骨架）。
      并在模型级与系统级使用 `<description>`。`check` 与 `solve` 均通过。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="D_Skeleton">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

@@ -4,6 +4,7 @@
 <!-- 语法点 `<tasks>`：顶层容器，内容按松散规则透传任意子元素；它是 `<computeTasks>` 之外的
      可选外层壳，可与顶层其它元素并列。
      本例在同一 `<esml>` 内并列写 `<tasks><computeTasks>…</computeTasks></tasks>`，
+     规范条文：§6.8（工程包装容器）。
      验证外层容器被识别且不与 `<computeTasks>` 冲突。`tasks`（system S）exit=0。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="T_Tasks">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

@@ -6,6 +6,7 @@
        · sum(x, 0)  1D → 标量
        · sum(M, 1) / prod(M, 0) / min(M, 0) / max(M, 1)  2D → 1D
        · scalar × array 是唯一合法广播 ⇒ 结果同形
+     规范条文：§7（向量归约内建）。
      `check` 只验类型层（axis 范围、形状一致、索引范围），errors=0。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_AxisReduce">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

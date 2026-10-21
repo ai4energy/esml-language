@@ -2,6 +2,7 @@
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 端口变量角色 `role="stream"`（物质流，inStream 语义），与 potential / flow 并列，
+     规范条文：附录 F1（stream 流股）。
      用于组分或物质流。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_PortStream">
   <portTypes><portType name="StreamPort" connectorFamily="stream">

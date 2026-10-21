@@ -3,6 +3,7 @@
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 `<check>`：validation 任务内的单条命名验收断言（自由文本，`name=` 可选）。
      实现作为元数据接受并跳过，不解释断言内容。`check` errors=0，`tasks` exit=0。
+     规范条文：§6.9（计算任务表）。
      容器形见 `checks.esml`。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="T_Check">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

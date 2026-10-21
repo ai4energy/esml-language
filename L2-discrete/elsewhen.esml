@@ -2,6 +2,7 @@
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 `<when>` 内的 `<elsewhen condition>`：候选分支。解析期把 `<elsewhen>` 拍平为
+     规范条文：附录 F3（事件语义糖）。
      独立的 `<when>`，同刻按声明序应用（顺序近似，不是显式 priority 链）。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L2_ElseWhen">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

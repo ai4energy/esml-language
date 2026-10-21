@@ -3,6 +3,7 @@
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 变量类型全貌：`<variableTypes>` / `<type>` 的三种形态——基本标量类型、
      类别 wrapper、枚举类型——以及声明侧引用；同时对照 `<parameter default=>` 与
+     规范条文：§3（类型系统）。
      `<variable initial=>` 两种初始值写法。 -->
  <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L0_TypeUnit">
    <units>

@@ -5,6 +5,7 @@
      导数契约三档：analytic（解析导数）、fd（有限差分）、opaque（不透明）；
      本例用 fd 档：`<derivative mode="fd"/>` 加 `<fd step relative/>` 给出步长契约。
      库与符号在 install / solve 期解析，`check` 期只验声明。
+     规范条文：§14.3（C ABI 类型映射）。
      外部函数文档须自带一个 `<system name="Demo">` 用例。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L8_ExternCabi">
   <functions>

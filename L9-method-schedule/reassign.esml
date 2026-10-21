@@ -6,6 +6,7 @@
      target 必须是状态或变量；指到参数时会显式告警且不改值，故本例指向状态 g.N。
      `check` errors=0；`simulate`（system S，tspan 0–20）：N(9) = 63.86 →
      N(10) = 50.000（reassign 生效）→ N(20) = 30.37（= 50·e^−0.5）。
+     规范条文：附录 K（METHOD × Schedule 编排）。
      simulate 的时长由 tspan 参数给定，不由 schedule 推导。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L9_Reassign">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

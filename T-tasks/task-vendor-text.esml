@@ -4,6 +4,7 @@
 <!-- 语法点 任务附属的厂商文本族：`<benchmark>`（属性 `name` / `expected` / `unit` / `tol` /
      `source`，声明基准点）与 `<verdict>`（自由文本结论）。
      实现接受并跳过，不解释内容，也不猜语义。`check` errors=0；`tasks`（system S）
+     规范条文：§6.9（计算任务表）。
      simulate exit=0（N(t) = 100·e^(−0.05t)，t = 60 ⇒ N ≈ 4.98；两段文本不影响执行）。 -->
  <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="T_VendorText">
    <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

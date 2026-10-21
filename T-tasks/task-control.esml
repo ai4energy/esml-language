@@ -3,6 +3,7 @@
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 control 任务（MPC）：`<task kind="control">`，载荷为 `<mpc N dt/>` 加
      `<estimate name initial/>`（initial 给输入路径与设定点）。
+     规范条文：§6.9（计算任务表）。
      `tasks`（system S）⇒ ControlResult{u = […] } exit=0。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="T_Control">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

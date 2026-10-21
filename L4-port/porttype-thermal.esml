@@ -2,6 +2,7 @@
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 热链端口：HeatPort = T（potential）+ Q_flow（flow）。
+     规范条文：§5（端口）。
      模型内用逐端口变量写法（port.T / port.Q_flow）参与方程。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_PortThermal">
   <portTypes><portType name="HeatPort" connectorFamily="thermal">

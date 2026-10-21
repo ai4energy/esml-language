@@ -3,6 +3,7 @@
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 时钟容器与时钟函数：`<clocks><clock name interval/></clocks>` 加
      `interval(c)` / `firstTick(c)` / `noClock(x)`（与 previous/sample 并列）。
+     规范条文：§7.1（状态机与时钟）。
      容器形态与直挂 `<clock>` 等价。`check` 通过，无未声明符号告警。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L2_ClockFunctions">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

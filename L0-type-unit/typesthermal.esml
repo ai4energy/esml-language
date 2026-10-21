@@ -2,6 +2,7 @@
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 类别 wrapper `<typesThermal>`：热工类型库按类别包裹 `<type>` 声明
+     规范条文：§3（类型按类别包裹）。
      （unit 用 K / W）。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L0_TypesThermal">
   <units><unitsBase>

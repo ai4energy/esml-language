@@ -8,6 +8,7 @@
      与 partition-crosslink.esml 的分工：那份演示显式 `<partitions>` 上的
      跨分区边界，本份演示**未分区**时的子系统联立（结果与不写 crosslink 一致）。
      solve（system Root）：Src 出 5.0 ⇒ A.u.y = 5.0 经 crosslink ⇒ B.v.s = 5.0
+     规范条文：§6.4（partition / crosslink）。
      ⇒ B.v.y = 5.0。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L7_SubsystemCrosslink">
   <modelTypes>

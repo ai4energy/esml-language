@@ -2,6 +2,7 @@
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 参数覆盖：`<sets><scope instance="i"><set path="k" value="…"/></scope></sets>`，
+     规范条文：§6.0（实例参数覆盖：scope / set / path）。
      覆盖路径走实例命名空间。`<set>` 只接受参数与取值，不接受 `unit=`。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L5_ScopeSet">
   <modelTypes><modelType name="M">

@@ -10,6 +10,7 @@
      系统级 `<set>` 的值必须是常数，所以库 B 的函数放在本地模型方程里
      （PosUse：y = pos(x)），以此证明两库定义都被并入且各自可用。
      `solve <本文件> -L <库根>` exit=0：本地 PosUse 的 y = pos(350.0) = 350.0（库 B 函数）；
+     规范条文：§6.1（标准库坐标引用）。
      热链 FixedT(Tset=300，默认) — Conductor — Body 稳态全链 300 K（库 A 模型）。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="X_UseMultiLib">
   <use library="cn.ai4energy.esml.thermal:heat-elements:0.1"/>

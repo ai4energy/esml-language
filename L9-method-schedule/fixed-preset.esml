@@ -4,6 +4,7 @@
 <!-- 语法点 系统级自由度控制：`<fixed>` 钉住变量，`<presets>` 给预设值。
      `<fixed><scope instance="…"><set path value/></scope></fixed>` 把 a 钉到 5，
      `<presets><scope instance="…"><preset path value lower upper/></scope></presets>` 给预设。
+     规范条文：§6.10（系统级观察与预设）。
      `check` 通过；`solve`（system S）：y = K·a + c = 2·5 + 1 = 11。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L9_FixedPreset">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

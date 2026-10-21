@@ -2,6 +2,7 @@
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 子系统：`<system>` 也可作为 instance 的 type 引用，即「系统套系统」，
+     规范条文：§6.4（partition / crosslink）。
      用于分层建模与分区。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L5_Subsystem">
   <modelTypes><modelType name="Leaf">

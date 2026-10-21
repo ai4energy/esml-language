@@ -2,6 +2,7 @@
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 变量角色：`<parameters>` 常数、`<discrete>` 事件触发的离散变量、
+     规范条文：§3（类型系统）。
      `role="state"` 状态（可被 `D(...)` 求导）与 `role="algebraic"` 代数未知量（默认）。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L0_Roles">
   <modelTypes><modelType name="M">

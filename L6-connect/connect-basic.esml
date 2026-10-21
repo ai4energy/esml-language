@@ -3,6 +3,7 @@
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 `<connections><connection from="a.p" to="b.q"/></connections>`：
      端口对连。求解前展开为 potential 相等 + flow 守恒。
+     规范条文：§8（连接语义）。
      本例是电气回路 Src—R—Gnd。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L6_ConnectBasic">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

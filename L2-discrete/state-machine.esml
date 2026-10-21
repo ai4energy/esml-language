@@ -3,6 +3,7 @@
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 `<stateMachine>`：状态 + 迁移 + activeState()。每个状态有互斥的离散 active 旗标。
      A→B 在 time > 1，B→A 在 time > 2（两状态 toggle）。
+     规范条文：§7.1（状态机与时钟）。
      `<transition priority=>` 当前不被识别，本例不使用。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L2_StateMachine">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
