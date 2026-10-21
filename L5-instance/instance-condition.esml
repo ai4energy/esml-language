@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 条件组件（§6.5）：`<instance … condition="…">` 按条件实例化——条件为假时
+     该**实例、其实例方程与以其为端点的连接**都不进模型；缺省 = 恒真。
+     条件在**构建期静态求值**，只能是常量布尔表达式（常量、比较、序集成员序号）；
+     不可静态判定 → 响亮报错（见 `instance-condition-probe.esml`）。
+     规范条文：§6.5（条件组件）。
+     `check` errors=0；`solve`（system S）只解出**两个**未知量：
+       a.y  = 2.0（无 condition ⇒ 恒真，<sets> 覆盖为 2.0）
+       b.y  = 3.0（condition="1 < 2" 为真，<sets> 覆盖为 3.0）
+       c.y  ——**不存在**（condition="2 < 1" 为假，实例整体被排除；
+              即便 <sets> 给它覆盖了 40.0，模型里也没有 c 这个实例）。
+     判据：解出的未知量个数（2）而不是某条方程的值——被排除的实例是「不在」，
+     不是「解成 0」。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L5_InstanceCondition">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes><modelType name="M">
+    <parameters><parameter name="v0" type="real" default="1.0"/></parameters>
+    <variables><variable name="y" type="real" role="algebraic"/></variables>
+    <equations><equation>y = v0</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances>
+      <!-- 缺省 condition = 恒真 -->
+      <instance name="a" type="M"/>
+      <!-- 条件为真 ⇒ 保留 -->
+      <instance name="b" type="M" condition="1 &lt; 2"/>
+      <!-- 条件为假 ⇒ 该实例、其实例方程与连到它的连接一并排除 -->
+      <instance name="c" type="M" condition="2 &lt; 1"/>
+    </instances>
+    <sets>
+      <scope instance="a"><set path="v0" value="2.0"/></scope>
+      <scope instance="b"><set path="v0" value="3.0"/></scope>
+      <scope instance="c"><set path="v0" value="40.0"/></scope>
+    </sets>
+    <schedule><sequence><continueFor time="0"/></sequence></schedule>
+  </system></systems>
+</esml>

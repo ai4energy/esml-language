@@ -513,6 +513,11 @@ instance 的 `type` 指向 `<system>` 时，它按子系统展开，不当作缺
 - 与**方程级**条件（§7 `ifelse` / `<if>` / `<case>`）不同：后者改方程右端，
   本条改**实例集合（拓扑）**。
 - 属性写法：实例上写 `condition="…"`（等价 `if="…"`）。
+- 示例：`L5-instance/instance-condition.esml`（三个实例：缺省恒真 / 条件为真 /
+  条件为假——条件为假那个实例连同其实例方程一并消失，模型里**没有**它，
+  不是「解成 0」）；
+  负例 `L5-instance/instance-condition-undecidable.esml`（条件写成对参数的
+  引用，构建期折叠不出来 ⇒ `solve` / `simulate` 响亮报错）。
 
 ### 6.6 系统（flowsheet）级方程 `<equations>`
 
