@@ -106,6 +106,12 @@
 > 别名闸；退出码 0 = 无一处旧拼写）。仓外存量旧写法文档迁移后，本规范即为唯一事实。
 > **机验基准是 XSD**（`xsd/esml-v1.xsd` + `xsd/esml-canonical-*.xsd`）：规范与本表若与
 > XSD 不一致，以 **XSD 为准**。附录 D 仅说明旧版文档的边界，不构成本线词法。
+>
+> **一处有意的例外**：端口变量的**角色元素形态**（`<flow>` / `<potential>` / `<stream>` /
+> `<constant>` / `<discrete>` / `<var>` / `<variable>`）与 `<portVariable role=…>` 并存，
+> **元素名即角色声明**（§5 有专例）。这是「名字给角色」与「属性给角色」两种写法并存，
+> 不是同一语义的同义改名（`<connection>`/`<connect>` 那种），故不在本节收紧之列。
+> 其余一切：同一语义只留一个名字。
 
 **文件扩展名**：官方扩展名 = **`.esml`** ——
 **库文件、系统、案例、计算任务一律 `.esml`**（全仓已统一：`examples`/`library`/夹具）。
@@ -126,7 +132,7 @@
 
 - `variableTypes` 定义量纲类型（含 `role`，可带 bounds/unit/default）。
   字段集共 15 项：
-  `name` · `unit` · `quantity` · `lower_bound` · `upper_bound` · `default` ·
+  `name` · `unit` · `quantity` · `lowerBound` · `upperBound` · `default` ·
   `nominal` · `role` · `kind` · `domain` · `delta` · `source` · `source_name` ·
   `dimension` · `description`。
 - **枚举类型**：`<type name="E" kind="enumeration" values="a,b,c" default="a"/>`
@@ -358,9 +364,10 @@ ESML 原生作者优先**组合（§4.1）/参数覆盖**；`<extendsFrom>` 主�
 `<connection>` 对数组端口逐元素建相等约束，流程层无需手工绑定。
 
 **`<constant>` 元素形态**：`PortVariableType` 接受 `<constant>` 作为
-portVariable 子元素，语义等价于 `<portVariable role="constant">`。两种写法一致：
+portVariable 子元素，语义等价于 `<portVariable role="parameter">`（`constant` 这个
+角色词归一到 `parameter`，见 §5 的角色词表）。两种写法一致：
 ```xml
-<portVariable name="g" role="constant" type="real" default="9.81"/>
+<portVariable name="g" role="parameter" type="real" default="9.81"/>
 <constant name="g" type="real" default="9.81"/>
 ```
 
@@ -599,6 +606,9 @@ Process/Case 也有 flowsheet 级 `EQUATION`。ESML canonical 对应地允许 `<
 （`<moveTo><set path="m.x" value="2.0"/></moveTo>`），不是自身的 `target` 属性；
 `<advance>` / `<complete>` 带 `unit=`。寻址用作者点号 `m.x`（§3 / §9）。
 
+`$ADVANCE` 展开为 `<advance unit="…"/>`，`$COMPLETE` 为 `<complete unit="…"/>`，
+`$JUMP_TO` 为 `<jumpTo target="…"/>`。
+
 > **待实现**：`<advance>` 的**条件**形式（`<advance until="t > 5"/>`）目前
 > 解析层**不读** `until`（只读 `unit`），条件推进尚未实现；本节只列已实现形态。
 
@@ -615,8 +625,8 @@ Process/Case 也有 flowsheet 级 `EQUATION`。ESML canonical 对应地允许 `<
 ```xml
 <project name="MyProject" version="1.0">
   <systems>
-    <systemRef name="chain" src="models/thermal-chain.esml"/>
-    <systemRef name="ctrl" src="models/ctrl.sys.esml"/>
+    <systemRef name="thermal_chain" src="models/thermal-chain.esml"/>
+    <systemRef name="ctrl" src="models/ctrl.sys.esml" system="Ctrl"/>
   </systems>
   <computeTasks>
     <task name="steady" kind="simulate" target="thermal_chain">
@@ -624,10 +634,9 @@ Process/Case 也有 flowsheet 级 `EQUATION`。ESML canonical 对应地允许 `<
       <tolerance abstol="1e-6" reltol="1e-3"/>
     </task>
     <task name="tune" kind="optimize" target="ctrl">
-      <method name="ipopt"/>
-      <constraints>
-        <constraint>x >= 0</constraint>
-      </constraints>
+      <tspan from="0" to="60"/>
+      <decision name="x" lower="0" upper="10"/>
+      <objective direction="min">(x-3)^2</objective>
     </task>
   </computeTasks>
 </project>
@@ -644,12 +653,12 @@ Process/Case 也有 flowsheet 级 `EQUATION`。ESML canonical 对应地允许 `<
 | 层级 | 内容 |
 |---|---|
 | `<project>` | 属性 `name`、`description`；子元素顺序 `systems` → `computeTasks` → `scenarioChain`，各至多一个 |
-| `<systems>` | 一组 `<systemRef src="…">`；`src` 指向模型文件，`system` 可指定文件内系统名，`libroot` 可加库根 |
-| `<computeTasks>` | 计算任务表：容器内一条条 `<task>`，七类 `kind`，见 §6.9 |
+| `<systems>` | 一组 `<systemRef name src>`；`name`（必需）= 本工程内的局部名，`src`（必需）指向模型文件，`system` 可指定文件内系统名，`libroot` 可加库根 |
+| `<computeTasks>` | 计算任务表：容器内一条条 `<task name kind>`，七类 `kind`，见 §6.9；载荷按 `kind` 取（`<tspan>` / `<solver>` / `<decision>` / `<objective>` …） |
 | `<scenarioChain>` | 一组 `<scenario>`，每个可含 `<point>` / `<set>` / `<data>` |
 
-元素名用 camelCase（`systemRef`、`computeTasks`、`scenarioChain`）；
-kebab-case 拼写作为兼容别名接受。
+元素名用 camelCase（`systemRef`、`computeTasks`、`scenarioChain`、`<task>`）；
+kebab-case 拼写**不是合法语法**，报错（§2 收紧集）。
 
 **`<tasks>` 外层壳**：`<computeTasks>` 之外的**可选外包装**，可与顶层其它元素并列。
 壳内子元素按松散规则透传（不另设结构约束）—— 它不引入新语义，只是给任务表
@@ -1113,11 +1122,11 @@ canonical 语法对旧词法直接报错（§2）。
 - 端口方向只用 `<port … category="inlet|outlet|bi-directional">`；
   自定义类别(如 node/connector)预留、连接规则后置。不再使用 dir/direction/in-out。
   变量级 `input/output` 保留给信号 causal role（不得当端口方向词用）。
-- PORTSET（参数沿流股传播）：`<port … port-set="flow">`（同模型同 port-set 参数等值）。
+- PORTSET（参数沿流股传播）：`<port … portSet="flow">`（同模型同 portSet 参数等值）。
 - `<portType>` 变量：`role="potential|flow|stream|input|output|parameter"` 或省略。
   省略 = 显式域变量束（thermal/water/gas/process），连接=逐位置相等，无守恒 role。
 - Connection-Type 参数：`<portType><parameters><parameter …/></parameters>` → 组件自动带
-  `<leaf>__<p>`；构建期按连接/port-set 值统一 + 冲突检测。
+  `<leaf>__<p>`；构建期按连接/portSet 值统一 + 冲突检测。
 - 边界组件：`Source`(固定头, bi-directional) / `Sink`(定流量, inlet) ≙ 电接地/电流源。
 
 ### SELECTOR / CASE·STN
@@ -1404,33 +1413,33 @@ CASE/多区/滞回：配 SELECTOR + `<events><when>`(STN)，方程用 `ifelse(se
   布局写回 `ml.u0` 续接。
 - **每段 solver 切换**：`<continueFor time="1" solver="rodas5p"/>`；可在段内覆盖求解器
   （tsit5 / rodas5p / fbdf / ida / dfbdf / qndf / nonlinear）。
-- **事件触发段间切换**：`<continueUntil condition="m.x &lt; 1.0" max-time="5"/>`——
+- **事件触发段间切换**：`<continueUntil condition="m.x &lt; 1.0" maxTime="5"/>`——
   条件穿越零时提前结束该段，下段从其终止时刻续接。
 
 ## 附录 L — 术语表与命名（类型/实例词义）
 
 ### L.1 类型词规范：`X-type` 与一个异类
-- **规范**：类型（可被实例化）一律带 `-type` 后缀 —— `variable-type`、`portType`、`modelType`；
+- **规范**：类型（可被实例化）一律带 `-type` 后缀 —— `variableType`、`portType`、`modelType`；
   实例/结构对象裸词 —— `instance`、`variable`、`port`、`system`、`connection`。
 - **异类 1 · `unit`（度量单位类型）**：类型层唯一不带 `-type` 的词，且三重歧义
   （① `<units><unit>` 类型；② 变量/端口 `unit=` 属性；③ 曾是实例别名 `<unit>`，现已 ban）。
-  叶子型、无实例树；历史歧义已逐项收紧（实例位只认 instance/component，`<scope unit=>` 报错）。
+  叶子型、无实例树；历史歧义已逐项收紧（实例位只认 `<instance>`，`<scope unit=>` 报错）。
 - **`system` 兼作类型**：一个 instance 的 `type=` 可以引用另一个 `<system>` 的名字，
   此时该 instance 按子系统展开（§6.4）。不为子系统另设类型元素；
   `<system>` 的「场景」与「可复用类型」两义由引用位置区分。
 
 > `portType` 符合 `X-type` 规范。
 
-> 目的：钉死"类型 vs 实例 vs 场景"用词，消历史双关；`component` 降为兼容别名。
+> 目的：钉死"类型 vs 实例 vs 场景"用词，消历史双关；`component` 已 ban（报错，不兼容）。
 
 | 词 | 语义 | 说明 |
 |---|---|---|
 | `modelType` | **类型（class）** | 唯一类型容器/词（`<modelTypes>/<modelType>`）；带 `type` 后缀以别实例 |
 | `instance` | **实例（主词）** | `<instances>/<members>` 内的实例元素 `<instance name type/>` |
-| `component` | 实例的**兼容别名** | XSD **仅在 `<members>` 内接受**；`<instances>` 内拒绝（负例 `L3-model/component-probe.esml`）。新写一律用 `instance`；"曾经当类型容器"的用法已取消 |
+| `component` | 实例名的**旧拼法** | **已 ban**：不是合法语法（XSD 不声明），报错；新写用 `<instance>`（负例 `L3-model/component-probe.esml`） |
 | `system` | **场景/装配**（实例树顶层），兼作**子系统类型** | 作为 `type=` 引用目标时按子系统展开（§6.4） |
 | `members` | 复合 modelType 的**成员实例**（instance） | ：members 内 instance=成员实例，非子类型 |
-| `model-instance` / `unit` | 更旧的实例别名 | 不推荐；新写一律用 `instance` |
+| `model-instance` / `unit` | 更旧的实例别名 | **已 ban**：报错（不兼容、不静默归一）；新写一律用 `<instance>` |
 
 - **文件后缀**：明文 `.esml` / 加密交付 `.esmlx` / `.xml` 过渡兼容（历史，不推荐）；角色前缀
   `*.comp.esml`=组件/模型类型库、`*.sys.esml`=系统/场景实例。
@@ -1476,8 +1485,8 @@ CASE/多区/滞回：配 SELECTOR + `<events><when>`(STN)，方程用 `ifelse(se
 1. **实例一律类型化**：系统的 `<instances>` 与复合组件的 `<members>` 使用同一种
    实例结构（名字 + 类型），不因所在容器不同而分叉。
 2. **命名对齐词法**：实例字段/容器统一用 `instance`；类型定义统一以 `Def`/`Type`
-   命名；`component` 只作别名，不进入新的字段名。
-3. **一切皆对象**：units / variable-type / portType / modelType / system /
+   命名；`component` 已 ban，不进入新的字段名。
+3. **一切皆对象**：units / variableType / portType / modelType / system /
    task / schedule 都共享
    `name + type/kind + description + 坐标引用` 的统一元数据骨架。
 4. 结构调整应逐项进行，每一步都保持语义与数值结果不变，避免静默漂移。
