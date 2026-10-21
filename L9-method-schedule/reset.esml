@@ -1,14 +1,15 @@
 <?xml version="1.0"?>
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
-<!-- 语法点 `<schedule><sequence>…<reassign path value/>…</sequence></schedule>`：
+<!-- 语法点 `<schedule><sequence>…<reset path value/>…</sequence></schedule>`：
      在该步的累计时刻（前面 `<continueFor time=>` 之和）把 path := value。
      target 必须是状态或变量；指到参数时会显式告警且不改值，故本例指向状态 g.N。
+     canonical 拼法只有 `<reset>` 一个（同一语义不设别名）。
      `check` errors=0；`simulate`（system S，tspan 0–20）：N(9) = 63.86 →
-     N(10) = 50.000（reassign 生效）→ N(20) = 30.37（= 50·e^−0.5）。
+     N(10) = 50.000（reset 生效）→ N(20) = 30.37（= 50·e^−0.5）。
      规范条文：附录 K（METHOD × Schedule 编排）。
      simulate 的时长由 tspan 参数给定，不由 schedule 推导。 -->
-<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L9_Reassign">
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L9_Reset">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
   <modelTypes><modelType name="Decay" discipline="generic">
     <parameters><parameter name="lambda" type="real" default="0.05"/></parameters>
@@ -19,7 +20,7 @@
     <instances><instance name="g" type="Decay"/></instances>
     <schedule><sequence>
       <continueFor time="10"/>
-      <reassign path="g.N" value="50.0"/>
+      <reset path="g.N" value="50.0"/>
       <continueFor time="10"/>
     </sequence></schedule>
   </system></systems>
