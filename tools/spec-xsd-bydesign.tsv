@@ -1,0 +1,26 @@
+# tools/spec-xsd-bydesign.tsv · SPEC ↔ XSD 对账的 by-design 登记表
+#
+# 这张表登记「确有据可查、判为不改」的分歧：`tools/check-spec-xsd-parity.py`
+# 遇到登记在案的差异就放行，不红。
+#
+# 为什么要把它落成数据：by-design 这条知识如果只活在脑子里 / 注释里，
+# 下次有人「顺手」把某个根删了或加了，门不会红 —— 因为门不知道那是有意为之。
+# 登记表在门的前面：想改的人先看见它，再决定要不要推翻它。
+#
+# 列：kind<TAB>name<TAB>reason
+#   kind = spec-root | entry-root
+#     spec-root   = SPEC 声明了这个文档根，但 XSD 不认它（`C3` 放行）
+#     entry-root  = 入口层 / canonical 层收了这个根，但 SPEC 不写它（`C1`/`C2`/`C4` 放行）
+#   name  = 元素名（不带尖括号）
+#   reason = 为什么按设计不改（必填，空白 ⇒ 门直接报错退出）
+#
+# 判据来源：SPEC.md 正文 + xsd/*.xsd 的声明位置 + 既有裁决记录（SPEC 附录 C）。
+# 写理由的规矩：**要能被下一个人复核** —— 指出是哪一处声明/哪一条裁决，
+# 不要写「历史如此」「按设计」这种没法核的话。
+#
+# 记录示例（格式示例，本轮并未登记任何一条）：
+#   entry-root	system	canonical basic.xsd:917 声明为全局元素，入口层照收；SPEC 只在 §2 表格里提到 <system>，未列为文档根
+#
+# --- 本轮（v1.3.3 文档根对账）登记条目：无 ---
+# 4 处真实差异（canonical 的全局根 SPEC 没写成文档根）+ 2 处附带发现，
+# 全部有确定修法（见 docs/design/xsd-spec-parity.md 第四节），故本表为空。
