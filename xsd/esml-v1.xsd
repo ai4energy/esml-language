@@ -22,7 +22,17 @@
     </xs:complexType>
   </xs:element>
 
-  <!-- 独立库文件根（units/types/ports/components/processes/schedules/tasks 等） -->
+  <!-- 根清单 = canonical 层的**全局元素**（唯一真相 = XSD）：
+       esml / units / variableTypes / portTypes / modelTypes / systems / system /
+       orderedSet / computeTasks / metadata / project。
+       逐元素对账（xsd/esml-canonical-*.xsd 的全局元素声明）：
+         本层补上 metadata（basic）与 project（project）——它们在 canonical 层是
+         全局元素，此前入口层没列，入口层会拒收 canonical 层认可的根。
+         本层删掉 schedule / solutionParameters / tasks / variables / domain——
+         这五个在 canonical 层都不是全局元素（schedule 只在 <system> 内、
+         solutionParameters 与 tasks 只在 <esml> 内、variables 只在 <modelType> 内、
+         domain 只在 <domains> 内），入口层却把它们当根收下，等于放行一份
+         canonical 层必然拒收的文档（假绿）。 -->
   <xs:element name="units">
     <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
   </xs:element>
@@ -42,22 +52,13 @@
   <xs:element name="system">
     <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
   </xs:element>
-  <xs:element name="schedule">
-    <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
-  </xs:element>
-  <xs:element name="solutionParameters">
-    <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
-  </xs:element>
   <xs:element name="computeTasks">
     <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
   </xs:element>
-  <xs:element name="tasks">
+  <xs:element name="metadata">
     <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
   </xs:element>
-  <xs:element name="variables">
-    <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
-  </xs:element>
-  <xs:element name="domain">
+  <xs:element name="project">
     <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
   </xs:element>
   <!-- 序集写作单数 `<orderedSet>`，复数容器 `<orderedSets>` 不是合法语法：
