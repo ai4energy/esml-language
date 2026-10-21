@@ -624,6 +624,13 @@ Process/Case 也有 flowsheet 级 `EQUATION`。ESML canonical 对应地允许 `<
 
 **用途**：把多个 `<esml>` 模型 + `<computeTasks>` 计算任务**打包**为一个工程单元。
 
+`<project>` 与 `<tasks>` **都是文档根**（canonical 层的全局元素，入口层照收，
+清单见 §13）：`<project>` 装的是「模型 + 任务」的工程单元；`<tasks>` 装的是
+`<computeTasks>` 的**可选外包装**（壳里装 `<computeTasks>`），它与 `<esml>` 里
+并列的 `<computeTasks>` 不是两个平级概念，而是同一个东西包了一层
+（并列写法见 `T-tasks/tasks.esml`）。`<tasks>` 在 `<esml>` 内既可作内层壳、
+也可独立成文件 —— 两种形态是同一个全局元素。
+
 **canonical 形态**（`xsd/esml-canonical-project.xsd`）：
 ```xml
 <project name="MyProject" version="1.0">
@@ -959,6 +966,23 @@ canonical 声明：`xsd/esml-canonical-compute.xsd` 的 `<tasks>` 全局元素�
 | `esml-canonical-common.xsd` | 共享 primitive（Ident 等；basic/compute 互含防冲突） | — | 引用 |
 | `esml-canonical-basic.xsd` | **模型体系** basic 子集（units/use/variableTypes/portTypes/modelType(含 members)/systems(含 sets/initial/connections/fixed/free/schedule)）；**include compute** → 同根混合文档（模型+`<computeTasks>`）可校验 | `<esml>` + units/variableTypes/modelTypes 独立根 | 严格 |
 | `esml-canonical-compute.xsd` | **计算体系**（七类 task 声明 + 载荷）；独立 `xsd/esml-canonical-common.xsd` | `<computeTasks>` | 严格 |
+| `esml-canonical-project.xsd` | **工程壳**（`<project>`：systems/systemRef + computeTasks + scenarioChain）；自包含，不 include basic/compute | `<project>` | 严格 |
+
+**文档根清单**（入口层 `xsd/esml-v1.xsd` 的根清单 = canonical 层**全局元素集**）：
+`<esml>` / `<units>` / `<variableTypes>` / `<portTypes>` / `<modelTypes>` / `<systems>` /
+`<system>` / `<orderedSet>` / `<metadata>` / `<computeTasks>` / `<project>` / `<tasks>`
+—— 共 12 个。
+除 `<esml>` 外其余 11 个都可**单独成文件**（独立单位表 / 变量类型表 / 端口类型表 /
+组件类型表 / 系统表 / 单个系统 / 独立序集 / 独立元数据 / 独立计算任务表 / 独立工程壳 /
+独立任务表外壳）。
+
+这 12 个之外的名字**不是文档根**：`<schedule>` / `<solutionParameters>` /
+`<variables>` / `<domain>` 都不是 —— 它们只在 `<system>` / `<esml>` / `<modelType>` /
+`<domains>` 内部出现，入口层不收它们作根。
+
+两处（入口层 / 本节清单）必须一致：入口层多收一个 = 放行一份 canonical 层必然拒收的文档
+= 假绿；入口层漏收一个 = 误拒一份 canonical 层认可的文档。机验：
+`tools/check-spec-xsd-parity.py`（三方对账 + 自证；退出码 0 = 一致）。
 
 校验命令：`python3 -c "import xmlschema; xmlschema.XMLSchema('xsd/esml-canonical-basic.xsd').validate('<fixture>')"`（compute 同理）。
 
@@ -1088,8 +1112,10 @@ scope := <scope instance=name><set path value/></scope>
        `<reset>`）、`<component>`（留 `<instance>`）；实例属性形态只剩 `type=`，
        `component=` / `model-type=` 一并退位；
      - 入口 schema `xsd/esml-v1.xsd` 的**根清单**对齐 canonical 层的全局元素集：
-       删 5 个 canonical 并不存在的假根（`schedule` / `solutionParameters` /
-       `tasks` / `variables` / `domain`），补 2 个漏根（`metadata` / `project`）。
+       删 4 个 canonical 并不存在的假根（`schedule` / `solutionParameters` /
+       `variables` / `domain`），补 2 个漏根（`metadata` / `project`）；
+       `<tasks>` 先按假根删掉、后由 canonical-compute.xsd 升为全局元素（§6.8 的
+       顶层壳，入口层同步声明），故它**是**文档根，不在假根之列。
   2. **示例**：全仓 136 件逐件过**两道**校验（入口 `esml-v1.xsd` + 逐元素的
      `esml-canonical-basic.xsd`）；刻意保留的负例 11 件（schema 5 / semantic 6）
      登记在 `tools/negatives.tsv`，写明红在哪一层。`<project>` 此前零覆盖，补了示例。
@@ -1103,11 +1129,22 @@ scope := <scope instance=name><set path value/></scope>
      `<stream>`/`<constant>`/`<discrete>`/`<var>`/`<variable>`）与
      `<portVariable role=…>` 并存，属「名字给角色」与「属性给角色」两种写法，
      不是同义改名。
+     本轮再补（残余对账）：§13 补**文档根清单**（12 个 = canonical 层全局元素集，
+     入口层根清单同集）与 `esml-canonical-project.xsd` 一行（此前表里缺这一行，
+     而 `<project>` 正是它声明的根），并点名 `<schedule>` / `<solutionParameters>` /
+     `<variables>` / `<domain>` 不是文档根；§6.8 写明 `<project>` 与 `<tasks>`
+     **都是**文档根（`<tasks>` 是 canonical-compute.xsd 的全局元素，入口层同步
+     声明），别把顶层壳与文档根混作一谈。
   4. **机验**：`tools/aliases.tsv` 落成 82 条 legacy→canonical 裁决表（数据化，
      不再只活在注释里）；`tools/check-examples.py` 据此加**别名闸**（legacy 名不得
      被 XSD 声明、不得出现在示例里；非「待入」行的 canonical 必须在 XSD 里有同名
      声明）与**根清单对账**（入口与 canonical 的全局元素集必须相等）。自证从
      2 好 4 坏补到 **3 好 4 坏 + 1 反向自检**。
+     再加 `tools/check-spec-xsd-parity.py`：**文档根三方对账**（入口层 /
+     canonical 层 / 本规范正文三个集合逐条机判，散文里的根声明由脚本按显式
+     规则抽取），by-design 登记落在 `tools/spec-xsd-bydesign.tsv`；自证为
+     **5 好 4 坏 + 1 反向自检 + 4 例真实树变异测试**（删根 / 多根 / 规范凭空加根 /
+     canonical 加全局元素而入口层没收，每例都必须真变红）。
 - v0.6.4：§6.6 系统（flowsheet）级 `<equations>` canonical 定义（引用实例量 `inst.var`，折为扁平名 `inst__var`）；basic XSD `SystemType` 加 `<equations>`。
 - v0.6.3：§6.5 条件组件（实例级 `condition`）canonical 定义；basic XSD 补 `condition` 属性，并补 `kind`/`values`、partition/crosslink/partitions。
 - v0.6.1：端口变量点号作者语法 `port.pvar` + 自动物化（`__` 回归内部，§4/§9）；
