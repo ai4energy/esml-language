@@ -14,12 +14,14 @@
   - 数值矩阵/黑盒闭包等无法 XML 化的载荷走 <extension>（见下）；
     本子集只保证“声明面”可 XSD 校验。
   - `<task>` 末尾以命名形式列出任务语义扩展元素
-    （<verdict>/<checks>/<check>/<dataset>/<features>/<feature>/<target[s]>/<hyper-params>/
-    <controller>/<setpoint>/<gains>/<actuator>/<sensor>/<controlled>/<method>/<test-data>/
+    （<verdict>/<checks>/<check>/<dataset>/<features>/<feature>/<target[s]>/<hyperParams>/
+    <controller>/<setpoint>/<gains>/<actuator>/<sensor>/<controlled>/<method>/<testData>/
     <reference>/<constraints>/<constraint>/<benchmarks>/<benchmark>/<status>/<tolerance>/
-    <control-vars>/<design-vars>/<inputs>/<outputs>/<outputList>）+ `<xs:any namespace="##other">`
+    <controlVars>/<designVars>/<inputs>/<outputs>/<outputList>）+ `<xs:any namespace="##other">`
     兜底。XSD 1.0 UPA 限制让 `<xs:any>` 与同 ns 已命名元素冲突（已记于文件顶部说明），故
     采用**命名枚举**。这些元素仅作元数据承载，不参与求解语义。
+    元素名一律 camelCase：kebab 拼写（<hyper-params>/<test-data>/<control-vars>/
+    <design-vars>）**不是合法语法**，报错（SPEC §2 收紧集）。
 
   校验：python3 -c "import xmlschema; xmlschema.XMLSchema('xsd/esml-canonical-compute.xsd').validate('<file>')"
 -->
@@ -84,12 +86,12 @@
       <dataset source="…" cols="…" format="…"/>
       <features><feature name="…"/>*</features>
       <target name="…"/>
-      <hyper-params><param name="…" value="…"/>*</hyper-params>
+      <hyperParams><param name="…" value="…"/>*</hyperParams>
       <controller kind="…"><setpoint var="…" value="…"/><gains Kp="…" Ki="…" Kd="…"/></controller>
       <actuator var="…" lowerBound="…" upperBound="…"/>
       <sensor var="…"/>
       <method name="…" samples="…" horizon="…"/>
-      <test-data source="…" format="…"/>
+      <testData source="…" format="…"/>
       <reference source="…" format="…"/>
       <constraints><constraint name="…" expr="…"/>*</constraints>
       <benchmarks><benchmark name="…" expected="…" unit="…" tol="…"/>*</benchmarks>

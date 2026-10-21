@@ -7,7 +7,8 @@
   loosely so the seven-task payload stays validated by `esml-canonical-compute.xsd`.
 
   Canonical element names are **camelCase** (`systemRef`, `computeTasks`,
-  `scenarioChain`); kebab-case spellings are accepted as compatibility aliases.
+  `scenarioChain`); kebab-case spellings are **not** legal syntax — 规范 §2 收紧集：
+  同一语义只留一种写法，其余写法一律报错，不做静默兼容。
 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
            xmlns:esml="https://www.ai4energy.cn/esml/v1"
