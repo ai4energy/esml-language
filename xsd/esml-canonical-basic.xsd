@@ -425,7 +425,7 @@
     <xs:attribute name="name" type="esml:Ident" use="required"/>
     <xs:attribute name="type" type="xs:string" use="required"/>
     <xs:attribute name="domain" type="xs:string" use="optional"/>
-    <xs:attribute name="extends-from" type="xs:string" use="optional"/>
+    <xs:attribute name="extendsFrom" type="xs:string" use="optional"/>
     <!-- 所属 partition id（缺省/未分区 = 0）。 -->
     <xs:attribute name="partition" type="xs:unsignedInt" use="optional"/>
     <!-- 条件组件（语言规范 §6.5）：构建期可判的布尔
@@ -438,8 +438,8 @@
     <xs:attribute name="to" type="xs:string" use="optional"/>
     <!-- 连接种类 + 端点分区 + 边界接口表。 -->
     <xs:attribute name="kind" type="xs:string" use="optional"/>
-    <xs:attribute name="a-part" type="xs:unsignedInt" use="optional"/>
-    <xs:attribute name="b-part" type="xs:unsignedInt" use="optional"/>
+    <xs:attribute name="aPart" type="xs:unsignedInt" use="optional"/>
+    <xs:attribute name="bPart" type="xs:unsignedInt" use="optional"/>
     <xs:attribute name="interface" type="xs:string" use="optional"/>
     <xs:anyAttribute processContents="lax"/>
   </xs:complexType>
@@ -455,7 +455,7 @@
     </xs:attribute>
     <xs:attribute name="name" type="xs:string" use="optional"/>
     <xs:attribute name="domain" type="xs:string" use="optional"/>
-    <xs:attribute name="time-layer" type="xs:unsignedInt" use="optional"/>
+    <xs:attribute name="timeLayer" type="xs:unsignedInt" use="optional"/>
     <xs:anyAttribute processContents="lax"/>
   </xs:complexType>
   <!-- record-type 目录（可选）。 -->
@@ -524,7 +524,8 @@
       <xs:element name="annotation" type="esml:AnnotationType" minOccurs="0" maxOccurs="unbounded"/>
       <!-- 选择器（规范附录 SELECTOR / CASE·STN）：<selectors><selector …/></selectors> -->
       <xs:element name="selectors" type="xs:anyType" minOccurs="0" maxOccurs="unbounded"/>
-      <!-- 基类 extends（子元素文本，逗号分隔；亦支持 extends-from= 属性） -->
+      <!-- 基类（子元素文本，逗号分隔）。canonical 拼法是 camelCase `extendsFrom`
+           （规范 §4.0）；kebab `extends-from` 不是合法语法，不在此声明。 -->
       <xs:choice minOccurs="0" maxOccurs="unbounded">
         <xs:element name="extendsFrom" type="xs:string"/>
       </xs:choice>
@@ -728,8 +729,8 @@
                                          `time` seconds (cumulative).
                                          `solver="…"` overrides the
                                          integrator for that one segment.
-             * `<continueUntil condition="…" max-time="…"/>` — **condition**
-                                         exit: run at most `max-time` seconds
+             * `<continueUntil condition="…" maxTime="…"/>` — **condition**
+                                         exit: run at most `maxTime` seconds
                                          and stop at the first instant
                                          `condition` holds (spec:1319). Not a
                                          `<continueFor>` spelling: `for` exits
@@ -1070,8 +1071,8 @@
     <xs:anyAttribute processContents="lax"/>
   </xs:complexType>
 
-  <!-- `<continueUntil condition="…" max-time="…"/>` — a **condition**-exit
-       segment: integrate at most `max-time`
+  <!-- `<continueUntil condition="…" maxTime="…"/>` — a **condition**-exit
+       segment: integrate at most `maxTime`
        seconds and stop at the first instant `condition` holds; the next
        segment then continues from that instant.
 
@@ -1080,14 +1081,14 @@
          * `condition` — the predicate. Without it the segment has no exit
            other than the bound, i.e. it is a `<continueFor>` wearing another
            name (and the two are never rewritten into one another).
-         * `max-time` — the upper bound. Without it a condition that never
+         * `maxTime` — the upper bound. Without it a condition that never
            becomes true runs forever. The bound is also the answer when the
            condition does not trip inside it: not an error.
        `condition` is author-form dotted text (`m.x < 1.0`), the same
        expression grammar the equations use. -->
   <xs:complexType name="ScheduleContinueUntilType">
     <xs:attribute name="condition" type="xs:string" use="required"/>
-    <xs:attribute name="max-time" type="xs:double" use="required"/>
+    <xs:attribute name="maxTime" type="xs:double" use="required"/>
     <xs:anyAttribute processContents="lax"/>
   </xs:complexType>
 
