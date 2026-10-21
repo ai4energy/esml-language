@@ -52,6 +52,13 @@
 （`systems`）、计算面（`computeTasks`）、单位表（`units`）、函数（`functions`）、
 宿主对象（`foreignObjects`）、元数据（`metadata`）等；段清单见 §2 表与 §6.9。
 
+> **根清单**：除 `<esml>` 外，另有若干**独立根**——库文件（`units` / `variableTypes` /
+> `portTypes` / `modelTypes` / `systems` / `system` / `orderedSet` / `metadata`）、
+> 计算壳（`computeTasks` / `tasks`）、工程壳（`project`）可单独成文。
+> 入口 schema `xsd/esml-v1.xsd` 的**根集合恒等于** canonical 层的全局元素集合
+> （唯一真相 = canonical XSD），该对账由 `docs/validate_roots.py` 常驻机判；
+> 逐项清单见 §13 的 XSD 分层表。
+
 **`<metadata>`** 是 `<esml>` 的**可选**子元素（最多一个），承载**文档级元数据**：
 常用子元素 `<author>` / `<license>` / `<description>` / `<provenance>`。
 其**子结构不固定**（schema 放行任意子元素），实现可以只读不消费。
@@ -671,13 +678,16 @@ Process/Case 也有 flowsheet 级 `EQUATION`。ESML canonical 对应地允许 `<
 kebab-case 拼写**不是合法语法**，报错（§2 收紧集）。
 
 **`<tasks>` 外层壳**：`<computeTasks>` 之外的**可选外包装**，可与顶层其它元素并列。
-壳内子元素按松散规则透传（不另设结构约束）—— 它不引入新语义，只是给任务表
+壳内子元素按 `##targetNamespace` + lax 透传——**已声明的子元素（如
+`<computeTasks>`）按其自身声明校验**，未声明的放行。它不引入新语义，只是给任务表
 套一层名字，便于同一文档放多张任务表。解析按 descendants() 找规范名
 `computeTasks` ⇒ **壳内嵌套的 `<computeTasks>` 被实读**，`<tasks>` 与
 `<computeTasks>` 不是两个平级概念，是同一个东西包了一层。
 canonical 声明：`xsd/esml-canonical-compute.xsd` 的 `<tasks>` 全局元素，
-`esml-canonical-basic.xsd` 的 `<esml>` 子元素表引用之（入口 schema
-`esml-v1.xsd` 同样声明同名根）。
+`esml-canonical-basic.xsd` 的 `<esml>` 子元素表引用之 ⇒ `<tasks>` 是
+canonical **全局元素**，既可作 `<esml>` 的可选子元素，也可作**文档根**
+（入口 schema `esml-v1.xsd` 同样声明同名根，根清单与之相等，由
+`docs/validate_roots.py` 机判）。
 示例：`T-tasks/tasks.esml`。
 
 ### 6.9 计算任务表（`<computeTasks>` / `<task>`）
@@ -962,11 +972,18 @@ canonical 声明：`xsd/esml-canonical-compute.xsd` 的 `<tasks>` 全局元素�
 **XSD 分层文档化**（`xsd/`）：
 | 文件 | 覆盖 | 根 | 校验 |
 |---|---|---|---|
-| `esml-v1.xsd` | 全库宽松入口 | `<esml>` + 独立库根 | lax |
+| `esml-v1.xsd` | 全库宽松入口（内容 lax，根清单严格） | `<computeTasks>` `<esml>` `<metadata>` `<modelTypes>` `<orderedSet>` `<portTypes>` `<project>` `<system>` `<systems>` `<tasks>` `<units>` `<variableTypes>` | lax |
 | `esml-canonical-common.xsd` | 共享 primitive（Ident 等；basic/compute 互含防冲突） | — | 引用 |
-| `esml-canonical-basic.xsd` | **模型体系** basic 子集（units/use/variableTypes/portTypes/modelType(含 members)/systems(含 sets/initial/connections/fixed/free/schedule)）；**include compute** → 同根混合文档（模型+`<computeTasks>`）可校验 | `<esml>` + units/variableTypes/modelTypes 独立根 | 严格 |
-| `esml-canonical-compute.xsd` | **计算体系**（七类 task 声明 + 载荷）；独立 `xsd/esml-canonical-common.xsd` | `<computeTasks>` | 严格 |
-| `esml-canonical-project.xsd` | **工程壳**（`<project>`：systems/systemRef + computeTasks + scenarioChain）；自包含，不 include basic/compute | `<project>` | 严格 |
+| `esml-canonical-basic.xsd` | **模型体系** basic 子集（units/use/variableTypes/portTypes/modelType(含 members)/systems(含 sets/initial/connections/fixed/free/schedule)）；**include compute** → 同根混合文档（模型+`<computeTasks>`）可校验 | `<computeTasks>` `<esml>` `<metadata>` `<modelTypes>` `<orderedSet>` `<portTypes>` `<system>` `<systems>` `<tasks>` `<units>` `<variableTypes>` | 严格 |
+| `esml-canonical-compute.xsd` | **计算体系**（七类 task 声明 + 载荷）；独立 `xsd/esml-canonical-common.xsd` | `<computeTasks>` `<tasks>` | 严格 |
+| `esml-canonical-project.xsd` | **工程壳**（`<project>`：`systems` / `computeTasks` / `scenarioChain`）；自包含，不 include basic/compute | `<project>` | 严格 |
+
+「根」一列 = 该 schema **实际可用**的全局元素（本地声明 ∪ `xs:include` 链上的
+全局元素）；整张表由 `docs/validate_roots.py` **逐行机判**，不是手抄的清单。
+入口层 `esml-v1.xsd` 的根集合**恒等于** canonical 层的全局元素集合
+（唯一真相 = canonical XSD）——少一个则合法文档被入口层判非法，多一个则入口层
+放行一份没有 schema 能校验的文档。裁决见
+`docs/design/root-matrix-adjudication.md`。
 
 **文档根清单**（入口层 `xsd/esml-v1.xsd` 的根清单 = canonical 层**全局元素集**）：
 `<esml>` / `<units>` / `<variableTypes>` / `<portTypes>` / `<modelTypes>` / `<systems>` /
@@ -982,14 +999,15 @@ canonical 声明：`xsd/esml-canonical-compute.xsd` 的 `<tasks>` 全局元素�
 
 两处（入口层 / 本节清单）必须一致：入口层多收一个 = 放行一份 canonical 层必然拒收的文档
 = 假绿；入口层漏收一个 = 误拒一份 canonical 层认可的文档。机验：
-`tools/check-spec-xsd-parity.py`（三方对账 + 自证；退出码 0 = 一致）。
+`tools/check-spec-xsd-parity.py`（三方对账 + 自证；退出码 0 = 一致）；
+`docs/validate_roots.py`（根矩阵块 + 本节表逐行对账）。
 
 校验命令：`python3 -c "import xmlschema; xmlschema.XMLSchema('xsd/esml-canonical-basic.xsd').validate('<fixture>')"`（compute 同理）。
 
-**说明**：`esml-v1.xsd` 只校验顶层结构；`esml-canonical-basic.xsd` 提供更强的
+**说明**：`esml-v1.xsd` 只校验顶层结构与根元素合法性；`esml-canonical-basic.xsd` 提供更强的
 内容校验，覆盖模型体系的主要元素（units、use、variableTypes、portTypes、
 modelType、systems、sets、initial、connections、fixed/free、schedule）。
-`esml-canonical-compute.xsd` 覆盖计算任务体系。
+`esml-canonical-compute.xsd` 覆盖计算任务体系，`esml-canonical-project.xsd` 覆盖工程壳。
 
 各部分的规范文本是判据；XSD 与规范同步更新。
 

@@ -10,7 +10,7 @@ ESML 是一种声明式、基于方程的物理系统建模语言，文档即 XM
 |---|---|
 | [`SPEC.md`](SPEC.md) | 语言规范：词法、类型系统、组件、端口、系统、方程、展开与求解约定 |
 | [`xsd/`](xsd/) | XML Schema：入口 schema 一份，canonical 子集四份（共享 primitive / 模型体系 / 计算体系 / 项目容器） |
-| [`docs/`](docs/) | 规范 ⇄ 示例 的机验对账：[`validate_examples.py`](docs/validate_examples.py)（五道检查）与 [`coverage.md`](docs/coverage.md)（对账表与逐条裁决） |
+| [`docs/`](docs/) | 机验对账：[`validate_roots.py`](docs/validate_roots.py)（入口层根清单 ⇄ canonical 全局元素）与 [`validate_examples.py`](docs/validate_examples.py)（规范 ⇄ 示例，五道检查）、[`coverage.md`](docs/coverage.md)（对账表与逐条裁决）、[`design/`](docs/design/)（裁决记录） |
 | `D-skeleton/` … `X-use/` | 每个语法点一份可运行文档，按语言层次分目录（见下表） |
 
 canonical XML 是正统语法；XML Schema 描述 canonical XML，是可机验的基准。
@@ -41,6 +41,22 @@ canonical XML 是正统语法；XML Schema 描述 canonical XML，是可机验�
 `SPEC.md` 的章节编号稳定，schema 与示例都按该编号引用。
 
 ## 校验与运行
+
+仓内两道**常驻机判**，`make check` 一起跑（任一失败即非零退出）：
+
+| 脚本 | 查什么 | 依赖 |
+|---|---|---|
+| [`docs/validate_roots.py`](docs/validate_roots.py) | **根矩阵**：入口层 `esml-v1.xsd` 的根集合 ⇄ canonical 层的全局元素集合；入口层注释里的根清单由脚本生成、逐字复核；SPEC §13 的 XSD 分层表逐行对账 | 仅标准库 |
+| [`docs/validate_examples.py`](docs/validate_examples.py) | 规范 ⇄ 示例 五道检查（XSD 机验 / 路径 / 章节引用 / 稀有元素 / SPEC 代码块） | `xmlschema` |
+
+```sh
+make check                                  # 两道都跑
+python3 docs/validate_roots.py             # 只跑根矩阵
+python3 docs/validate_roots.py selftest    # 根矩阵的自证（好例 / 坏例）
+```
+
+改了 schema 之后，先 `python3 docs/validate_roots.py sync` 重生成入口层注释里的
+根矩阵清单（**清单不手工转述**），再跑 `make check`。
 
 任意 XML Schema 校验器均可。入口 schema 校验良构性与命名空间，canonical schema
 校验文档结构：

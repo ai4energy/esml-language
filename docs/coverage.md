@@ -430,7 +430,8 @@ canonical 声明处）＋ 至少一份演示该语法的示例，外加实现侧
 | `89262a5` | §6.5 补条件的操作数作用域，并把「参数形态」标为待定 |
 | `696aecd` | 落盘 SPEC 覆盖对账表，并在 README 挂上入口 |
 | `03b8b38` | §5.8 补一句闸门实测——[3] 角并不因 14/83 判红 |
-| （本提交） | 修本表：把上一版的「（本提交）」换成实际 SHA |
+| `d63d39f` | 修本表：把上一版的「（本提交）」换成实际 SHA |
+| `35f32e8` | 入口层根清单 ⇄ canonical 全局元素：落成常驻机判（`docs/validate_roots.py`）＋ 收敛根集合 ＋ 裁决留档 |
 
 ---
 
@@ -440,6 +441,10 @@ canonical 声明处）＋ 至少一份演示该语法的示例，外加实现侧
 # 1) 全部五道检查
 python3 docs/validate_examples.py
 #    需要 xmlschema：pip install xmlschema
+
+# 1b) 根矩阵对账（入口层根清单 ⇄ canonical 全局元素；仅标准库）
+python3 docs/validate_roots.py
+#    自证（好例 / 坏例）：python3 docs/validate_roots.py selftest
 
 # 2) 单件 XSD 校验（README「校验与运行」一节的写法）
 python3 -c "import xmlschema; xmlschema.XMLSchema('xsd/esml-canonical-basic.xsd').validate('L3-model/modeltype-basic.esml')"
