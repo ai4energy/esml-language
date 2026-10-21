@@ -502,34 +502,45 @@ Process/Case 也有 flowsheet 级 `EQUATION`。ESML canonical 对应地允许 `<
 <system name="Seq">
   <instances>...</instances>
   <initialisationProcedures>
-    <use library="..."/>
-    <unit name="..."/>
-    <start>
-      <set name="x" value="0"/>
-      <assign name="y" value="x + 1"/>
-    </start>
-    <next>
-      <moveto target="Branch"/>
-      <jumpto target="Exit"/>
-      <advance until="t > 5"/>
-      <complete/>
-    </next>
+    <initialisationProcedure name="cooling">
+      <use><unit name="real" procedure="standard"/></use>
+      <start>
+        <set path="m.x" value="0.5"/>
+        <assign path="m.y" value="m.x + 1"/>
+      </start>
+      <next>
+        <moveTo><set path="m.x" value="1.5"/></moveTo>
+        <jumpTo><set path="m.y" value="2.5"/></jumpTo>
+        <advance unit="s"/>
+        <complete unit="s"/>
+      </next>
+    </initialisationProcedure>
   </initialisationProcedures>
 </system>
 ```
 
 **子元素**：
 
-| 子元素 | 含义 |
-|---|---|
-| `<use library="g:a:v"/>` | 引用库包 |
-| `<unit name="…"/>` | 声明单位 |
-| `<start>` | 入口序列；内含 `<set>` / `<assign>` / `<selector>` / `<replace>` |
-| `<next>` | 序列延续；内含 `<moveto>` / `<jumpto>` / `<advance>` / `<complete>` |
-| `<initialisationprocedure>` | 单个初始化过程 |
+| 层 | 子元素 | 含义 |
+|---|---|---|
+| `<initialisationProcedures>` | `<initialisationProcedure name>` | 容器内一条条**单数**过程；`name` 是过程标识 |
+| `<initialisationProcedure>` | `<use>` | 引用库包/单位过程：`<use><unit name="…" procedure="…"/></use>`（`<unit>` 是 `<use>` 的子元素，不是并列层） |
+| `<initialisationProcedure>` | `<start>` | 入口序列；内含 `<set>` / `<assign>` / `<selector>` / `<replace>`（寻址用 `path=`） |
+| `<initialisationProcedure>` | `<next>` | 序列延续；内含 `<moveTo>` / `<jumpTo>` / `<advance>` / `<complete>` |
 
-`$ADVANCE` 展开为 `<advance until="…"/>`，`$COMPLETE` 为 `<complete/>`，
-`$JUMP_TO` 为 `<jumpto target="…"/>`。
+**拼写单轨**：容器与全部子元素是 **camelCase** —— `<initialisationProcedures>` /
+`<initialisationProcedure>` / `<moveTo>` / `<jumpTo>`；kebab 拼法
+（`<initialisation-procedures>` / `<move-to>` / `<jump-to>`）一律拒收。
+
+**载荷**：`<moveTo>` / `<jumpTo>` 的**子元素**带 `path` / `value`
+（`<moveTo><set path="m.x" value="2.0"/></moveTo>`），不是自身的 `target` 属性；
+`<advance>` / `<complete>` 带 `unit=`。寻址用作者点号 `m.x`（§3 / §9）。
+
+> **待实现**：`<advance>` 的**条件**形式（`<advance until="t > 5"/>`）目前
+> 解析层**不读** `until`（只读 `unit`），条件推进尚未实现；本节只列已实现形态。
+
+示例：`L2-discrete/initialisationprocedures.esml`（`<jumpTo>` / `<complete>` 支）、
+`L2-discrete/initialisationprocedure-advance.esml`（`<moveTo>` / `<advance>` 支）。
 
 本结构在解析期读取并展开。
 
