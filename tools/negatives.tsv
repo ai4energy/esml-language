@@ -1,18 +1,26 @@
 # tools/negatives.tsv · 自述负例清单（check-examples.py 读它）
 # 列：path <TAB> level <TAB> reason
 # level=schema    该件必须被 XSD **拒收**；XSD 收下它 = 判据漏了（红）
-# level=semantic 该件必须**通过** XSD（它红在语义/求解层，不在 schema 层）；
+# level=semantic 该件必须**通过** XSD（拼写合法，红在 XSD 之后的某一层：
+#                 解析 / 语义 / 求解 / 库坐标审计——不必是「求解层」这一种）；
 #                 XSD 拒收它 = 我们把一个语义负例误判成拼写错（红）
 # 「未判定」不合法：每件都要写清它红在哪一层，否则下次复核又要重新猜。
+#
+# 登记条数：16 件（schema 9 / semantic 7）—— 改表即改这一行；
+# tools/check-neg-debt.py 每次跑都重算并核对，对不上就红（台账写错就改台账）。
 L0-type-unit/units-contradiction.esml	semantic	单位声明与 type unit= 矛盾（§11 量纲冲突），拼写合法
-L1-expr-equation/array-index-probe.esml	semantic	数组下标越界，求解期报 I25a；拼写合法
-L1-expr-equation/axis-reduce-probe.esml	semantic	沿 axis 归约维度不匹配，求解期报 I25b；拼写合法
-L1-expr-equation/oob-probe.esml	semantic	序集下标越界，求解期报 I25d；拼写合法
+L1-expr-equation/array-index-probe.esml	semantic	数组维 "GhostSet" 既非字面量、也非已声明序集/参数名，求解期报 I25a；拼写合法
+L1-expr-equation/axis-reduce-probe.esml	semantic	rank-1 数组上 sum(x, 1) 的 axis 1 越界（合法 0..0），求解期报 I25b；拼写合法
+L1-expr-equation/oob-probe.esml	semantic	数组字面下标 x[4] 越出 1-based 合法范围 1..=3，求解期报 I25d；拼写合法
 L1-expr-equation/shape-mismatch-probe.esml	semantic	形状不匹配，求解期报 I25c；拼写合法
-X-use/use-f12-mismatch.esml	semantic	F12 端口类别与连接方向不匹配，求解期报；拼写合法
-L1-expr-equation/derivativesymbol.esml	schema	<derivativeSymbol> 依附的 <body>+<derivative> 组合违反 basic XSD 的 xs:choice maxOccurs="1"（三选一）
-L1-expr-equation/noderivative.esml	schema	同上（<noDerivative>）
-L1-expr-equation/partial-derivative.esml	schema	同上（<partial>）
-L1-expr-equation/zeroderivative.esml	schema	同上（<zeroDerivative>）
+X-use/use-f12-mismatch.esml	semantic	F12 = <use library> 坐标与 libroot 的 registry 行不精确一致（:9.9.9 vs :0.1），审计期报；拼写合法。注：该审计只在带 -L <libroot> 时跑，不带 -L 的 check 是绿的
+L1-expr-equation/derivativesymbol.esml	schema	<derivativeSymbol> 依附的 <body>+<derivative> 组合违反 basic XSD 的 xs:choice maxOccurs="1"（三选一）；引擎同一件报 F1，但归因是 <body> 的方程写法（ParseError::Expr）⇒ 位置归因见 derivativesymbol-noextern-probe.esml
+L1-expr-equation/noderivative.esml	schema	<noDerivative> 同上（<body>+<derivative> 违反 xs:choice；引擎 F1 归因 <body> 方程写法）⇒ 位置归因见 noderivative-noextern-probe.esml
+L1-expr-equation/partial-derivative.esml	schema	<partial> 同上（<body>+<derivative> 违反 xs:choice；引擎 F1 归因 <body> 方程写法）⇒ 位置归因见 partial-noextern-probe.esml
+L1-expr-equation/zeroderivative.esml	schema	<zeroDerivative> 同上（<body>+<derivative> 违反 xs:choice；引擎 F1 归因 <body> 方程写法）⇒ 位置归因见 zeroderivative-noextern-probe.esml
+L1-expr-equation/derivativesymbol-noextern-probe.esml	schema	「合法位被拒」：<derivativeSymbol> 在 <derivative> 之内（拼写与位置皆合法），但 <derivative> 只在 <extern> 形函数上合法 ⇒ XSD 拒收；引擎报 F1 判据 C（without an <extern>）
+L1-expr-equation/noderivative-noextern-probe.esml	schema	「合法位被拒」：<noDerivative> 同上（XSD 拒收 + 引擎 F1 判据 C）
+L1-expr-equation/partial-noextern-probe.esml	schema	「合法位被拒」：<partial> 同上（XSD 拒收 + 引擎 F1 判据 C）
+L1-expr-equation/zeroderivative-noextern-probe.esml	schema	「合法位被拒」：<zeroDerivative> 同上（XSD 拒收 + 引擎 F1 判据 C）
 L3-model/component-probe.esml	schema	legacy <component> 元素形态，canonical 只收 <instance>（SPEC §2 收紧词法）
 L5-instance/instance-condition-undecidable.esml	semantic	instance condition 引用模型参数，构建期不可静态判定；check 过、solve/simulate 必须报「not statically decidable」（SPEC §6.5）

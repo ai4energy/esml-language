@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 负例（预期失败）：「合法位被拒」——`<noDerivative wrt="x"/>` 放在**合法位**
+     （`<derivative mode="analytic">` 之内；canonical 拼写，`wrt` 必填），
+     整件仍被拒：`<derivative>` 只在 `<extern>` 形函数上合法
+     （`xsd/esml-canonical-basic.xsd` 的 `FunctionType`：`xs:choice` 三选一 =
+     `<body>` | extern+derivative+fd | `<algorithm>`），本件的 `<function>` 没有 `<extern>`。
+     ⇒ XSD 拒收（`Element 'derivative': This element is not expected`）；
+       引擎 `esml check` 报 **F1**，判据 C 的措辞是
+       "declares <derivative> … without an <extern> — the derivative model is only
+       meaningful on the `extern` form" ⇒ 拒的是**位**，不是拼写。
+     为什么要另立一件（旧件顶不上）：同 token 的旧件 `L1-expr-equation/noderivative.esml`
+     的 `<body>` 写的是方程 `y = x`，引擎在 **body 形态**上就拒
+     （`ParseError::Expr`），根本走不到导数判据 ⇒ 旧件的 F1 归因是 body，
+     证明不了「位」。本件**不写 `<body>`**，于是整件唯一的缺陷就是「导数没挂 `<extern>`」。
+     正对照：同一 token 挂 `<extern>` 形（extern+derivative+fd 分支）XSD 与引擎都放行，
+     见 `L8-function/extern-cabi.esml`（`<extern>` + `<derivative mode="fd"/>`）。
+     规范条文：§14.2（求导三档）。
+     非零退出是预期行为。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_DerivativeNoexternNone">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <functions><function name="f">
+    <inputs><input name="x"/></inputs>
+    <outputs><output name="y"/></outputs>
+    <derivative mode="analytic"><noDerivative wrt="x"/></derivative>
+  </function></functions>
+  <modelTypes><modelType name="M">
+    <parameters><parameter name="x" type="real" default="3.0"/></parameters>
+    <variables><variable name="y" type="real" role="algebraic"/></variables>
+    <equations><equation>y = f(x)</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="M"/></instances>
+    <schedule><sequence><continueFor time="0"/></sequence></schedule>
+  </system></systems>
+</esml>
