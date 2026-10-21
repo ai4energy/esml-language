@@ -40,6 +40,22 @@
   **`instances` = 组件实例集合**（XML `<instances>` / `SystemDef.instances`），
   **`units` 只指单位表**（两者不再撞名）。
 
+### 1.1 文档骨架（`<esml>` 根 · `<metadata>`）
+
+一份 ESML 文档的根是 `<esml>`：命名空间 `https://www.ai4energy.cn/esml/v1` **必写**，
+`name` 是文档名，`schema` 可选（写 `esml/v1`）。根之下是各**顶层段**——类型
+（`variableTypes` / `portTypes` / `modelTypes` / `recordTypes`）、模型体系
+（`systems`）、计算面（`computeTasks`）、单位表（`units`）、函数（`functions`）、
+宿主对象（`foreignObjects`）、元数据（`metadata`）等；段清单见 §2 表与 §6.9。
+
+**`<metadata>`** 是 `<esml>` 的**可选**子元素（最多一个），承载**文档级元数据**：
+常用子元素 `<author>` / `<license>` / `<description>` / `<provenance>`。
+其**子结构不固定**（schema 放行任意子元素），实现可以只读不消费。
+`<metadata>` **不参与编译与求解**——它写什么都不改变方程数、可解性与数值结果。
+
+- 示例：`D-skeleton/metadata.esml`（author / license / description）、
+  `D-skeleton/provenance.esml`（出处声明）。
+
 ## 2. 词法（收紧集）
 
 > **唯一真相 = XSD（机验基准）**：canonical 元素/属性一律 **camelCase**（`modelTypes` /
@@ -126,6 +142,17 @@
 - 差值/仿射换算等按类型定义推进（quantity/delta 属后续类型扩展项）；
   单位/量纲语义由 `VariableType.unit/quantity` 标注，**数值层用裸数**
   （详见 §1 设计原则）。
+- **类型按类别包裹（wrapper）**：`<variableTypes>` 里的 `<type>` 可以**直接裸放**，
+  也可以按类别包一层——`<typesGeneric>` / `<typesThermal>` / `<typesDimensionless>`
+  （`discipline=` 可选）。**包内 `<type>` 与裸放完全等价**，wrapper 只表达
+  「这一批类型属于哪一类」，不改变声明语义。示例：`L0-type-unit/typesgeneric.esml`、
+  `L0-type-unit/typesthermal.esml`、`L0-type-unit/type-unit.esml`
+  （枚举类型放在 `<typesDimensionless>` 内）。
+- **记录类型**：顶层 `<recordTypes>` 目录内写 `<recordType name>`，其下用
+  `<field name type default role unit/>` 逐字段声明。示例：`L0-type-unit/record-type.esml`。
+- **单位表分组**：`<units>` 的 `<unitsDerived>` 内可直接放 `<unit>`，也可先放
+  `<group name>` 再在组内放 `<unit>`；组内 `<unit>` 与组外平级可用（分组只是组织形式，
+  不改变单位语义——见附录 J）。示例：`L0-type-unit/units-group.esml`。
 
 ## 4. 组件（modelType）
 
@@ -215,6 +242,12 @@ ESML 原生作者优先**组合（§4.1）/参数覆盖**；`<extendsFrom>` 主�
 **派生组件里声明与基类同名的** parameter/variable/member/discrete（合并规则「派生同名胜」）。
 可选显式标记 `redeclare="true"`：名字必须在基类存在（否则**响亮报错**，
 防拼写错静默新增）。`replaceable="true"` 为元数据（未被替换时行为等同普通声明）。
+
+**`<extends>`（类级继承的 canonical 子元素形态）**：`<modelType>` 内可写
+`<extends name="Base"/>`（等价属性写法 `extends="Base"`），声明**同一文档内**声明的
+基类。它与 `<extendsFrom>` **并列**、不是同一件事：`<extendsFrom>` 合并的是
+**第三方转换库**的基类，`<extends>` 合并的是**本文档内**的基类；两者合并规则同为
+**派生同名优先**。示例：`L3-model/extends.esml`（子类型继承基类参数 `k`）。
 
 ### 4.1 复合组件
 
@@ -445,6 +478,20 @@ instance 的 `type` 指向 `<system>` 时，它按子系统展开，不当作缺
 （S 层），另有规范；图分解建模（市场/分层/多尺度/储能/电解器/随机规划/SVaR/MHE）
 的子系统显式表达属图模型层，不属于本节的基本求解单元分层。
 
+**元素形态**：系统级 `<partitions>` 表内写 `<partition id name discipline timeLayer/>`——
+`id` **从 1 起**（`0` 保留给「未分区」，`id="0"` 报错），`discipline` 标分区的学科域，
+`timeLayer` 标跨时层序号（>0 时生效）；实例用 `partition="id"` 归入分区。
+跨分区耦合写在系统级 `<links><crosslink from to/></links>`（端点 = 实例.成员.量 的限定路径；
+旧拼写 `<link>` 已被拒绝）。**分区是可选的解耦标注**：去掉 `<partitions>` /
+`partition=` / `<crosslink>`、改写为 `<connection>`，结果与不分区一致。
+示例：`L7-partition/partition-crosslink.esml`（两分区一 crosslink）、
+`L7-partition/partition-chain.esml`（三分区两 crosslink 串成一条链）、
+`L7-partition/subsystem-crosslink.esml`（子系统型 crosslink）。
+
+**计算域声明**：顶层 `<domains><domain name><discretization method order intervals/></domain></domains>`
+声明计算域及其离散区间数（`lowerBound` / `upperBound` / `method` / `order` 是扩展属性，
+不参与求解语义）。示例：`L7-partition/domain.esml`。
+
 ### 6.5 条件组件（实例级 `condition`）
 
 组件可按条件实例化：条件为假则**该实例、其实例方程
@@ -651,17 +698,17 @@ canonical 声明：`xsd/esml-canonical-compute.xsd` 的 `<tasks>` 全局元素�
 |---|---|---|
 | `<verdict>` / `<status>` | 自由文本 | `T-tasks/task-vendor-text.esml` / `T-tasks/status.esml` |
 | `<tolerance>` | 自由文本 | `T-tasks/tolerance.esml` |
-| `<dataset>` / `<testData>` / `<reference>` | 数据源引用（`source` / `cols` / `format`） | `T-tasks/dataset.esml` / `test-data.esml` / `reference.esml` |
-| `<target>` / `<targets>` | 目标引用 | `T-tasks/target.esml` / `targets.esml` |
-| `<features>` / `<feature>` | 特性声明 | `T-tasks/features.esml` / `feature.esml` |
-| `<checks>` / `<check>` | 验收断言 | `T-tasks/checks.esml` / `check.esml` |
+| `<dataset>` / `<testData>` / `<reference>` | 数据源引用（`source` / `cols` / `format`） | `T-tasks/dataset.esml` / `T-tasks/test-data.esml` / `T-tasks/reference.esml` |
+| `<target>` / `<targets>` | 目标引用 | `T-tasks/target.esml` / `T-tasks/targets.esml` |
+| `<features>` / `<feature>` | 特性声明 | `T-tasks/features.esml` / `T-tasks/feature.esml` |
+| `<checks>` / `<check>` | 验收断言 | `T-tasks/checks.esml` / `T-tasks/check.esml` |
 | `<constraints>` / `<constraint>` | 约束 | `T-tasks/task-constraint.esml` |
 | `<hyperParams>` | 超参（`<param name value/>`） | `T-tasks/hyperparams.esml` |
-| `<benchmarks>` / `<benchmark>` | 基准 | `T-tasks/benchmarks.esml` / `task-vendor-text.esml` |
-| `<controller>`（内含 `<setpoint>` / `<gains>`） | 控制器声明 | `T-tasks/controller.esml` / `controller-gains.esml` / `gains.esml` |
+| `<benchmarks>` / `<benchmark>` | 基准 | `T-tasks/benchmarks.esml` / `T-tasks/task-vendor-text.esml` |
+| `<controller>`（内含 `<setpoint>` / `<gains>`） | 控制器声明 | `T-tasks/controller.esml` / `T-tasks/controller-gains.esml` / `T-tasks/gains.esml` |
 | `<setpoint>` | 设定点 | `T-tasks/setpoint.esml` |
-| `<actuator>` / `<sensor>` / `<controlled>` | 执行器 / 传感器 / 被控量 | `T-tasks/actuator.esml` / `sensor.esml` / `controlled.esml` |
-| `<controlVars>` / `<designVars>` | 控制变量 / 设计变量（`<var name/>`） | `T-tasks/control-vars.esml` / `design-vars.esml` / `controlled-control-vars.esml` |
+| `<actuator>` / `<sensor>` / `<controlled>` | 执行器 / 传感器 / 被控量 | `T-tasks/actuator.esml` / `T-tasks/sensor.esml` / `T-tasks/controlled.esml` |
+| `<controlVars>` / `<designVars>` | 控制变量 / 设计变量（`<var name/>`） | `T-tasks/control-vars.esml` / `T-tasks/design-vars.esml` / `T-tasks/controlled-control-vars.esml` |
 | `<outputList>` | 输出列表（`<var name/>`） | `T-tasks/outputlist.esml` |
 | `<description>` | 自由文本 | （暂缺示例） |
 
@@ -674,6 +721,32 @@ canonical 声明：`xsd/esml-canonical-compute.xsd` 的 `<tasks>` 全局元素�
 `T-tasks/task-control.esml` / `T-tasks/task-surrogate.esml` / `T-tasks/task-validation.esml`
 （逐类单跑），以及上表的任务附属元数据族。
 机验基准：`xsd/esml-canonical-compute.xsd`。
+
+**顶层 `<solutionParameters>` 段**（与 `<computeTasks>` 同族的顶层段）：承载**求解参数**，
+**两种形状都合法**——
+
+- **属性形态**：`<solutionParameters reltol="1e-6" abstol="1e-9"/>`；
+- **子元素形态**：`<solutionParameters name="sp1"><solver name="Tsit5" abstol="1e-6"
+  reltol="1e-3" saveat="0.1" maxsteps="10000"/></solutionParameters>`。
+
+它是**字面量容器**：实现可接受、显式报告后跳过，**不参与求解语义**——真正生效的求解
+设置来自 `<task>` 的载荷或调用参数。示例：`D-skeleton/solutionparameters.esml`
+（子元素形态）、`T-tasks/solutionparameters.esml`（属性形态）。
+
+### 6.10 系统级观察与预设（`<observe>` / `<presets>`）
+
+系统级有两个**声明面**（都在 `<system>` 内，与 `<instances>` / `<connections>` 平级）：
+
+- **观察列表 `<observe>`**：`<observe name="default"><var path="m.x" name="x"/>…</observe>`
+  声明「这个系统要观测哪些量」。`path` 是**限定路径**（`m.x`；`t` 指时间本身），
+  `name` 是输出名（可省，省了就用路径末段）。它**只声明观测量，不改变模型**。
+  示例：`L0-type-unit/observe-list.esml`。
+- **预设 `<presets>`**：`<presets><scope instance="u"><preset path="y" value="0.0"
+  lower= upper=/></scope></presets>`，给作用域内的量**预设初值/取值域**。
+  与方法级预设（附录 F5 的 `<methods><onLoad>`）**并列**：前者挂在**系统**上、
+  以 `<scope instance=>` 定位；后者挂在**方法**上、以 `path` 定位。两者都是
+  「preset 语义」——在求解前覆盖 `initial` / `default`。
+  示例：`L9-method-schedule/fixed-preset.esml`（`<fixed>` 钉值 + `<presets>` 预设）。
 
 ## 7. 方程类别与语义
 
@@ -714,6 +787,24 @@ canonical 声明：`xsd/esml-canonical-compute.xsd` 的 `<tasks>` 全局元素�
   的规则物化为 `port.pvar_1..port.pvar_n`（ordered-set 维度按成员名、二维 `pvar_i_j`），
   与普通变量一视同仁；`port.pvar[i]` 引用解析到对应元素。
   换言之 **§9 的展开规则对「实例变量」与「端口变量」是同一张表**，不设第二条路径。
+
+### 7.1 状态机与时钟（离散面）
+
+**状态机 `<stateMachine>`**：模型级 `<stateMachine name="fsm">` 内写状态与迁移——
+`<state name initialState/>` 与 `<transition from to condition reset/>`。
+每个状态对应一个**互斥的离散 active 旗标**，方程里用 `activeState(A)` 读它；
+`condition` 是迁移触发条件；`reset="true"` 表示该次迁移**复位**相关状态。
+示例：`L2-discrete/state-machine.esml`（两状态 toggle）、
+`L2-discrete/reset-transition.esml`（迁移带 `reset=`）。
+
+**时钟 `<clock>`**：模型级可直挂 `<clock name="c" interval="0.1"/>`，也可用容器
+`<clocks><clock name="c" interval="0.1"/></clocks>`——**两种写法等价**。
+时钟面上的算子分两类：
+- **采样/保持**：`sample(x, c)` 取 x 在**当前拍**上的采样值，`previous(x)` 取上一拍的值并保持；
+- **时钟自身**：`interval(c)` 拍长、`firstTick(c)` 首拍时刻、`noClock(x)` x 无时钟时为真。
+
+示例：`L2-discrete/clock-sample.esml`（`sample` / `previous`）、
+`L2-discrete/clock-functions.esml`（`interval` / `firstTick` / `noClock`）。
 
 ## 8. 连接语义
 
@@ -1017,6 +1108,9 @@ canonical 语法对旧词法直接报错（§2）。
 - 模型级 `<selectors><selector name …><values><value>Below</value><value>Above</value></values><default>Below</default></selector></selectors>`
   → 实现降级为 discrete 数值变量（码 = 定义序 0..n-1，default 取 label 对应码，label 留 desc）。
 - 方程用 `ifelse(sel==k,…)` 选分支；状态切换用 `<events><when condition>…<assign path="sel" value="k"/></when>`（同 PCM discrete+indicator 机制）。XSD `SelectorType`(common) 即规范。
+- **系统级初值**：`<initialSelectors><scope instance="m"><initialSelector path="mode"
+  value="fast"/></scope></initialSelectors>`——在**系统**上给某实例的选择器定初值，
+  `value` 写**label 字符串**（不是码）。示例：`L3-model/selector-values.esml`。
 
 ### ORDERED_SET 序集
 - 声明（文档顶层）：`<orderedSet name="Species" static="true"><element>H2O</element>…</orderedSet>`
@@ -1089,7 +1183,8 @@ CASE/多区/滞回：配 SELECTOR + `<events><when>`(STN)，方程用 `ifelse(se
 - 系统级 `<connectRules><rule from= to=/>*</connectRules>`：仅当至少一端为自定义类别时启用
   规则表对称配对校验（bi-directional 万能）；无规则表而用自定义类别 → 编译期报错。
 - 信号口按**位置配对**（pvar 命名可不同，如 OutSignal.y ↔ InSignal.u）。
-- 示例：自定义类别端口的连接规则表。
+- 示例：自定义类别端口的连接规则表 —— `L6-connect/connect-rules.esml`（feed 只允许接
+  primary / secondary）。
 
 ### 附录 F2 — 信号 causal 连接护栏
 - PortType 变量全为 `input|output` role → 该口是信号连接器（可跨 PortType：SigOut↔SigIn）。
@@ -1221,6 +1316,14 @@ CASE/多区/滞回：配 SELECTOR + `<events><when>`(STN)，方程用 `ifelse(se
 示例：`weir_flow` 与 `weir_half` 的嵌套调用。
 - **外部函数**：`kind="external"` 数值 body 函数 + 已注册的外部对象 + `<partials>` 机制。
   解析偏导可注入以构造残差 Jacobian；evaluator 句柄为无 body 的外部源。
+- **局部量 `<locals>`**：`<function>` 内可声明 `<locals><local name="t"/></locals>`；
+  函数体（`<algorithm>`）里用 `<assign name="t" value="…"/>` 逐句赋值，局部量随函数
+  调用被**内联展开**（不进入模型命名空间）。示例：`L8-function/locals.esml`。
+- **宿主对象 `<foreignObjects>`**：顶层
+  `<foreignObjects><foreignObject name="fo" class="sensor"><method name="Level">
+  <set path="y" value="3.0"/></method></foreignObject></foreignObjects>`；
+  方程里以 `fo.Method()` 调用，方法体**只有 `<set>`**（先赋值后返回该值）。
+  示例：`L8-function/foreign-object.esml`。
 - **XSD**：canonical 子集收录 `<functions>`（inputs / body / partials）。
 
 ## 附录 J · 单位语义
@@ -1257,6 +1360,14 @@ CASE/多区/滞回：配 SELECTOR + `<events><when>`(STN)，方程用 `ifelse(se
   多段（按时间段切分）求解，把末状态写回作下段初值，`preset` 在第 i≥2 段前
   多段（按时间段切分）求解，把末状态写回作下段初值，`preset` 在第 i≥2 段前
   运行（可 `_set_param_default!` 段间改参数 = piecewise 阶跃操作）。
+- **调度步类型**：`<sequence>` 里的步有三种——
+  - `<continueFor time="2"/>`：**推进**一段时长（连续时间顺序拼接）；
+  - `<reassign path="g.N" value="50.0"/>`：在**该步的累计时刻**（前面 `<continueFor time=>`
+    之和）把 `path` 置为 `value`；`path` 必须指向状态或变量（指到参数会显式告警且不改值）；
+  - `<stop time="10"/>`：**记录 STOP 边界**——其后若再跟 `<continueFor>` 会被校验拒绝。
+    它是**结构校验标记，不是运行时截断**：求解时长仍由 tspan 决定。
+
+  示例：`L9-method-schedule/reassign.esml`（段间重赋值）、`L9-method-schedule/stop.esml`（STOP 标记）。
 - v0 边界：仅**纯 ODE**（无 algebraic/discrete）；段时长总和 = tspan 长度（否则报错）；
   **控制器 / 无定模型 = 普通 simulate**（为单元测试注入，不改 ESMLModel 结构本身）
 - 示例：段解析、多段拼接等价单次连续求解、段间改 k ⇒ H=6.8。
