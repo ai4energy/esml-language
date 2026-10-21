@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 工程包装容器 `<project>`（SPEC §6.8）：**独立文档根**，与 `<esml>` 根平级，
+     把多个模型 + 计算任务打包为一个工程单元。
+     结构：systems（`<systemRef name src>`）→ computeTasks（叶子是 `<task name kind>`）
+     → scenarioChain，各至多一个；元素名一律 camelCase，kebab 拼写不合法。
+     本例的 systemRef 指向仓内示例文件 D-skeleton/skeleton-minimal.esml 的 system S；
+     任务是 simulate，载荷按 kind 取 `<tspan>` + `<solver>`。 -->
+<project xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="D_Project" version="1.0">
+  <systems>
+    <systemRef name="decay" src="D-skeleton/skeleton-minimal.esml" system="S"/>
+  </systems>
+  <computeTasks>
+    <task name="sim" kind="simulate">
+      <tspan from="0" to="60"/>
+      <solver name="Tsit5"/>
+    </task>
+  </computeTasks>
+</project>
