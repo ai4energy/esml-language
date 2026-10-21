@@ -70,6 +70,26 @@ esml simulate path/to/example.esml -L path/to/library
   作者标识符中禁止出现。
 - 实例路径用 `.` 书写。
 
+## 机验
+
+示例与 XSD 的一致性由 [`tools/check-examples.py`](tools/check-examples.py) 把关：
+
+```sh
+python3 -m venv .venv && .venv/bin/pip install lxml   # 只需一次
+.venv/bin/python tools/check-examples.py              # 全仓；退出码 0 = 全绿
+.venv/bin/python tools/check-examples.py --vocab      # 附带逐元素对账表
+.venv/bin/python tools/check-examples.py --self-test  # 2 好 2 坏自证
+```
+
+它对每件示例跑**两道**校验：入口 `xsd/esml-v1.xsd` 与逐元素的
+`xsd/esml-canonical-basic.xsd`。只跑入口是不够的——入口的内容模型是
+`processContents="lax"`，**未声明的元素名原样放过**，`--self-test` 里专门有一个
+反向用例把这件事钉住。
+
+刻意保留的负例登记在 [`tools/negatives.tsv`](tools/negatives.tsv)，并写明它
+**红在哪一层**：`schema` 表示 XSD 必须拒收它，`semantic` 表示拼写合法、红在求解层。
+标成 `schema` 的负例哪天被 XSD 收下了，门就红——那说明判据漏了，不是件变好了。
+
 ## 贡献
 
 语言变更先落为规范修订：一处改动同时涉及 `SPEC.md`、它蕴含的 XSD 变更，以及
