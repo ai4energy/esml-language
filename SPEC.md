@@ -1,4 +1,4 @@
-# ESML 语言规范 v0.6.6
+# ESML 语言规范 v1.3.3
 
 > 本文件 = **ESML 语言规范（canonical）**。
 > ESML canonical XML 是**正统语法**；XSD 只描述 canonical ESML。
@@ -11,6 +11,10 @@
 > ComputeTask 七类正名；v0.6.3 §6.5 条件组件（实例级 condition）；
 > v0.6.4 §6.6 系统（flowsheet）级 `<equations>`；
 > v0.6.5 §5 端口变量可带 `array=`；v0.6.6 §4.0a 方程形状决定因果计划。
+>
+> **两条版本线，别混**：**v0.x = 语言内容修订史**（见附录 C 的 v0.x 条目，一路到
+> v0.6.6 为止）；**v1.3.x = 本仓发布线**（自 v1.3.0 起）。本次 **v1.3.3** =
+> XSD 与示例的一致性清理（见附录 C 首条）。
 >
 > 本文描述 ESML 声明式物理建模语言：XML 语法、语义、编译器展开与求解约定。
 > 语言以自己的术语定义；词法已收紧。
@@ -858,6 +862,40 @@ scope := <scope instance=name><set path value/></scope>
 ```
 
 ## 附录 C 修订史
+- **v1.3.3：XSD 与示例的一致性清理**（本仓发布线 v1.3.x；v0.x 是语言内容修订史，
+  见下方条目）。逐条：
+  1. **XSD 收敛**（同一语义只留一个名字）：
+     - 属性名一律 camelCase —— kebab（`extends-from` / `time-layer` / `max-time` /
+       `a-part` / `b-part` / `port-set` / `control-horizon` / `sample-time` /
+       `lower-bound` / `upper-bound`）与 snake（`time_layer` / `from_state` /
+       `to_state` / `out_state` / `out_kind` / `out_system` / `lower_bound` /
+       `upper_bound` / `tolerance_pct`）旧拼法全部退位；
+     - legacy 属性名 `porttype` / `interface` / `desc` / `dir` 退位，canonical 是
+       `portType` / `description` / `category`；
+     - 删掉三个同义元素：`<extends>`（留 `<extendsFrom>`）、`<reassign>`（留
+       `<reset>`）、`<component>`（留 `<instance>`）；实例属性形态只剩 `type=`，
+       `component=` / `model-type=` 一并退位；
+     - 入口 schema `xsd/esml-v1.xsd` 的**根清单**对齐 canonical 层的全局元素集：
+       删 5 个 canonical 并不存在的假根（`schedule` / `solutionParameters` /
+       `tasks` / `variables` / `domain`），补 2 个漏根（`metadata` / `project`）。
+  2. **示例**：全仓 136 件逐件过**两道**校验（入口 `esml-v1.xsd` + 逐元素的
+     `esml-canonical-basic.xsd`）；刻意保留的负例 11 件（schema 5 / semantic 6）
+     登记在 `tools/negatives.tsv`，写明红在哪一层。`<project>` 此前零覆盖，补了示例。
+  3. **规范正文**：§2 收紧集与 XSD 对齐 —— 去掉「`porttype=`/`interface=` 是兼容
+     别名」「XSD 为兼容旧文档仍声明 `<component>`」「`component=` 与 `type=` 等价」
+     这三处与 schema 相反的说法；其余章节逐条改成 canonical 拼法（§3 的
+     `lowerBound`/`upperBound`、§6.7 的 `<moveTo>`/`<jumpTo>`/
+     `<initialisationProcedure>`、§6.8 的 `<task>` 与 `<systemRef name src>`、
+     附录 K 的 `maxTime`、附录 B（续）的 `portSet`、附录 L.1 的术语表）。
+     另补一条**有意的例外**：端口变量的角色元素形态（`<flow>`/`<potential>`/
+     `<stream>`/`<constant>`/`<discrete>`/`<var>`/`<variable>`）与
+     `<portVariable role=…>` 并存，属「名字给角色」与「属性给角色」两种写法，
+     不是同义改名。
+  4. **机验**：`tools/aliases.tsv` 落成 82 条 legacy→canonical 裁决表（数据化，
+     不再只活在注释里）；`tools/check-examples.py` 据此加**别名闸**（legacy 名不得
+     被 XSD 声明、不得出现在示例里；非「待入」行的 canonical 必须在 XSD 里有同名
+     声明）与**根清单对账**（入口与 canonical 的全局元素集必须相等）。自证从
+     2 好 4 坏补到 **3 好 4 坏 + 1 反向自检**。
 - v0.6.4：§6.6 系统（flowsheet）级 `<equations>` canonical 定义（引用实例量 `inst.var`，折为扁平名 `inst__var`）；basic XSD `SystemType` 加 `<equations>`。
 - v0.6.3：§6.5 条件组件（实例级 `condition`）canonical 定义；basic XSD 补 `condition` 属性，并补 `kind`/`values`、partition/crosslink/partitions。
 - v0.6.1：端口变量点号作者语法 `port.pvar` + 自动物化（`__` 回归内部，§4/§9）；
