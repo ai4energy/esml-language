@@ -10,7 +10,8 @@
   2. **SPEC → 示例**：SPEC.md 正文里点名的仓内示例路径，逐条核存在性。
   3. **示例 → SPEC**：示例头部是否指名了 SPEC.md 的章节（`§x.y` / `附录 X`），
      并按章节聚合出「每个编号对应哪些示例」——这就是工单要的
-     「每个编号的『应当有示例』清单」。
+     「每个编号的『应当有示例』清单」。头部的「规范条文：」一行可以指名**多条**
+     （以 `＋` 分隔），聚合时逐条计入。
   4. **稀有元素覆盖**：把每份示例用到的 ESML 元素统计出来，频次 ≤3 的
      （即该示例独有的语法点）逐个查 SPEC.md 是否点名；没点名的就是
      「无 SPEC 依据」。
@@ -126,7 +127,26 @@ def check_spec_refs(quiet):
     return not broken
 
 
-SECTION_RE = re.compile(r"§\s*([0-9]+(?:\.[0-9]+)*[a-z]?)|附录\s*([A-N])")
+CITE_RE = re.compile(r"规范条文：([^\n]*?)。")
+CLAUSE_RE = re.compile(r"§\s*[0-9]+(?:\.[0-9]+)*[a-z]?|附录\s*[A-N]\d*b?(?:\s*（续）)?")
+
+
+def cited_clauses(head):
+    """头部「规范条文：」一行里指名的全部条文，返回 [(编号键, 全称)]。
+
+    一行可以指名多条（以 `＋` 分隔），例如
+    `规范条文：§6.10（系统级观察与预设）＋ 附录 F6（自由度 FIX）。`
+    """
+    m = CITE_RE.search(head)
+    if not m:
+        return []
+    out = []
+    for part in m.group(1).split("＋"):
+        part = part.strip()
+        k = CLAUSE_RE.search(part)
+        if k:
+            out.append((k.group(0).replace(" ", ""), part))
+    return out
 
 
 def check_cited(quiet):
@@ -137,10 +157,11 @@ def check_cited(quiet):
     for p in files:
         head = "\n".join(p.read_text(encoding="utf-8").splitlines()[:25])
         rel = str(p.relative_to(REPO))
-        m = SECTION_RE.search(head)
-        if m:
+        clauses = cited_clauses(head)
+        if clauses:
             cited.append(rel)
-            per_section[m.group(0).replace(" ", "")].append(rel)
+            for key, label in clauses:
+                per_section[key].append((rel, label))
         else:
             uncited.append(rel)
     print("== 3. 示例 → SPEC 章节引用 ==")
@@ -150,9 +171,11 @@ def check_cited(quiet):
     print("   按章节聚合（= 每个编号的「应当有示例」清单）：%d 个编号"
           % len(per_section))
     for sec in sorted(per_section, key=lambda s: (s.startswith("附录"), s)):
-        files_of = per_section[sec]
-        print("     %-10s %2d 件  %s"
-              % (sec, len(files_of), " ".join(f.split("/")[-1] for f in files_of)))
+        entries = per_section[sec]
+        labels = sorted({lab for _, lab in entries})
+        print("     %-10s %2d 件  〔%s〕  %s"
+              % (sec, len(entries), " ／ ".join(labels),
+                 " ".join(f.split("/")[-1] for f, _ in entries)))
     return not uncited
 
 
