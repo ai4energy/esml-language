@@ -860,6 +860,18 @@
           </xs:complexType>
         </xs:element>
         <xs:element ref="esml:computeTasks" minOccurs="0" maxOccurs="1"/>
+        <!-- 工程包装外壳 `<tasks>`（SPEC §6.8）。它是 `<computeTasks>` 的**外层**：
+             与 `<computeTasks>` 并列写在同一个 `<esml>` 里，二者不互斥也不嵌套替代 ——
+             语义不同，名字也只有这一种。
+             此前只有 T-tasks/tasks.esml 演示它，而本根的 choice 里没有它 ⇒ 语料被自家
+             schema 拒收。补的是漏声明，不是放宽。 -->
+        <xs:element name="tasks" minOccurs="0" maxOccurs="1">
+          <xs:complexType><xs:sequence>
+            <xs:element ref="esml:computeTasks" minOccurs="0" maxOccurs="1"/>
+          </xs:sequence>
+          <xs:anyAttribute processContents="lax"/>
+          </xs:complexType>
+        </xs:element>
       </xs:choice>
       <xs:attribute name="name" type="xs:string" use="optional"/>
       <xs:attribute name="schema" type="xs:string" use="optional"/>

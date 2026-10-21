@@ -30,8 +30,9 @@
 
 自证（`--self-test`）
 --------------------
-一个「检查器」如果对任何东西都说 OK，它和没有检查器等价。所以本脚本自带 4 个构造样例
-（2 好 2 坏）证明它**真的会红**：好件必须判过、坏件必须判红，两边任一翻转都算自证失败。
+一个「检查器」如果对任何东西都说 OK，它和没有检查器等价。所以本脚本自带 7 个构造样例
+（3 好 4 坏，另加 1 条反向自检）证明它**真的会红**：好件必须判过、坏件必须判红，
+任一翻转都算自证失败。
 
 用法
 ----
@@ -330,7 +331,7 @@ def self_test(validate, stream):
             ok, err = validate(p, CANONICAL_SCHEMA)
             results.append((name, False, ok, err))
 
-    w("[self-test] 构造样例 2 好 2 坏 —— 证明本检查器真的会红\n")
+    w("[self-test] 构造样例 3 好 4 坏 + 1 反向自检 —— 证明本检查器真的会红\n")
     failures = 0
     for name, should_pass, ok, err in results:
         verdict = "PASS" if ok == should_pass else "BROKEN"

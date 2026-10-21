@@ -78,7 +78,7 @@ esml simulate path/to/example.esml -L path/to/library
 python3 -m venv .venv && .venv/bin/pip install lxml   # 只需一次
 .venv/bin/python tools/check-examples.py              # 全仓；退出码 0 = 全绿
 .venv/bin/python tools/check-examples.py --vocab      # 附带逐元素对账表
-.venv/bin/python tools/check-examples.py --self-test  # 2 好 2 坏自证
+.venv/bin/python tools/check-examples.py --self-test  # 3 好 4 坏 + 反向自检
 ```
 
 它对每件示例跑**两道**校验：入口 `xsd/esml-v1.xsd` 与逐元素的
