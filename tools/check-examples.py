@@ -28,6 +28,23 @@
 
 没有「未判定」：每件都要落进一层，否则下次复核又得重新猜。
 
+词法别名（`tools/aliases.tsv`）
+-----------------------------
+「哪些写法是 legacy」这条知识如果只活在注释里，下次有人把 legacy 名加回 XSD，
+机器是拦不住的。`tools/aliases.tsv` 把它落成数据，本脚本据此逐条机验：
+
+  1. legacy 元素名 / 属性名不得被任何 xsd/*.xsd **声明**（豁免行除外）
+  2. legacy 名不得出现在示例里（schema 级负例本身就要用 legacy 写法，跳过）
+  3. 入口 schema 的全局元素集必须与 canonical 层的全局元素集**一致**
+     （入口多收一个 = 放行一份 canonical 必然拒收的文档，假绿）
+  4. 别名表里非「待入」行的 canonical 拼法**必须在 XSD 里有同名声明**
+     （表与 schema 脱节 = 有人改了名字没改表，或表里写错了）
+
+「豁免」= 该名字在别的语境里仍是合法拼法（如 vendor `<hyperParams><param>`），
+整条不参与检查；那个语境仍由 XSD 的结构管着，写错地方一样过不了 canonical 校验。
+「待入」= canonical 拼法本仓 XSD 尚未声明（该语法点本仓还没收），不参与第 4 条，
+但第 1/2/3 条照样管它 —— 拼法是 legacy 就不能写进示例。
+
 自证（`--self-test`）
 --------------------
 一个「检查器」如果对任何东西都说 OK，它和没有检查器等价。所以本脚本自带 7 个构造样例
@@ -38,7 +55,7 @@
 ----
     tools/check-examples.py              # 全仓；退出码 0 = 全绿
     tools/check-examples.py --vocab      # 附带逐元素对账表
-    tools/check-examples.py --self-test  # 2 好 2 坏自证
+    tools/check-examples.py --self-test  # 3 好 4 坏 + 反向自检自证
 
 依赖：lxml（XSD 校验器）。装法见 README 或 `python3 -m venv .venv && .venv/bin/pip install lxml`。
 xmllint 若可用，`--xmllint` 会改用它并保持同样的判据口径。
@@ -64,6 +81,7 @@ CANONICAL_SCHEMA = XSD_DIR / "esml-canonical-basic.xsd"
 COMPUTE_SCHEMA = XSD_DIR / "esml-canonical-compute.xsd"
 PROJECT_SCHEMA = XSD_DIR / "esml-canonical-project.xsd"
 NEGATIVES_TSV = Path(__file__).resolve().parent / "negatives.tsv"
+ALIASES_TSV = Path(__file__).resolve().parent / "aliases.tsv"
 ESML_GLOB = "*.esml"
 
 # 校验顺序：`<esml>` 文档走 canonical-basic（它 include 了 common + compute）；
@@ -202,6 +220,122 @@ def declared_elements():
     return names
 
 
+def declared_names():
+    """→ (声明过的元素名集合, 声明过的属性名集合)。只认 `name=`（声明），不认 `ref=`。"""
+    els, ats = set(), set()
+    for f in sorted(XSD_DIR.glob("*.xsd")):
+        text = COMMENTS.sub("", f.read_text(encoding="utf-8"))
+        for m in re.finditer(r"<xs:element\s+name=\"([^\"]+)\"", text):
+            els.add(m.group(1))
+        for m in re.finditer(r"<xs:attribute\s+name=\"([^\"]+)\"", text):
+            ats.add(m.group(1))
+    return els, ats
+
+
+def load_aliases():
+    """→ [(kind, legacy, canonical, exempt, pending, note)]。每行四列，kind 合法，豁免/待入须写理由。"""
+    rows = []
+    for lineno, line in enumerate(ALIASES_TSV.read_text(encoding="utf-8").splitlines(), 1):
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        parts = line.split("\t")
+        if len(parts) != 4:
+            sys.exit(
+                f"[check-examples] {ALIASES_TSV.name}:{lineno} 必须 4 列"
+                "（kind/legacy/canonical/说明）"
+            )
+        kind, legacy, canonical, note = parts
+        if kind not in ("element", "attribute"):
+            sys.exit(
+                f"[check-examples] {ALIASES_TSV.name}:{lineno} kind={kind!r} 非法：只许 element / attribute"
+            )
+        if not legacy.strip() or not canonical.strip() or not note.strip():
+            sys.exit(
+                f"[check-examples] {ALIASES_TSV.name}:{lineno} 有空列 —— "
+                "legacy / canonical / 说明 都必须写"
+            )
+        exempt = note.startswith("豁免：")
+        pending = note.startswith("待入：")
+        if "豁免" in note and not exempt:
+            sys.exit(
+                f"[check-examples] {ALIASES_TSV.name}:{lineno} 豁免必须以「豁免：」开头 —— "
+                "例外要写成机器读得懂的形状"
+            )
+        if "待入" in note and not pending:
+            sys.exit(
+                f"[check-examples] {ALIASES_TSV.name}:{lineno} 待入必须以「待入：」开头 —— "
+                "例外要写成机器读得懂的形状"
+            )
+        rows.append((kind, legacy, canonical, exempt, pending, note))
+    return rows
+
+
+def alias_violations(negatives):
+    """legacy 名不得被 schema 声明、不得出现在示例里；canonical 必须在 XSD 里有声明。→ [(where, msg)]"""
+    els, ats = declared_names()
+    rows = load_aliases()
+    out = []
+
+    # schema 级负例本身就要用 legacy 写法（它们的存在意义就是被拒收），跳过。
+    legacy_examples = {
+        rel for rel, (level, _) in negatives.items() if level == "schema"
+    }
+    used_el, used_at = collections.defaultdict(set), collections.defaultdict(set)
+    for p in esml_files():
+        rel = str(p.relative_to(REPO))
+        if rel in legacy_examples:
+            continue
+        raw = COMMENTS.sub("", p.read_text(encoding="utf-8", errors="replace"))
+        for m in re.finditer(r"<([A-Za-z_][\w.\-]*)", raw):
+            used_el[m.group(1)].add(rel)
+        for m in re.finditer(r"\s([A-Za-z_][\w.\-]*)\s*=\s*\"", raw):
+            used_at[m.group(1)].add(rel)
+
+    for kind, legacy, canonical, exempt, pending, note in rows:
+        if exempt:
+            continue
+        decl = els if kind == "element" else ats
+        used = used_el if kind == "element" else used_at
+        spelling = f"<{legacy}>" if kind == "element" else f"@{legacy}"
+        if legacy in decl:
+            out.append(
+                ("alias", f"XSD 仍声明 legacy {kind}名 {spelling}"
+                          f"（canonical = {canonical}）")
+            )
+        if legacy in used:
+            files = sorted(used[legacy])
+            out.append(
+                ("alias", f"示例仍用 legacy {kind}名 {spelling} —— {files[0]}"
+                          f"（canonical = {canonical}）")
+            )
+        # 表与 schema 必须对得上：canonical 拼法要么在 XSD 里有声明，
+        # 要么显式标了「待入」（该语法点本仓 XSD 还没收）。
+        if not pending and canonical not in decl:
+            out.append(
+                ("alias", f"别名表说 legacy {kind}名 {spelling} 的 canonical 是 "
+                          f"{spelling.replace(legacy, canonical)}，"
+                          f"但 XSD 里没有这个{kind}声明 —— 表与 schema 脱节"
+                          f"（若该语法点本仓还没收，标「待入：」）")
+            )
+    return out
+
+
+def root_reconciliation_violations():
+    """入口 schema 的全局元素集必须与 canonical 层一致。→ [(where, msg)]"""
+    canon = (
+        set(global_roots(CANONICAL_SCHEMA))
+        | set(global_roots(COMPUTE_SCHEMA))
+        | set(global_roots(PROJECT_SCHEMA))
+    )
+    entry = set(global_roots(ENTRY_SCHEMA))
+    out = []
+    for n in sorted(entry - canon):
+        out.append(("roots", f"入口 schema 收了 canonical 没有的根 <{n}> —— 假绿"))
+    for n in sorted(canon - entry):
+        out.append(("roots", f"canonical 认的根 <{n}> 入口 schema 没列 —— 误拒"))
+    return out
+
+
 def used_elements():
     """示例里真正用到的元素名（剥注释后按标签扫）→ 名字 -> {相对路径}。"""
     used = collections.defaultdict(set)
@@ -269,6 +403,12 @@ GOOD = {
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="SELF_ENTRY">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
 </esml>
+""",
+    # 好例 3：独立库根 `<units>` —— 入口层新补上的根，必须真的收得下。
+    "good-units-root.esml": """<?xml version="1.0"?>
+<units xmlns="https://www.ai4energy.cn/esml/v1" name="base-units">
+  <unitsBase><unit name="m" symbol="m"/></unitsBase>
+</units>
 """,
 }
 BAD = {
@@ -425,6 +565,15 @@ def main(argv=None):
         if re.search(r"负例|预期失败|预期报错", raw_head):
             red.append((rel, "manifest", "文件头自称负例，却不在 tools/negatives.tsv 里（「未判定」不合法）"))
 
+    # ---- 词法别名闸：legacy 名不得被 schema 声明、不得出现在示例里 ----
+    alias_rows = load_aliases()
+    for where, msg in alias_violations(negatives):
+        red.append(("tools/aliases.tsv", where, msg))
+
+    # ---- 根清单对账：入口 schema 的全局元素集必须与 canonical 一致 ----
+    for where, msg in root_reconciliation_violations():
+        red.append(("xsd/esml-v1.xsd", where, msg))
+
     # ---- 汇总 ----
     if not args.quiet:
         for rel, where, msg in red:
@@ -438,7 +587,10 @@ def main(argv=None):
         f"预期拒收 {checked['expected-fail']} 件（负例清单标 schema，必须红） · "
         f"负例清单 {len(negatives)} 件（schema "
         f"{sum(1 for v in negatives.values() if v[0] == 'schema')} / semantic "
-        f"{sum(1 for v in negatives.values() if v[0] == 'semantic')}） · 违规 {len(red)}"
+        f"{sum(1 for v in negatives.values() if v[0] == 'semantic')}） · "
+        f"别名表 {len(alias_rows)} 条（待入 {sum(1 for r in alias_rows if r[4])} / "
+        f"豁免 {sum(1 for r in alias_rows if r[3])}） · "
+        f"违规 {len(red)}"
     )
 
     if args.vocab:
