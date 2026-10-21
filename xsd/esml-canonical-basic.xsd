@@ -575,8 +575,9 @@
       </xs:choice>
       <xs:element name="members" minOccurs="0">
         <xs:complexType><xs:sequence>
+          <!-- 复合成员一律 `<instance>`（规范 §2 收紧词法）；legacy `<component>`
+               元素不在此声明。 -->
           <xs:element name="instance" type="esml:InstRefType" minOccurs="0" maxOccurs="unbounded"/>
-          <xs:element name="component" type="esml:InstRefType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence></xs:complexType>
       </xs:element>
       <xs:element name="connections" minOccurs="0">
