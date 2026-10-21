@@ -1,10 +1,11 @@
 <?xml version="1.0"?>
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
-<!-- 语法点旧拼写 `<connections><connect from="a.p" to="b.q"/></connections>`：
-     端口对连的早期写法。求解前同样展开为 potential 相等 + flow 守恒。
-     `<connect>` 与 `<connection>` 是同一语义的两种拼写；新文档一律写 `<connection>`。 -->
-<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L6_ConnectLegacy">
+<!-- 语法点 `<connections><connection from="a.p" to="b.q"/></connections>`：
+     端口对连的规范拼写。求解前展开为 potential 相等 + flow 守恒。
+     legacy 拼写 `<connect>` 仍由 parser 接受（见 parser/model.rs），但不是规范；
+     本件只演示规范写法。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L6_ConnectCanonical">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
   <portTypes><portType name="Pin" connectorFamily="electrical">
     <variables>
@@ -33,6 +34,6 @@
   </modelTypes>
   <systems><system name="S" discipline="electrical">
     <instances><instance name="s" type="Src"/><instance name="r" type="R"/><instance name="g" type="Gnd"/></instances>
-    <connections><connect from="s.p" to="r.p"/><connect from="r.p" to="g.g"/></connections>
+    <connections><connection from="s.p" to="r.p"/><connection from="r.p" to="g.g"/></connections>
   </system></systems>
 </esml>

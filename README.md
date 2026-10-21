@@ -70,6 +70,32 @@ esml simulate path/to/example.esml -L path/to/library
   作者标识符中禁止出现。
 - 实例路径用 `.` 书写。
 
+## 机验
+
+示例与 XSD 的一致性由 [`tools/check-examples.py`](tools/check-examples.py) 把关：
+
+```sh
+python3 -m venv .venv && .venv/bin/pip install lxml   # 只需一次
+.venv/bin/python tools/check-examples.py              # 全仓；退出码 0 = 全绿
+.venv/bin/python tools/check-examples.py --vocab      # 附带逐元素对账表
+.venv/bin/python tools/check-examples.py --self-test  # 3 好 4 坏 + 反向自检
+```
+
+它对每件示例跑**两道**校验：入口 `xsd/esml-v1.xsd` 与逐元素的
+`xsd/esml-canonical-basic.xsd`。只跑入口是不够的——入口的内容模型是
+`processContents="lax"`，**未声明的元素名原样放过**，`--self-test` 里专门有一个
+反向用例把这件事钉住。
+
+刻意保留的负例登记在 [`tools/negatives.tsv`](tools/negatives.tsv)，并写明它
+**红在哪一层**：`schema` 表示 XSD 必须拒收它，`semantic` 表示拼写合法、红在求解层。
+标成 `schema` 的负例哪天被 XSD 收下了，门就红——那说明判据漏了，不是件变好了。
+
+「哪些写法算 legacy」这条知识落在 [`tools/aliases.tsv`](tools/aliases.tsv)，
+门据此逐条机验：legacy 元素名/属性名不得被任何 `xsd/*.xsd` 声明、不得出现在示例里；
+别名表里指认的 canonical 拼法必须真的在 XSD 里有声明（表与 schema 不得脱节）；
+入口 schema 的**根清单**必须与 canonical 层的全局元素集**完全一致**——入口多收一个
+根，等于放行一份 canonical 必然拒收的文档（假绿）；入口少收一个，则是误拒。
+
 ## 贡献
 
 语言变更先落为规范修订：一处改动同时涉及 `SPEC.md`、它蕴含的 XSD 变更，以及

@@ -1,0 +1,17 @@
+# tools/negatives.tsv · 自述负例清单（check-examples.py 读它）
+# 列：path <TAB> level <TAB> reason
+# level=schema    该件必须被 XSD **拒收**；XSD 收下它 = 判据漏了（红）
+# level=semantic 该件必须**通过** XSD（它红在语义/求解层，不在 schema 层）；
+#                 XSD 拒收它 = 我们把一个语义负例误判成拼写错（红）
+# 「未判定」不合法：每件都要写清它红在哪一层，否则下次复核又要重新猜。
+L0-type-unit/units-contradiction.esml	semantic	单位声明与 type unit= 矛盾（§11 量纲冲突），拼写合法
+L1-expr-equation/array-index-probe.esml	semantic	数组下标越界，求解期报 I25a；拼写合法
+L1-expr-equation/axis-reduce-probe.esml	semantic	沿 axis 归约维度不匹配，求解期报 I25b；拼写合法
+L1-expr-equation/oob-probe.esml	semantic	序集下标越界，求解期报 I25d；拼写合法
+L1-expr-equation/shape-mismatch-probe.esml	semantic	形状不匹配，求解期报 I25c；拼写合法
+X-use/use-f12-mismatch.esml	semantic	F12 端口类别与连接方向不匹配，求解期报；拼写合法
+L1-expr-equation/derivativesymbol.esml	schema	<derivativeSymbol> 依附的 <body>+<derivative> 组合违反 basic XSD 的 xs:choice maxOccurs="1"（三选一）
+L1-expr-equation/noderivative.esml	schema	同上（<noDerivative>）
+L1-expr-equation/partial-derivative.esml	schema	同上（<partial>）
+L1-expr-equation/zeroderivative.esml	schema	同上（<zeroDerivative>）
+L3-model/component-probe.esml	schema	legacy <component> 元素形态，canonical 只收 <instance>（SPEC §2 收紧词法）
