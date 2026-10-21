@@ -97,6 +97,21 @@ python3 -m venv .venv && .venv/bin/pip install lxml   # 只需一次
 入口 schema 的**根清单**必须与 canonical 层的全局元素集**完全一致**——入口多收一个
 根，等于放行一份 canonical 必然拒收的文档（假绿）；入口少收一个，则是误拒。
 
+规范正文与 schema 的**文档根**对账由 [`tools/check-spec-xsd-parity.py`](tools/check-spec-xsd-parity.py)
+把关（仅标准库依赖）：
+
+```sh
+python3 tools/check-spec-xsd-parity.py                # 三方对账；退出码 0 = 一致
+python3 tools/check-spec-xsd-parity.py --report        # 附带 SPEC 根声明清单与证据行
+python3 tools/check-spec-xsd-parity.py --self-test     # 5 好 4 坏 + 反向 + 真实树变异
+```
+
+它把三个集合摆在一起对账：canonical 层的全局元素、入口 schema 的全局元素、
+`SPEC.md` 正文里被描述为文档根的元素。入口多收 = 假绿，入口漏收 = 误拒，
+SPEC 写了 XSD 不认的根 = 规范与 schema 对不上。确有据可查、判为不改的分歧登记在
+[`tools/spec-xsd-bydesign.tsv`](tools/spec-xsd-bydesign.tsv)（理由必填）。
+本轮的对账结论与逐条裁定见 [`docs/design/xsd-spec-parity.md`](docs/design/xsd-spec-parity.md)。
+
 ## 贡献
 
 语言变更先落为规范修订：一处改动同时涉及 `SPEC.md`、它蕴含的 XSD 变更，以及
