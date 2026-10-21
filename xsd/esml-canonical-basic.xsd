@@ -604,7 +604,8 @@
           </xs:choice>
         </xs:complexType>
       </xs:element>
-      <xs:element name="extends" type="xs:anyType" minOccurs="0" maxOccurs="unbounded"/>
+      <!-- 类级继承的 canonical 拼法只有上面那个 `<extendsFrom>`（规范 §4.0）；
+           同语义的 `<extends name="Base"/>` 不在此声明。 -->
       <!-- <modelType> 内的 <function> 是子系统式绑定（create/step|derivs/free），
            复用顶层 <functions> 的 FunctionType。接受两种形状
            （canonical XSD / 代码生成输出）。 -->
