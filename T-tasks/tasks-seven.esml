@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
-<!-- 语法点 七类计算任务：`<computeTasks name target><task name kind>…载荷…</task></computeTasks>`。
+<!-- 语法点 七类问题类计算任务：`<computeTasks name target><task name kind>…载荷…</task></computeTasks>`。
      模型面与任务面同处一个 `<esml>` 根；独立文档须以 `<esml>` 为根。
-     `tasks`（system S）七类全部实跑 exit=0：
+     `tasks`（system S）七类问题类全部实跑 exit=0：
        simulate → 轨迹 · sensitivity → ±fraction 摄动结果 ·
        estimation → EstimationResult{theta = [0.0500…]}（内联样本拟合 g.lambda）·
        validation → ValidationResult{r2 = 0.9999…} ·
@@ -12,7 +12,7 @@
        surrogate → SurrogateResult{coeffs = [1,2,3], r2 = 1.0}（复原 y = 1 + 2x + 3x²）。
      载荷要求：estimation / validation / surrogate 须**内联** `<samples><sample x y/>`；
      optimize 须 `<tspan>`；control 须 `<mpc N dt/>` 加 `<estimate name initial/>`。
-     规范条文：§6.9（计算任务表）。
+     规范条文：§6.9（计算任务表）；辅助任务见 `tasks-auxiliary.esml`。
      本例只使用实现已接受的属性。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L9_TasksSeven">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>

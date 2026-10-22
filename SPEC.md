@@ -1,4 +1,4 @@
-# ESML 语言规范 v1.3.3
+# ESML 语言规范 v1.3.4
 
 > 本文件 = **ESML 语言规范（canonical）**。
 > ESML canonical XML 是**正统语法**；XSD 只描述 canonical ESML。
@@ -11,10 +11,11 @@
 > ComputeTask 七类正名；v0.6.3 §6.5 条件组件（实例级 condition）；
 > v0.6.4 §6.6 系统（flowsheet）级 `<equations>`；
 > v0.6.5 §5 端口变量可带 `array=`；v0.6.6 §4.0a 方程形状决定因果计划。
+> v0.6.7 任务层口径：七类问题类（simulate / sensitivity / estimation / optimize / control / surrogate / validation）+ 三个辅助任务（forecast / data / decision）；辅助任务不占七类编号，也不引入新的求解角色。
 >
 > **两条版本线，别混**：**v0.x = 语言内容修订史**（见附录 C 的 v0.x 条目，一路到
-> v0.6.6 为止）；**v1.3.x = 本仓发布线**（自 v1.3.0 起）。本次 **v1.3.3** =
-> XSD 与示例的一致性清理（见附录 C 首条）。
+> v0.6.6 为止）；**v1.3.x = 本仓发布线**（自 v1.3.0 起）。本次 **v1.3.4** =
+> 任务层的「七类问题类 + 三个辅助任务」口径落地（SPEC §6.9 / 附录 M / XSD 同步）。
 >
 > 本文描述 ESML 声明式物理建模语言：XML 语法、语义、编译器展开与求解约定。
 > 语言以自己的术语定义；词法已收紧。
@@ -671,7 +672,7 @@ Process/Case 也有 flowsheet 级 `EQUATION`。ESML canonical 对应地允许 `<
 |---|---|
 | `<project>` | 属性 `name`、`description`；子元素顺序 `systems` → `computeTasks` → `scenarioChain`，各至多一个 |
 | `<systems>` | 一组 `<systemRef name src>`；`name`（必需）= 本工程内的局部名，`src`（必需）指向模型文件，`system` 可指定文件内系统名，`libroot` 可加库根 |
-| `<computeTasks>` | 计算任务表：容器内一条条 `<task name kind>`，七类 `kind`，见 §6.9；载荷按 `kind` 取（`<tspan>` / `<solver>` / `<decision>` / `<objective>` …） |
+| `<computeTasks>` | 计算任务表：容器内一条条 `<task name kind>`，七类问题类 + 三个辅助任务，见 §6.9；载荷按 `kind` 取（`<tspan>` / `<solver>` / `<decision>` / `<objective>` …） |
 | `<scenarioChain>` | 一组 `<scenario>`，每个可含 `<point>` / `<set>` / `<data>` |
 
 元素名用 camelCase（`systemRef`、`computeTasks`、`scenarioChain`、`<task>`）；
@@ -715,10 +716,10 @@ canonical **全局元素**，既可作 `<esml>` 的可选子元素，也可作**
 | 层 | 内容 |
 |---|---|
 | `<computeTasks>` | 任务表容器；属性 `name` / `target` / `schema` 均可选 |
-| `<task>` | 属性 **`kind` 必填**（七类闭集，见附录 M）、**`name` 必填**；`target` / `description` 可选 |
+| `<task>` | 属性 **`kind` 必填**（七类问题类闭集 + 三个辅助任务，见附录 M）、**`name` 必填**；`target` / `description` 可选 |
 | 子元素 | 载荷由 `kind` 决定（见下表）；同一 `kind` 可按需重复与扩展元数据并存 |
 
-**七类 `kind` 与其载荷**（`kind` 决定结构，守恒由结构决定）：
+**七类问题类与其载荷**（`kind` 决定结构，守恒由结构决定）：
 
 | `kind` | 核心载荷 |
 |---|---|
@@ -730,8 +731,17 @@ canonical **全局元素**，既可作 `<esml>` 的可选子元素，也可作**
 | `surrogate` | `<surrogate method degree/>`、`<data>` |
 | `validation` | `<metrics>`（含 `<metric>`）、`<data>` |
 
-**求解约定**：按 `kind` 构造问题再求解（任务声明 → 问题树 → 求解）；
-`kind` 是**闭集**，新增能力走附录 M 的功能层机制与组合，不新增 `kind`。
+**三个辅助任务**（不占七类编号，不引入新的求解角色）：
+
+| `kind` | 核心载荷 | 与问题类的关系 |
+|---|---|---|
+| `forecast` | `<tspan from to/>`、`<estimate>`（首个条目给目标变量）、`<mpc N dt/>`（外推步数与步长） | `surrogate` 在时间轴上的特例：先仿真出基线，再对轨迹拟合外推 |
+| `data` | `<samples>`（内联样本）、可选 `<data>` | 对样本做摘要统计（count / min / max / mean / std / median），不求解 |
+| `decision` | `<decision name lower upper>`（候选集）、`<objective direction>` | 候选选择（单目标）或 Pareto 前沿（两目标），不求解 |
+
+**任务层口径**：七类问题类是闭集；辅助任务固定为 `forecast` / `data` / `decision` 三项，是功能层组合的显式声明，不占七类编号，也不引入新的求解角色。`kind` 的合法取值 = 七类问题类 ∪ 三个辅助任务；新增能力仍走附录 M 的功能层机制与组合，不新增问题类。
+
+**求解约定**：按 `kind` 构造问题再求解（任务声明 → 问题树 → 求解）；七类问题类是**闭集**，辅助任务是固定三项，二者都不通过新增 `kind` 扩展。
 
 **任务级元数据元素**（附录 M「metadata 参数」的落地清单）：`<task>` 除上表的
 `kind` 载荷外，还可带**任务附属元数据** —— 只承载声明性信息（数据源引用、
@@ -761,7 +771,7 @@ canonical **全局元素**，既可作 `<esml>` 的可选子元素，也可作**
 `outputList`、`controlVars`、`designVars`），不是 kebab-case；
 `<task>` 另有同名**属性** `description`（`xs:string`），与 `<description>` 元素并存。
 
-**示例**：`T-tasks/tasks-seven.esml`（七类各一条的合照）、`T-tasks/task-simulate.esml` /
+**示例**：`T-tasks/tasks-seven.esml`（七类问题类各一条的合照）、`T-tasks/tasks-auxiliary.esml`（三个辅助任务各一条）、`T-tasks/task-simulate.esml` /
 `T-tasks/task-sensitivity.esml` / `T-tasks/task-estimation.esml` / `T-tasks/task-optimize.esml` /
 `T-tasks/task-control.esml` / `T-tasks/task-surrogate.esml` / `T-tasks/task-validation.esml`
 （逐类单跑），以及上表的任务附属元数据族。
@@ -965,8 +975,8 @@ canonical **全局元素**，既可作 `<esml>` 的可选子元素，也可作**
 - **模型体系**（可求解单元 `<system>`；单位/变量类型/变量/组件/接口(≡port)/connect/
   members/系统/partition/深层子系统；自由度 `<fixed>/<free>` 是标签）→
   每一层都有对应的 canonical 用例，逐层链式闭合即可回归语言面。
-- **计算求解体系**（闭集七类 task：simulate/sensitivity/estimation/optimize/control/
-  surrogate/validation；任务层×功能层，见附录 M）→
+- **计算求解体系**（七类问题类 + 三个辅助任务：simulate/sensitivity/estimation/optimize/
+  control/surrogate/validation，外加 forecast/data/decision；任务层×功能层，见附录 M）→
   由 `<computeTasks>` 构建计算任务并求解。
 
 **XSD 分层文档化**（`xsd/`）：
@@ -975,7 +985,7 @@ canonical **全局元素**，既可作 `<esml>` 的可选子元素，也可作**
 | `esml-v1.xsd` | 全库宽松入口（内容 lax，根清单严格） | `<computeTasks>` `<esml>` `<metadata>` `<modelTypes>` `<orderedSet>` `<portTypes>` `<project>` `<system>` `<systems>` `<tasks>` `<units>` `<variableTypes>` | lax |
 | `esml-canonical-common.xsd` | 共享 primitive（Ident 等；basic/compute 互含防冲突） | — | 引用 |
 | `esml-canonical-basic.xsd` | **模型体系** basic 子集（units/use/variableTypes/portTypes/modelType(含 members)/systems(含 sets/initial/connections/fixed/free/schedule)）；**include compute** → 同根混合文档（模型+`<computeTasks>`）可校验 | `<computeTasks>` `<esml>` `<metadata>` `<modelTypes>` `<orderedSet>` `<portTypes>` `<system>` `<systems>` `<tasks>` `<units>` `<variableTypes>` | 严格 |
-| `esml-canonical-compute.xsd` | **计算体系**（七类 task 声明 + 载荷）；独立 `xsd/esml-canonical-common.xsd` | `<computeTasks>` `<tasks>` | 严格 |
+| `esml-canonical-compute.xsd` | **计算体系**（七类问题类 + 三个辅助任务的声明 + 载荷）；独立 `xsd/esml-canonical-common.xsd` | `<computeTasks>` `<tasks>` | 严格 |
 | `esml-canonical-project.xsd` | **工程壳**（`<project>`：`systems` / `computeTasks` / `scenarioChain`）；自包含，不 include basic/compute | `<project>` | 严格 |
 
 「根」一列 = 该 schema **实际可用**的全局元素（本地声明 ∪ `xs:include` 链上的
@@ -1163,6 +1173,7 @@ scope := <scope instance=name><set path value/></scope>
      规则抽取），by-design 登记落在 `tools/spec-xsd-bydesign.tsv`；自证为
      **5 好 4 坏 + 1 反向自检 + 4 例真实树变异测试**（删根 / 多根 / 规范凭空加根 /
      canonical 加全局元素而入口层没收，每例都必须真变红）。
+- v0.6.7：任务层口径定为「七类问题类 + 三个辅助任务」；`TaskKindType` 放行 forecast/data/decision，辅助任务不引入新的求解角色（见 §6.9 与附录 M）。
 - v0.6.4：§6.6 系统（flowsheet）级 `<equations>` canonical 定义（引用实例量 `inst.var`，折为扁平名 `inst__var`）；basic XSD `SystemType` 加 `<equations>`。
 - v0.6.3：§6.5 条件组件（实例级 `condition`）canonical 定义；basic XSD 补 `condition` 属性，并补 `kind`/`values`、partition/crosslink/partitions。
 - v0.6.1：端口变量点号作者语法 `port.pvar` + 自动物化（`__` 回归内部，§4/§9）；
@@ -1539,8 +1550,10 @@ CASE/多区/滞回：配 SELECTOR + `<events><when>`(STN)，方程用 `ifelse(se
 ## 附录 M — 计算面术语（任务 / 问题类 / 调度 / 求解器）
 
 **抽象分层（一层又一层）：每层对上层是黑盒。**
-- **任务层 = 闭集七类**：simulate / sensitivity / estimation / optimize / control / surrogate /
-  validation。只开七个"按钮"，不再新增 kind。
+- **任务层 = 七类问题类 + 三个辅助任务**：问题类是 simulate / sensitivity / estimation /
+  optimize / control / surrogate / validation，只开七个"按钮"，不再新增问题类；
+  辅助任务是 forecast / data / decision，固定三项，不占七类编号，也不引入新的求解角色
+  （forecast = surrogate 的时间轴特例；data = 摘要统计；decision = 候选选择）。
 - **功能层 = 机制 + 组合**（放某类之下，作其 method/模式/载荷，不进 enum）：
   - simulate × `solve=steady|transient` · `schedule` 多段 · 求解器（AE/ODE/DAE 自动分派）；
   - sensitivity = simulate × 扰动后处理；estimation = optimize(simulate 目标) × data；validation = simulate × 对比指标 —— 三者是 **simulate 的驱动组合**，不重复实现 simulate；
@@ -1552,8 +1565,9 @@ CASE/多区/滞回：配 SELECTOR + `<events><when>`(STN)，方程用 `ifelse(se
 
 | 词 | 语义 | 说明 |
 |---|---|---|
-| `task`（`ComputeTask`） | 计算流程"外壳" | 描述层：`kind`(simulate/sensitivity/estimation/optimize/control/surrogate/validation) + 目标模型 + 参数 |
+| `task`（`ComputeTask`） | 计算流程"外壳" | 描述层：`kind`（七类问题类 + forecast/data/decision 三个辅助任务）+ 目标模型 + 参数 |
 | 问题类（七类） | 抽象问题类型 | `SimulationProblem / SensitivityProblem / EstimationProblem / OptimizationProblem / ControlProblem / DataDrivenProblem / ValidationProblem` |
+| 辅助任务（三项） | 功能层组合的显式声明 | `forecast`（surrogate 时间轴特例）/ `data`（摘要统计）/ `decision`（候选选择）；不占七类编号 |
 | metadata 参数 | 每模块声明"具有哪些" | 每类任务各自声明其可用的元数据项，建模时生成 |
 | 求解角色 | AE / ODE / DAE | 按模型（纯代数/状态/高指标降阶后）自动选 |
 | `schedule` 段 | 运行时编排 | ：多 `<continueFor>` 段 + 段前 `<call method>`；`METHOD/RUN` 逐段 |

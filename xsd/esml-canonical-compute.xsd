@@ -33,8 +33,15 @@
            version="1.0.0">
 
   <xs:include schemaLocation="esml-canonical-common.xsd"/>
+  <!--
+    任务层口径（SPEC §6.9 / 附录 M）：
+      七类问题类 = simulate / sensitivity / estimation / optimize / control / surrogate / validation
+      三个辅助任务 = forecast / data / decision
+    辅助任务不占七类编号，也不引入新的求解角色；它们是对功能层组合的显式声明。
+  -->
   <xs:simpleType name="TaskKindType">
     <xs:restriction base="xs:string">
+      <!-- 七类问题类（闭集） -->
       <xs:enumeration value="simulate"/>
       <xs:enumeration value="sensitivity"/>
       <xs:enumeration value="estimation"/>
@@ -42,6 +49,10 @@
       <xs:enumeration value="control"/>
       <xs:enumeration value="surrogate"/>
       <xs:enumeration value="validation"/>
+      <!-- 三个辅助任务（不占七类编号） -->
+      <xs:enumeration value="forecast"/>
+      <xs:enumeration value="data"/>
+      <xs:enumeration value="decision"/>
     </xs:restriction>
   </xs:simpleType>
 
@@ -265,6 +276,9 @@
         control(MPC)  → mpc(N dt …)（线性预测矩阵 A/B/c 走 extension）
         surrogate     → data? + surrogate(degree/method)?  (X/Y 数据外部)
         validation    → data? + metrics?
+        forecast      → tspan? + estimate? + mpc?（辅助任务：时间轴外推）
+        data          → samples? + data?（辅助任务：摘要统计）
+        decision      → decision* + objective?（辅助任务：候选选择）
 
       实际文档中 task 子元素的顺序是灵活的（扩展元数据可前可后）。
       若用 `<xs:sequence>` 强约束顺序会拒绝合法文档，故改用单一
