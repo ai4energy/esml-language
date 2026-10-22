@@ -4,7 +4,8 @@
 <!-- 语法点 `<when>` 加 `<assign>`：离散变量在事件时刻被赋值并保持。
      滞回开关：T > Tbar + 1 时 on := 1；T < Tbar − 1 时 on := 0；
      规范条文：附录 F3（事件语义糖）。
-     用 `pre()` 引用上一事件后保持的值。 -->
+     注意：引擎尚未实现 `pre()`，本件用当前值 `on` 演示 assign；
+     `pre()` 的上一值语义登记为 E-2，待引擎补齐。初值 2.0 使第一个事件立即触发。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L2_WhenAssign">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
   <modelTypes><modelType name="Hysteresis">
@@ -16,12 +17,12 @@
       <variable name="on" type="real" default="0.0"/>
     </discrete>
     <variables>
-      <variable name="T" type="real" role="state" initial="0.0"/>
+      <variable name="T" type="real" role="state" initial="2.0"/>
       <variable name="u" type="real" role="algebraic"/>
     </variables>
     <equations>
       <equation>D(T) = -k * (T - u)</equation>
-      <equation>u = pre(on) * 10.0</equation>
+      <equation>u = on * 10.0</equation>
     </equations>
     <events>
       <when condition="T &gt; Tbar + 1">

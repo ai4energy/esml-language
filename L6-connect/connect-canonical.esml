@@ -5,7 +5,7 @@
      端口对连的规范拼写。求解前展开为 potential 相等 + flow 守恒。
      legacy 拼写 `<connect>` 仍由 parser 接受（见 parser/model.rs），但不是规范；
      规范条文：§8（连接语义）。
-     本件只演示规范写法。 -->
+     本件只演示规范写法；拓扑为 Src—R 串联。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L6_ConnectCanonical">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
   <portTypes><portType name="Pin" connectorFamily="electrical">
@@ -27,14 +27,9 @@
       <variables><variable name="p.v" type="real" role="algebraic"/><variable name="p.i" type="real" role="algebraic"/></variables>
       <equations><equation>p.v = R * p.i</equation></equations>
     </modelType>
-    <modelType name="Gnd">
-      <ports><port name="g" portType="Pin"/></ports>
-      <variables><variable name="g.v" type="real" role="algebraic"/><variable name="g.i" type="real" role="algebraic"/></variables>
-      <equations><equation>g.v = 0</equation></equations>
-    </modelType>
   </modelTypes>
   <systems><system name="S" discipline="electrical">
-    <instances><instance name="s" type="Src"/><instance name="r" type="R"/><instance name="g" type="Gnd"/></instances>
-    <connections><connection from="s.p" to="r.p"/><connection from="r.p" to="g.g"/></connections>
+    <instances><instance name="s" type="Src"/><instance name="r" type="R"/></instances>
+    <connections><connection from="s.p" to="r.p"/></connections>
   </system></systems>
 </esml>
