@@ -12,10 +12,11 @@
      本份演示**方法表 × schedule 的接线**（命令在段前何时生效）。
      寻址只收作者点号 `m.k`：`__` 是结构分隔符、作者标识符禁含（§3），
      扁平写法 `m__k` 一律拒收。
-     ⚠ 验证路径：`esml check` 通过；但 `esml simulate` 子命令只按命令行给的 tspan 积分、
-     **不消费 `<schedule>`**（段划分与段前方法体都跳过），拿它跑会得到 e^{-4} 那个值
-     规范条文：附录 K（METHOD × Schedule 编排）。
-     —— 那是校验工具的缺口，不是本例的语义。验这一条要走消费 schedule 的路径。 -->
+     验证路径：`esml check` 通过；`esml simulate <file>` 在**未显式给 `tspan` 选项** 时按
+     `<schedule>` 运行（段划分与段前方法体都生效），段末 y(2) = e^{-6}。
+     显式 `tspan 0,2` 会覆盖 schedule、退回单段，得到 e^{-4}——这是检查单段行为的入口，
+     不是本体的语义。两条路径都可复跑。
+     规范条文：附录 K（METHOD × Schedule 编排）。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L9_CallMethodBody">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
   <modelTypes><modelType name="Decay" discipline="generic">
