@@ -2,7 +2,7 @@
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 `<foreignObjects><foreignObject name class><method name><set name value/></method></foreignObject></foreignObjects>`：
-     宿主对象方法，在方程里以 `fo.Method()` 调用，方法体是「赋值后返回」。
+     外部对象方法，在方程里以 `fo.Method()` 调用，方法体是「赋值后返回」。
      规范条文：附录 I（用户函数与黑盒）。
      本例 y = fo.Level()，Level 返回常量 3.0。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L8_ForeignObject">

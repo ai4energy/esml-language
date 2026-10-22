@@ -50,7 +50,7 @@
 `name` 是文档名，`schema` 可选（写 `esml/v1`）。根之下是各**顶层段**——类型
 （`variableTypes` / `portTypes` / `modelTypes` / `recordTypes`）、模型体系
 （`systems`）、计算面（`computeTasks`）、单位表（`units`）、函数（`functions`）、
-宿主对象（`foreignObjects`）、元数据（`metadata`）等；段清单见 §2 表与 §6.9。
+外部对象（`foreignObjects`）、元数据（`metadata`）等；段清单见 §2 表与 §6.9。
 
 > **根清单**：除 `<esml>` 外，另有若干**独立根**——库文件（`units` / `variableTypes` /
 > `portTypes` / `modelTypes` / `systems` / `system` / `orderedSet` / `metadata`）、
@@ -1440,7 +1440,7 @@ CASE/多区/滞回：配 SELECTOR + `<events><when>`(STN)，方程用 `ifelse(se
 - **局部量 `<locals>`**：`<function>` 内可声明 `<locals><local name="t"/></locals>`；
   函数体（`<algorithm>`）里用 `<assign name="t" value="…"/>` 逐句赋值，局部量随函数
   调用被**内联展开**（不进入模型命名空间）。示例：`L8-function/locals.esml`。
-- **宿主对象 `<foreignObjects>`**：顶层
+- **外部对象 `<foreignObjects>`**：顶层
   `<foreignObjects><foreignObject name="fo" class="sensor"><method name="Level">
   <set path="y" value="3.0"/></method></foreignObject></foreignObjects>`；
   方程里以 `fo.Method()` 调用，方法体**只有 `<set>`**（先赋值后返回该值）。
