@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
-<!-- 语法点 `<controller>`：MPC 任务内的控制器声明，属性 `kind` / `horizon` / `sampleTime` /
-     `controlHorizon`，子元素 `<setpoint var value>` 与 `<gains Kp Ki Kd>`。
-     规范条文：§6.9（计算任务表）。
-     实现作为元数据接受并跳过。`check` errors=0，`tasks` exit=0。 -->
+<!-- 语法点 `<controller>`：可执行的单回路 PID 声明。属性 `kind`（p/pi/pid）/
+     `sampleTime` 等，子元素 `<gains Kp Ki Kd>` 给出控制律；控制目标由
+     `<controlled var setpoint>` 唯一给出。
+     规范条文：§6.9（计算任务表）。`check` errors=0，`tasks` exit=0。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="T_Controller">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
   <modelTypes><modelType name="DecayModel" discipline="generic">
@@ -18,12 +18,14 @@
   </system></systems>
   <computeTasks name="t-ctrl" target="S">
     <task name="mpc" kind="control">
+      <tspan from="0" to="60"/>
       <mpc N="10" dt="1"/>
       <estimate name="g.lambda" initial="0.05"/>
-      <controller kind="pid" horizon="10" sampleTime="1" controlHorizon="5">
-        <setpoint var="g.N" value="4.98"/>
-        <gains Kp="1.0" Ki="0.1" Kd="0.0"/>
+      <controller kind="pid" sampleTime="1">
+        <gains Kp="-0.1" Ki="-0.005" Kd="0.0"/>
       </controller>
+      <controlled var="g.N" setpoint="0.0"/>
+      <decision name="g.lambda" lower="0" upper="1"/>
     </task>
   </computeTasks>
 </esml>

@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
-<!-- 语法点 `<setpoint>`：控制器设定点，可写成属性形（`var=` / `value=`）
-     或子元素形（`<var name value/>`）。它挂在 control 任务的 controller 下，
-     规范条文：§6.9（计算任务表）。
-     实现只做元数据透传、不参与求解。`check` errors=0。 -->
+<!-- 语法点 `<setpoint>`：控制器元数据设定点，可写成属性形（`var=` / `value=`）
+     或子元素形（`<var name value/>`）。可执行 PID 的控制目标只认
+     `<controlled var setpoint>`；本元素作为厂商元数据透传。
+     规范条文：§6.9（计算任务表）。`check` errors=0。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L5_Setpoint">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
   <modelTypes><modelType name="DecayModel" discipline="generic">
@@ -17,10 +17,11 @@
     <schedule><sequence><continueFor time="60"/></sequence></schedule>
   </system></systems>
   <computeTasks name="t-sp" target="S">
-    <task name="ctrl" kind="control">
-      <mpc N="5" dt="1"/>
-      <controller kind="PI">
+    <task name="ctrl" kind="simulate">
+      <tspan from="0" to="60"/>
+      <controller kind="pid">
         <setpoint var="g.N" value="50.0"/>
+        <gains Kp="1.0" Ki="0.0" Kd="0.0"/>
       </controller>
     </task>
   </computeTasks>
