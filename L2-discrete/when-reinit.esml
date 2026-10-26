@@ -17,8 +17,8 @@
       <variable name="v" type="real" role="state" initial="0.0"/>
     </variables>
     <equations>
-      <equation>D(h) = v</equation>
-      <equation>D(v) = -g</equation>
+      <equation>Der(h) = v</equation>
+      <equation>Der(v) = -g</equation>
     </equations>
     <events>
       <when condition="h &lt; 0.0">

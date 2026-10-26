@@ -10,19 +10,19 @@
     <modelType name="Base">
       <parameters><parameter name="k" type="real" default="0.3"/></parameters>
       <variables><variable name="x" type="real" role="state" initial="1.0"/></variables>
-      <equations><equation>D(x) = -k * x</equation></equations>
+      <equations><equation>Der(x) = -k * x</equation></equations>
     </modelType>
     <modelType name="Child">
       <extendsFrom>Base</extendsFrom>
       <parameters><parameter name="u" type="real" default="0.0"/></parameters>
       <variables><variable name="y" type="real" role="state" initial="0.0"/></variables>
-      <equations><equation>D(y) = -k * y + u</equation></equations>
+      <equations><equation>Der(y) = -k * y + u</equation></equations>
     </modelType>
     <modelType name="Child2">
       <extendsFrom>Base</extendsFrom>
       <parameters><parameter name="u" type="real" default="0.0"/></parameters>
       <variables><variable name="y" type="real" role="state" initial="0.0"/></variables>
-      <equations><equation>D(y) = -k * y + u</equation></equations>
+      <equations><equation>Der(y) = -k * y + u</equation></equations>
     </modelType>
   </modelTypes>
   <systems><system name="S">

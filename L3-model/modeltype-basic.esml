@@ -10,7 +10,7 @@
     <description>一阶 ODE：dx/dt = -k*x。L3 基本形态（不含端口/成员）。</description>
     <parameters><parameter name="k" type="real" default="0.5"/></parameters>
     <variables><variable name="x" type="real" role="state" initial="1.0"/></variables>
-    <equations><equation>D(x) = -k * x</equation></equations>
+    <equations><equation>Der(x) = -k * x</equation></equations>
   </modelType></modelTypes>
   <systems><system name="S">
     <instances><instance name="m" type="FirstOrder"/></instances>

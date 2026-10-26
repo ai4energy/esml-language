@@ -4,7 +4,7 @@
 <!-- 语法点 段前方法体（附录 K）：`<methods><method name="ramp"><set path="m.k"
      value="3.0"/></method></methods>` 声明具名方法体；`<call method="ramp"/>`
      归属**其后**那个 `<continueFor>` 段，并在该段开始前把 `m.k` 由默认 2.0 改成 3.0。
-     模型 D(y) = -k·y、y(0) = 1 ⇒ 闭式 y(t) = e^{-kt}：整段 2 s 都在这次调用之后
+     模型 Der(y) = -k·y、y(0) = 1 ⇒ 闭式 y(t) = e^{-kt}：整段 2 s 都在这次调用之后
      ⇒ 全程 k = 3 ⇒ 段末 y(2) = e^{-6} ≈ 0.0024787522。
      去掉 `<call>` 的同一模型（k 仍取默认 2.0）段末为 e^{-4} ≈ 0.0183156389，
      两者相差约 7.4 倍 ⇒ 方法体有没有落地一眼可辨，不是「看起来正常」的静默结果。
@@ -22,7 +22,7 @@
   <modelTypes><modelType name="Decay" discipline="generic">
     <parameters><parameter name="k" type="real" default="2.0"/></parameters>
     <variables><variable name="y" type="real" role="state" initial="1.0"/></variables>
-    <equations><equation>D(y) = -k * y</equation></equations>
+    <equations><equation>Der(y) = -k * y</equation></equations>
   </modelType></modelTypes>
   <systems><system name="S">
     <instances><instance name="m" type="Decay"/></instances>

@@ -4,7 +4,7 @@
 <!-- 语法点 `<schedule><sequence>…<stop time=…/>…</sequence></schedule>`：`<stop>` 记录 STOP 边界，
      其后再跟 `<continueFor>` 会被校验拒绝——它是结构校验标记，不是运行时截断。
      simulate 的时长由 tspan 参数给定（给 tspan 0–20 仍跑满 20 s，不截断）。
-     `check` errors=0；`solve`（system S）exit=0（g.N = 0 是 D(N) = 0 的平衡点）；
+     `check` errors=0；`solve`（system S）exit=0（g.N = 0 是 Der(N) = 0 的平衡点）；
      规范条文：附录 K（METHOD × Schedule 编排）。
      `simulate`：N(10) = 60.74（衰减照常）。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L9_Stop">
@@ -12,7 +12,7 @@
   <modelTypes><modelType name="Decay" discipline="generic">
     <parameters><parameter name="lambda" type="real" default="0.05"/></parameters>
     <variables><variable name="N" type="real" role="state" initial="100.0"/></variables>
-    <equations><equation>D(N) = -lambda * N</equation></equations>
+    <equations><equation>Der(N) = -lambda * N</equation></equations>
   </modelType></modelTypes>
   <systems><system name="S">
     <instances><instance name="g" type="Decay"/></instances>

@@ -7,10 +7,10 @@
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="D_Skeleton">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
   <modelTypes><modelType name="Decay" discipline="generic">
-    <description>指数衰减：D(N) = -lambda·N，N(0)=100（模型级 description，规范 §4）。</description>
+    <description>指数衰减：Der(N) = -lambda·N，N(0)=100（模型级 description，规范 §4）。</description>
     <parameters><parameter name="lambda" type="real" default="0.05"/></parameters>
     <variables><variable name="N" type="real" role="state" initial="100.0"/></variables>
-    <equations><equation>D(N) = -lambda * N</equation></equations>
+    <equations><equation>Der(N) = -lambda * N</equation></equations>
   </modelType></modelTypes>
   <systems><system name="S">
     <!-- 文档骨架 D 例：根 esml 的 name 属性 + 模型级 / 系统级 description。 -->

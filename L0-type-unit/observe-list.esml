@@ -12,7 +12,7 @@
       <variable name="y" type="real" initial="2.0" role="algebraic"/>
     </variables>
     <equations>
-      <equation>D(x) = -k * x</equation>
+      <equation>Der(x) = -k * x</equation>
       <equation>y = 2.0 * x</equation>
     </equations>
   </modelType></modelTypes>

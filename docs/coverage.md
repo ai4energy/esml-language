@@ -248,7 +248,7 @@ BEFORE 状态有 **54 / 136** 份示例在本仓 `SPEC.md` 里查无点名依据
   <modelTypes><modelType name="M">
     <parameters><parameter name="k" type="real" default="0.2"/></parameters>
     <variables><variable name="x" type="real" role="state" initial="1.0"/></variables>
-    <equations><equation>D(x) = -k * x</equation></equations>
+    <equations><equation>Der(x) = -k * x</equation></equations>
   </modelType></modelTypes>
   <systems><system name="S">
     <instances><instance name="m" type="M"/></instances>

@@ -4,7 +4,7 @@
 <!-- 语法点 `<functions><function name><inputs><input name/></inputs><body>…</body></function></functions>`：
      纯表达式函数，可嵌套调用另一函数。方程中直接调用，例如
      规范条文：附录 I（用户函数与黑盒）。
-     D(H) = Fin − weir_flow(H, W)。 -->
+     Der(H) = Fin − weir_flow(H, W)。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L8_FunctionExpr">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
   <functions>
@@ -23,7 +23,7 @@
       <parameter name="W" type="real" default="0.5"/>
     </parameters>
     <variables><variable name="H" type="real" initial="0.2" role="state"/></variables>
-    <equations><equation>D(H) = Fin - weir_flow(H, W)</equation></equations>
+    <equations><equation>Der(H) = Fin - weir_flow(H, W)</equation></equations>
   </modelType></modelTypes>
   <systems><system name="Sys"><instances><instance name="t" type="TankF"/></instances></system></systems>
 </esml>

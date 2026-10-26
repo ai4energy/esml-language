@@ -33,7 +33,7 @@
        <variable name="kRatio" type="real"/>
      </variables>
      <equations>
-       <equation>D(T) = -k * (T - Tset)</equation>
+       <equation>Der(T) = -k * (T - Tset)</equation>
        <equation>Tset = 293.15 + mode + 2 * Mode.cool</equation>
        <equation>kRatio = k2 / k</equation>
      </equations>

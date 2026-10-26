@@ -16,7 +16,7 @@
        <variable name="ys" type="real" role="algebraic" initial="1.0"/>
      </variables>
      <equations>
-       <equation>D(y) = -y</equation>
+       <equation>Der(y) = -y</equation>
        <equation>yp = previous(y)</equation>
        <equation>ys = sample(y, c)</equation>
      </equations>

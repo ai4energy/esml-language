@@ -10,7 +10,7 @@
     <discrete><variable name="mode" type="real" default="0.0"/></discrete>
     <variables><variable name="x" type="real" role="state" initial="0.0"/></variables>
     <equations>
-      <equation>D(x) = mode</equation>
+      <equation>Der(x) = mode</equation>
     </equations>
     <events>
       <when condition="time &gt; 1.0">

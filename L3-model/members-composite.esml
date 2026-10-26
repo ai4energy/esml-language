@@ -9,7 +9,7 @@
     <modelType name="Leaf">
       <parameters><parameter name="k" type="real" default="0.3"/></parameters>
       <variables><variable name="x" type="real" role="state" initial="1.0"/></variables>
-      <equations><equation>D(x) = -k * x</equation></equations>
+      <equations><equation>Der(x) = -k * x</equation></equations>
     </modelType>
     <modelType name="Body">
       <members>
@@ -17,7 +17,7 @@
         <instance name="b" type="Leaf"/>
       </members>
       <variables><variable name="y" type="real" role="state" initial="0.0"/></variables>
-      <equations><equation>D(y) = -(a.x + b.x)</equation></equations>
+      <equations><equation>Der(y) = -(a.x + b.x)</equation></equations>
     </modelType>
   </modelTypes>
   <systems><system name="S">

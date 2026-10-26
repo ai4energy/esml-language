@@ -2,7 +2,7 @@
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 延迟算子 `delay(u, T)`：纯延迟的一阶 Padé 近似（PT1 滞后环节），
-     降为隐藏滞后态 d：T·D(d) = u − d，d(0) = u(0)。
+     降为隐藏滞后态 d：T·Der(d) = u − d，d(0) = u(0)。
      `solve`（system S）：常数输入的延迟仍是常数，y = u = 5.0。
      `simulate`（system R，tspan 0–2）：斜坡 u = 2t、T = 0.5 时
      规范条文：§7（表达式内建）。

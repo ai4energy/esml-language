@@ -15,7 +15,7 @@
       <variable name="x" type="real" role="state" initial="1.0"/>
     </variables>
     <equations>
-      <equation>D(x) = -x</equation>
+      <equation>Der(x) = -x</equation>
     </equations>
   </modelType></modelTypes>
   <systems><system name="S">

@@ -21,7 +21,7 @@
   <modelTypes><modelType name="M">
     <parameters><parameter name="t_delay" type="Time"/></parameters>
     <variables><variable name="T" type="TempK" role="state" initial="350.0"/></variables>
-    <equations><equation>D(T) = 0</equation></equations>
+    <equations><equation>Der(T) = 0</equation></equations>
   </modelType></modelTypes>
   <systems><system name="S">
     <instances><instance name="g" type="M"/></instances>

@@ -21,7 +21,7 @@
       <variable name="u" type="real" role="algebraic"/>
     </variables>
     <equations>
-      <equation>D(T) = -k * (T - u)</equation>
+      <equation>Der(T) = -k * (T - u)</equation>
       <equation>u = pre(on) * 10.0</equation>
     </equations>
     <events>

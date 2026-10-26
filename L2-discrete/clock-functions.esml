@@ -17,7 +17,7 @@
       <variable name="nc" type="real" role="algebraic"/>
     </variables>
     <equations>
-      <equation>D(y) = -y</equation>
+      <equation>Der(y) = -y</equation>
       <equation>iv = interval(c)</equation>
       <equation>ft = firstTick(c)</equation>
       <equation>nc = noClock(x)</equation>

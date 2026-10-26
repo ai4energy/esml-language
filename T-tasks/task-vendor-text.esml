@@ -11,7 +11,7 @@
    <modelTypes><modelType name="DecayModel" discipline="generic">
      <parameters><parameter name="lambda" type="real" default="0.05"/></parameters>
      <variables><variable name="N" type="real" role="state" initial="100.0"/></variables>
-     <equations><equation>D(N) = -lambda * N</equation></equations>
+     <equations><equation>Der(N) = -lambda * N</equation></equations>
    </modelType></modelTypes>
    <systems><system name="S">
      <instances><instance name="g" type="DecayModel"/></instances>

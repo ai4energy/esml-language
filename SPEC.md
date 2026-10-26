@@ -152,7 +152,7 @@
   解析为声明序号整数**（`a`→0、`b`→1…），故中间表示仍为数值；`kind` 如实声明为 `"enumeration"`。
   兼容源拼写 `type E = enumeration(a,b,c)` 由转换器归一化。
 - 变量/端口变量**必须引用**一个已声明类型（强约束，`type="..."` 缺失 → 报错）。
-- `role=state` 的变量参与微分 `D(...)`；`role=flow` 的变量在连接里守恒
+- `role=state` 的变量参与微分 `Der(...)`；`role=flow` 的变量在连接里守恒
   （隐式连接器电学 `PortType.vars`）。`role=stream` 是元数据（不守恒），由
   Mixer 等单元做组分加权（详附录 F1）。
 - `portVariable` 的**因果角色用 `role`**：`role=potential`（势，连接相等）/ `role=flow`
@@ -805,19 +805,19 @@ canonical **全局元素**，既可作 `<esml>` 的可选子元素，也可作**
 
 ## 7. 方程类别与语义
 
-- 代数等式；微分 `D(x)=expr`（x 须为 state，且 `D(...)` 仅作 LHS）；
-  高阶导 `D(D(x))` 自动降阶为一阶链（高阶导自动降阶，
+- 代数等式；微分 `Der(x)=expr`（x 须为 state，且 `Der(...)` 仅作 LHS）；
+  高阶导 `Der(Der(x))` 自动降阶为一阶链（高阶导自动降阶，
   附录 F9 高阶导行）。
 - 连接生成方程（§8）。
 - 分段方程用 **`ifelse(cond, A, B)` 残差 + clamp/min/max**表达
   （稳态/准稳态分段），不引入硬 if 方程。
 - **`integral(e)` 是糖**：在出现处**所在实例**上引入一个状态
   `integral__<key>`（`role=state`，`init=0`，可用 `<set>` 覆盖），并追加一条
-  `D(integral__<key>) = e`；该处替换为这个状态。key 取实参裸引用的末段
+  `Der(integral__<key>) = e`；该处替换为这个状态。key 取实参裸引用的末段
   （`integral(sp)` → `integral__sp`），否则取实参渲染的净化串；同一实参在同一实例
   内**复用同一个状态**。
   **声明形式**（与上式等价、供作者显式命名）：作者自己写
-  `D(integral_<x>) = <x>` 时，`integral_<x>` 即为该状态（`init=0`），
+  `Der(integral_<x>) = <x>` 时，`integral_<x>` 即为该状态（`init=0`），
   `integral(<x>)` 指的是它——此时**不新建状态、不追加方程**。
   仅此一处用 `__` 生成内部名；`integral` **不是内建函数**：真漏到求值期会
   `unknown function 'integral'` 响亮报错，不做静默兜底。
@@ -836,7 +836,7 @@ canonical **全局元素**，既可作 `<esml>` 的可选子元素，也可作**
   支持：数组字面量 `{e1,…}`、comprehension `{f(i) for i in a:b}`（含 `if…then…else` 三元，
   展开期折叠）、`linspace(a,b,n)`、`fill(v,n[,m])`、切片 LHS `der(T[2:n-1])`/`T[a:b]`、
   `end`/`end±k`、逐元素 `.- .+ .* ./`、矩阵字面量 `[a,b;c,d]`、矩阵×向量 `A*x+B*u`。
-  `coeff*der(x)=rhs` 归一为 `D(x)=rhs/coeff`（repo 显式导数式约定）。多维数组
+  `coeff*der(x)=rhs` 归一为 `Der(x)=rhs/coeff`（repo 显式导数式约定）。多维数组
   `array="n,m"` 展开为 `name_i_j`（允许 0 维）。
 - **端口变量同规则展开**（见 §5）：`<portVariable array="…"/>` 按**完全相同**
   的规则物化为 `port.pvar_1..port.pvar_n`（ordered-set 维度按成员名、二维 `pvar_i_j`），
@@ -914,7 +914,7 @@ canonical **全局元素**，既可作 `<esml>` 的可选子元素，也可作**
 
 - **稳态**：纯代数系统（`length(ml.states) == 0`）走 `NonlinearOnlySolver`
   （Newton 阻尼迭代，实现）；守恒/边界由方程闭合。
-- **瞬态**：`role=state` + `D(...)`；初值来自 `<variable initial/>`；DE 求解
+- **瞬态**：`role=state` + `Der(...)`；初值来自 `<variable initial/>`；DE 求解
   按问题类型分派（ODE / DAE 各选对应积分器）。大规模代数部分自动启用**稀疏 Jacobian**
   （当代数未知量数达到阈值后启用）。
 - 一致性初始化：求解入口接受 `NoInit` / `AlgConsistentInit` / `FullConsistentInit`
@@ -1188,7 +1188,7 @@ scope := <scope instance=name><set path value/></scope>
   多个=partition 内部自解 + crosslink 模块间联立）；connect=组件间、crosslink=子系统间；
   crosslink 端点=port 束；模型体系与计算求解体系两分。
 - v0.5.1：附录 K METHOD×Schedule 多段编排（语法 + 纯 ODE 段间续接/preset）。
-- v0.5.0（v0.4.1 增补）：端口规范词收窄 inlet|outlet|bi-directional；纯 PortType 连接护栏；Connection-Type 参数/PortSet；Source/Sink；SELECTOR；Ordered-Set（数组定维/成员常量/label 下标/成员一等 ConstSetMember）；IF(对称可逆)；FOR(lo..hi 与序集迭代)；CARD/IN(一等/运行时)；CASE(STN 情形A+B)；process 级全局参数传播。**v0.4.1 增补**：stream 流股组成；信号 causal 护栏；自定义端口类别+连接规则表；when/edge/reinit 事件语义糖；复合嵌入(复合壳保留)；on_load 预设；自由度 FIX/FREE；vector 归约内建(size/sum/mean/min/max)；附录 F1–F8。**高阶导**：`D(D(x))` 自动降阶（见附录 F）。
+- v0.5.0（v0.4.1 增补）：端口规范词收窄 inlet|outlet|bi-directional；纯 PortType 连接护栏；Connection-Type 参数/PortSet；Source/Sink；SELECTOR；Ordered-Set（数组定维/成员常量/label 下标/成员一等 ConstSetMember）；IF(对称可逆)；FOR(lo..hi 与序集迭代)；CARD/IN(一等/运行时)；CASE(STN 情形A+B)；process 级全局参数传播。**v0.4.1 增补**：stream 流股组成；信号 causal 护栏；自定义端口类别+连接规则表；when/edge/reinit 事件语义糖；复合嵌入(复合壳保留)；on_load 预设；自由度 FIX/FREE；vector 归约内建(size/sum/mean/min/max)；附录 F1–F8。**高阶导**：`Der(Der(x))` 自动降阶（见附录 F）。
 **高指标 DAE（Pantelides）**：平衡高指标 DAE 自动降阶为一阶 index-1（见附录 F9）。
 - v0.4.1：§4.1 复合组件（成员装配/限定路径/嵌套展开）入 spec；附录 B 骨架补 members。
 - v0.4：§6.1 标准库坐标引用 `<use>`/registry.tsv；§12 标准库分层。
@@ -1282,7 +1282,7 @@ CASE/多区/滞回：配 SELECTOR + `<events><when>`(STN)，方程用 `ifelse(se
 ### CASE 多分支
 `<case on="sel"><branch value="k"><body><equation>lhs = rhs</equation>*</body></branch>*</case>`
 每方程 gated：`(1 - sign(abs(sel-k))) * (lhs-rhs) = 0`（激活分支才约束； 指示器风格）。
-- **情形A（STN 正统）**：各分支 lhs 同为 `D(x)` → 合并右端 `D(x)=Σ_k (1-sign|sel-k|)·rhs_k`（selector+events 驱动，bang-bang 同款）。
+- **情形A（STN 正统）**：各分支 lhs 同为 `Der(x)` → 合并右端 `Der(x)=Σ_k (1-sign|sel-k|)·rhs_k`（selector+events 驱动，bang-bang 同款）。
 - 示例：堰流代数情形；以及带 selector + case + 事件滞回的 STN 情形，平衡态 H≈W+(Fin/1.84)^(2/3)。
 
 ### 附录 F1 — stream 流股组成（组分加权混合）
@@ -1372,7 +1372,7 @@ CASE/多区/滞回：配 SELECTOR + `<events><when>`(STN)，方程用 `ifelse(se
   Pantelides 降阶 → 平衡一阶 index-1 DAE；纯 ODE / index-1 DAE / 非平衡系统零扰动。
   结构层：等价变量消元 + DFS 增广路匹配 → Pantelides 指标降低/提升，
   直到不再有 runaway。多层求导自动降为一阶，ESML 未知量仍按**原变量**存储（非 `x(t)` 的高阶导形式）。
-  结构层求导在符号层原生展开（`D(常量) ≡ 0`）。
+  结构层求导在符号层原生展开（`Der(常量) ≡ 0`）。
 
 ### 附录 F10 — 外部 I/O 经信号口 / 端口壳（block 化单机 + 语言层闭环）
 
@@ -1386,7 +1386,7 @@ CASE/多区/滞回：配 SELECTOR + `<events><when>`(STN)，方程用 `ifelse(se
   3. 驱动方 = 输出口组件（源/控制器/Driver）；`connect` 只许 output→input（附录 F2 护栏）。
   4. 对象端口 `category="bi-directional"`（避免  方向护栏把信号口误判）。
   5. 连续量接口：控制量在饱和内用 `ifelse(u<lo,lo,ifelse(u>hi,hi,u))` 夹紧；积分器用状态
-     `D(ei)=e`（无 anti-windup 的连续 PI 会有积分饱和，需注意——离散实现见范式二）。
+     `Der(ei)=e`（无 anti-windup 的连续 PI 会有积分饱和，需注意——离散实现见范式二）。
 - **两类闭环范式分界**：
   - 范式一（**语言层连续闭环**）：控制器/设定值源均为组件，`connect` 组网，一次 ODE/DAE 求解。
 
@@ -1414,7 +1414,7 @@ CASE/多区/滞回：配 SELECTOR + `<events><when>`(STN)，方程用 `ifelse(se
 | CARD / IN 集合算子 | 内建 |
 | CASE 多分支（合并右端 / gating 两种情形） | `<case>` |
 | stream 流股组成：连接逐相等 + Mixer 单元加权 | `role=stream` / Mixer |
-| 高阶导 D(D(x)) | 自动降阶 |
+| 高阶导 Der(Der(x)) | 自动降阶 |
 | 高指标 DAE | 自动降阶至 index-1 |
 
 未纳入规范的能力：嵌套层级参数传播、分布式 PDE。

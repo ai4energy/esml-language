@@ -9,7 +9,7 @@
   <modelTypes><modelType name="M">
     <variables><variable name="x" type="real" role="state" initial="0.0"/></variables>
     <equations>
-      <equation>D(x) = ifelse(time &lt; 0.5, 2.0, 0.0)</equation>
+      <equation>Der(x) = ifelse(time &lt; 0.5, 2.0, 0.0)</equation>
     </equations>
   </modelType></modelTypes>
   <systems><system name="S">

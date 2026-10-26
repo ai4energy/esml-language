@@ -20,7 +20,7 @@
        <variable name="s4" type="real" role="algebraic"/>
      </variables>
      <equations>
-       <equation>D(x) = -x</equation>
+       <equation>Der(x) = -x</equation>
        <equation>s1 = sin(w * time) + exp(-x)</equation>
        <equation>s2 = sqrt(a) + abs(-b) + floor(a) + ceil(b)</equation>
        <equation>s3 = clamp(a, 0.0, 2.0) + min(a, b) + max(a, b) + mid(a, b, 0.5)</equation>

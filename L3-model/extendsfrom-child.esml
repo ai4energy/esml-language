@@ -14,7 +14,7 @@
     <modelType name="Child" discipline="generic">
       <extendsFrom>Base</extendsFrom>
       <variables><variable name="x" type="real" role="state" initial="1.0"/></variables>
-      <equations><equation>D(x) = -k * x</equation></equations>
+      <equations><equation>Der(x) = -k * x</equation></equations>
     </modelType>
   </modelTypes>
   <systems><system name="S">
