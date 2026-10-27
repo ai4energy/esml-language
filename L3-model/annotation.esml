@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- L-ANNOT：`<modelType>` 的图形标注。纯 UI 元数据 —— 求解器从不读它
+     （由 crates/esml-engine/tests/annotation_numeric_invariance.rs 钉住）。
+     这里用 `data:` 内联 SVG，示例因此自包含、不依赖旁边的图标文件。
+     规范条文：L-ANNOT；手册 §8.3；判据 scripts/check-annotations.py（A1–A5）。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L3_Annotation">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes>
+    <modelType name="Tagged">
+      <annotation>
+        <icon src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgNjAiPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAiIGhlaWdodD0iNjAiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iIzMzMyIvPjwvc3ZnPg==" w="100" h="60"/>
+        <placement x="0" y="0" w="100" h="60" rot="0"/>
+      </annotation>
+      <variables><variable name="y" type="real" role="algebraic"/></variables>
+      <equations><equation>y = 1.0</equation></equations>
+    </modelType>
+  </modelTypes>
+  <systems><system name="Demo">
+    <instances><instance name="g" type="Tagged"/></instances>
+  </system></systems>
+</esml>
