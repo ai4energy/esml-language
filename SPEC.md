@@ -80,9 +80,9 @@
 |---|---|---|
 | 顶层 | `<esml xmlns="https://www.ai4energy.cn/esml/v1" name=...>` | 根（namespace `https://www.ai4energy.cn/esml/v1`） |
 | 类型容器 | `<variableTypes>`、`<portTypes>`、`<modelTypes>` | — |
-| 端口协议 | `<portType name domain>`（`<interface>` / `<connector>` 旧拼写**报错**） | 连接器"类" |
-| 端口实例 | `<port name portType="X" size? count?/>`（**只有 `portType=`**；`porttype=`/`interface=` **报错**） |  |
-| 端口变量 | `<portVariable name role="potential\|flow\|stream\|input\|output" type/>` | effort 并入 potential；显式域不写 role（详附录 F1）；组件方程用点号 `port.pvar` |
+| 端口协议 | `<portType name connectorFamily conservation>`（`<interface>` / `<connector>` / `domain=` 旧拼写**报错**） | 连接器"类" |
+| 端口实例 | `<port name portType="X" category? connectClass? size? portSet?/>`（**只有 `portType=`**；`porttype=`/`interface=`/`type=`/`set=` **报错**；属性集解析期闭集） |  |
+| 端口变量 | `<portVariable name portRole="potential\|flow\|stream" \| causality="input\|output" carrier? type/>`（`role=` 报错） | effort 并入 potential；显式域不写 portRole（详附录 F1）；组件方程用点号 `port.pvar` |
 | 组件 | `<modelType name>` | 组件类型声明；`<members><instance name type/></members>`（§4.1）；`<extendsFrom>Base</extendsFrom>` 继承（§4.0） |
 | 系统/实例 | `<system name>`/`<instances><instance name type/>` | `<system>` 也可作为 instance 的 `type` 引用（子系统，§6.4） |
 | 作用域引用 | `<scope instance=".."><set path value/>`（`unit=` 非法） | `unit` 只表度量单位 |
@@ -1118,7 +1118,7 @@ portVariable := <portVariable name role=potential|flow type/>
 modelType := <modelType name domain> ports? parameters? variables?
               equations? members? connections? </modelType>
 member := <members><instance name type/></members>
-port := <port name portType size? count?/>
+port := <port name portType category? connectClass? size? portSet?/>
 variable := <variable name type role initial default/>
 equation := <equation> expr (=|~) expr </equation>
 system := <system name> instances connections? sets? schedule? </system>

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
-<!-- 语法点 端口变量角色 `role="flow"`：连接节点上各 flow 之和为零（守恒），悬空端口的 flow 钉零。
+<!-- 语法点 端口变量角色 `portRole="flow"`：连接节点上各 flow 之和为零（守恒），悬空端口的 flow 钉零。
      本例两个恒温源（300 K / 280 K）经导体相连，节点守恒把 Q_flow 钉出
      规范条文：§5（端口）。
      (300 − 280) / 0.5 = 40 W。`check` errors=0；`solve`（system S）cd.port_a.Q_flow = 40.0。 -->

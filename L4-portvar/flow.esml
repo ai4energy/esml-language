@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
-<!-- 语法点 端口变量元素形 `<flow>`：元素名即角色，等价 `role="flow"`。
+<!-- 语法点 端口变量**属性形** `portRole="flow"`：
+     旧元素形 `<flow>` 已退役（解析期响亮拒收），本例演示 canonical 属性形。
      连接节点守恒与悬空端口钉零照常生效。
      本例只展示 `<flow>` 这一语法点（T 用已覆盖的 portVariable 角色形声明）：
      300 K / 280 K 两恒温源经导体，Q_flow = (300 − 280) / 0.5 = 40 W。

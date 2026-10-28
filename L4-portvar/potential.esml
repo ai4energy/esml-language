@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
-<!-- 语法点 端口变量元素形 `<potential>`：元素名即角色，等价 `role="potential"`。
+<!-- 语法点 端口变量**属性形** `portRole="potential"`：
+     旧元素形 `<potential>` 已退役（解析期响亮拒收），本例演示 canonical 属性形。
      连接节点上的 potential 相等照常生效。
      本例只展示 `<potential>` 这一语法点（i 用已覆盖的 portVariable 角色形声明）：
      10 V 源 — 2 Ω 电阻 — 地，解出 v = 10 / 0。

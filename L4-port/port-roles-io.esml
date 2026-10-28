@@ -1,8 +1,9 @@
 <?xml version="1.0"?>
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
-<!-- 语法点 端口角色 `input` / `output`：portType 用 `domain=` 标领域，端口变量用
-     `role="input"` / `role="output"`（与 potential / flow / stream 并列）。
+<!-- 语法点 信号因果 `causality="input"` / `causality="output"`：portType 用
+     `connectorFamily=` 标端口族（`domain=` 是旧拼写，解析期拒收），信号口变量用
+     `causality=`（与物理口的 `portRole=` 互斥，同一 portType 只能二选一）。
      规范条文：§5（端口）＋ §6.6（系统级方程）。
      `check` 通过。input 端口的取值由流程层的方程给定——`<set>` 只给参数，不能替代方程。
      本件的 `<system>` 级 `<equations><equation>m.p.u = 1.0</equation></equations>`

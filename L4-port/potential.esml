@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
-<!-- 语法点 端口变量角色 `role="potential"`：连接节点上各 potential 相等。
+<!-- 语法点 端口变量角色 `portRole="potential"`：连接节点上各 potential 相等。
      本例 10 V 源 — 2 Ω 电阻 — 地，节点势相等把电压钉出 10 / 0。
      规范条文：§5（端口）。
      `check` errors=0；`solve`（system S）：r.a.v = 10.0、r.b.v = 0.0、r.a.i = 5.0。 -->

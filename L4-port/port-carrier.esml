@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 流股载量 `carrier="q"`（端口变量属性）：一个端口有多个 flow 变量时，
+     由 stream 变量点名**哪一个 flow** 承载它（流股加权/混流用）。
+     规范条文：§6.8 六轴表（carrier）；解析期校验「必须是同端口的 flow 变量」。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_PortCarrier">
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
+  <portTypes><portType name="TwoFlowPort">
+    <variables>
+      <portVariable name="p" portRole="potential" type="real"/>
+      <portVariable name="m" portRole="flow" type="real"/>
+      <portVariable name="q" portRole="flow" type="real"/>
+      <portVariable name="h" portRole="stream" carrier="q" type="real"/>
+    </variables>
+  </portType></portTypes>
+  <modelTypes><modelType name="Pass">
+    <ports><port name="a" portType="TwoFlowPort"/><port name="b" portType="TwoFlowPort"/></ports>
+    <variables><variable name="x" type="real" role="algebraic"/></variables>
+    <equations>
+      <equation>x = a.p</equation>
+      <equation>a.m = x</equation>
+      <equation>a.q = x</equation>
+      <equation>b.p = x</equation>
+    </equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="i" type="Pass"/><instance name="j" type="Pass"/></instances>
+    <connections><connection from="i.b" to="j.a"/></connections>
+  </system></systems>
+</esml>
