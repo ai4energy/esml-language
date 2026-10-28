@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `<portType conservation="balance">`：守恒由组件写（连接器不生成
+     Σflow=0）；默认 `kcl` 由连接器生成。同一节点混用 ⇒ 解析后展平报错。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_Conservation">
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
+  <portTypes><portType name="P" conservation="balance">
+    <variables>
+      <portVariable name="p" portRole="potential" type="real"/>
+      <portVariable name="m" portRole="flow" type="real"/>
+    </variables>
+  </portType></portTypes>
+  <modelTypes><modelType name="C">
+    <ports><port name="a" portType="P"/></ports>
+    <variables><variable name="x" type="real"/></variables>
+    <equations><equation>x = a.p</equation><equation>a.m = 1.0</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S"><instances><instance name="i" type="C"/></instances></system></systems>
+</esml>
