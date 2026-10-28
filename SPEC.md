@@ -360,9 +360,10 @@ ESML 原生作者优先**组合（§4.1）/参数覆盖**；`<extendsFrom>` 主�
 （**注意**：`initial` 只是**求解起点**，不是"钉值" —— 端口变量的**值**仍由连接或
 单元内方程给，见 §8。另见 §4.0a 的两条作者规矩。）
 
-* **允许的属性**：`name`（必需）、`role`、`type`、`array`、`initial`、`default`、`description`。
-  `direction=` **不接受**（端口的方向在 `<port category=/direction=>` 上，不在其内部变量上）；
-  任何未知拼写一律**响亮报错**，不静默丢弃。
+* **允许的属性**：`name`（必需）、`portRole`、`causality`、`carrier`、`type`、`array`、`initial`、`default`、`description`。
+  `role=` / `direction=` **不接受**（物理语义用 `portRole="potential|flow|stream"`，信号口用
+  `causality="input|output"`；端口方向在 `<port category="inlet|outlet|bi">` 上，且
+  `direction=`/`dir=` 已解析期拒收）；任何未知拼写一律**响亮报错**，不静默丢弃。
 * **`array` 的展开规则与普通变量完全一致**（§9）：`array="n"` → `w_1..w_n`；
   `array="Species"`（ordered-set 维度）→ 按**成员名**展开；`array="n,m"` → `w_i_j`。
 * **引用形式**：`port.pvar[i]`（如 `out.w[1]`）解析到展开后的元素符号 `out.w_1`。
@@ -1384,7 +1385,7 @@ CASE/多区/滞回：配 SELECTOR + `<events><when>`(STN)，方程用 `ifelse(se
   1. 输入口变量（input）由连接相等定值，必须有驱动源；悬空欠定（编译期应报）。
   2. 输出口变量（output）由组件内方程定值，可悬空。
   3. 驱动方 = 输出口组件（源/控制器/Driver）；`connect` 只许 output→input（附录 F2 护栏）。
-  4. 对象端口 `category="bi-directional"`（避免  方向护栏把信号口误判）。
+  4. 对象端口 `category="bi"`（避免  方向护栏把信号口误判）。
   5. 连续量接口：控制量在饱和内用 `ifelse(u<lo,lo,ifelse(u>hi,hi,u))` 夹紧；积分器用状态
      `Der(ei)=e`（无 anti-windup 的连续 PI 会有积分饱和，需注意——离散实现见范式二）。
 - **两类闭环范式分界**：

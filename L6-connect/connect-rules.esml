@@ -14,13 +14,13 @@
   </portTypes>
   <modelTypes>
     <modelType name="Producer" discipline="generic">
-      <ports><port name="out" portType="Fluid1" category="feed"/></ports>
+      <ports><port name="out" portType="Fluid1" connectClass="feed"/></ports>
       <variables><variable name="out.x" type="real" initial="0.0" role="algebraic"/></variables>
     </modelType>
     <modelType name="Consumer" discipline="generic">
       <ports>
-        <port name="in_a" portType="Fluid1" category="primary"/>
-        <port name="in_b" portType="Fluid1" category="secondary"/>
+        <port name="in_a" portType="Fluid1" connectClass="primary"/>
+        <port name="in_b" portType="Fluid1" connectClass="secondary"/>
       </ports>
       <variables>
         <variable name="in_a.x" type="real" initial="0.0" role="algebraic"/>
