@@ -16,10 +16,10 @@
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
   <portTypes>
     <portType name="SigOut" domain="signal">
-      <portVariable name="y" role="output" type="real"/>
+      <portVariable name="y" causality="output" type="real"/>
     </portType>
     <portType name="SigIn" domain="signal">
-      <portVariable name="y" role="input" type="real"/>
+      <portVariable name="y" causality="input" type="real"/>
     </portType>
   </portTypes>
   <modelTypes>

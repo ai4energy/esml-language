@@ -11,8 +11,8 @@
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_PortRolesIO">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
   <portTypes><portType name="IO" domain="electrical">
-    <portVariable name="u" role="input"  type="real"/>
-    <portVariable name="w" role="output" type="real"/>
+    <portVariable name="u" causality="input"  type="real"/>
+    <portVariable name="w" causality="output" type="real"/>
   </portType></portTypes>
   <modelTypes><modelType name="M">
     <ports><port name="p" portType="IO"/></ports>
