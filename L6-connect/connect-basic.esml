@@ -10,8 +10,8 @@
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
   <portTypes><portType name="Pin" connectorFamily="electrical">
     <variables>
-      <portVariable name="v" role="potential" type="real"/>
-      <portVariable name="i" role="flow"      type="real"/>
+      <portVariable name="v" portRole="potential" type="real"/>
+      <portVariable name="i" portRole="flow"      type="real"/>
     </variables>
   </portType></portTypes>
   <modelTypes>

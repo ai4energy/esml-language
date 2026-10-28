@@ -7,8 +7,8 @@
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_PortThermal">
   <portTypes><portType name="HeatPort" connectorFamily="thermal">
     <variables>
-      <portVariable name="T"      role="potential" type="real"/>
-      <portVariable name="Q_flow" role="flow"      type="real"/>
+      <portVariable name="T"      portRole="potential" type="real"/>
+      <portVariable name="Q_flow" portRole="flow"      type="real"/>
     </variables>
   </portType></portTypes>
   <modelTypes><modelType name="FixedT">

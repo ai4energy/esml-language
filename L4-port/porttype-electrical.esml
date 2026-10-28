@@ -8,8 +8,8 @@
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_PortElectrical">
   <portTypes><portType name="Pin" connectorFamily="electrical">
     <variables>
-      <portVariable name="v" role="potential" type="real"/>
-      <portVariable name="i" role="flow"      type="real"/>
+      <portVariable name="v" portRole="potential" type="real"/>
+      <portVariable name="i" portRole="flow"      type="real"/>
     </variables>
   </portType></portTypes>
   <modelTypes><modelType name="Src">

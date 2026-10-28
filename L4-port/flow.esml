@@ -9,8 +9,8 @@
    <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
    <portTypes><portType name="HeatPort" connectorFamily="thermal">
      <variables>
-       <portVariable name="T"      role="potential" type="real"/>
-       <portVariable name="Q_flow" role="flow"      type="real"/>
+       <portVariable name="T"      portRole="potential" type="real"/>
+       <portVariable name="Q_flow" portRole="flow"      type="real"/>
      </variables>
    </portType></portTypes>
    <modelTypes>

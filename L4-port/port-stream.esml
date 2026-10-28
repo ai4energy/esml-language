@@ -7,7 +7,7 @@
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_PortStream">
   <portTypes><portType name="StreamPort" connectorFamily="stream">
     <variables>
-      <portVariable name="c" role="stream" type="real"/>
+      <portVariable name="c" portRole="stream" type="real"/>
     </variables>
   </portType></portTypes>
   <modelTypes><modelType name="Mix">
