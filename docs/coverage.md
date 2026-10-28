@@ -244,7 +244,7 @@ BEFORE 状态有 **54 / 136** 份示例在本仓 `SPEC.md` 里查无点名依据
 ```xml
 <?xml version="1.0"?>
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="T_TopSet">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="M">
     <parameters><parameter name="k" type="real" default="0.2"/></parameters>
     <variables><variable name="x" type="real" role="state" initial="1.0"/></variables>
@@ -462,7 +462,7 @@ cd ~/esml && python3 tools/four_way_gate.py
 cat > spec65-useC.esml <<'EOF'
 <?xml version="1.0"?>
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="T_Spec65_UseC">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="CondComp">
     <parameters><parameter name="useC" type="real" default="1.0"/></parameters>
     <variables><variable name="y" type="real" role="algebraic"/></variables>

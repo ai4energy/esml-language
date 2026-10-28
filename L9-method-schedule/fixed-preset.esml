@@ -7,7 +7,7 @@
      规范条文：§6.10（系统级观察与预设）＋ 附录 F6（自由度 FIX）。
      `check` 通过；`solve`（system S）：y = K·a + c = 2·5 + 1 = 11。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L9_FixedPreset">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="Calc">
     <parameters><parameter name="K" type="real" default="2.0"/><parameter name="c" type="real" default="1.0"/></parameters>
     <variables><variable name="y" type="real" role="algebraic" initial="0.0"/><variable name="a" type="real" role="algebraic" initial="0.0"/></variables>

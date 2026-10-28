@@ -7,7 +7,7 @@
      规范条文：§8（连接语义）。
      本件只演示规范写法；拓扑为 Src—R 串联。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L6_ConnectCanonical">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <portTypes><portType name="Pin" connectorFamily="electrical">
     <variables>
       <portVariable name="v" portRole="potential" type="real"/>

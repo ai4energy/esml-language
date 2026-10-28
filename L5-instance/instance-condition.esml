@@ -14,7 +14,7 @@
      判据：解出的未知量个数（2）而不是某条方程的值——被排除的实例是「不在」，
      不是「解成 0」。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L5_InstanceCondition">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="M">
     <parameters><parameter name="v0" type="real" default="1.0"/></parameters>
     <variables><variable name="y" type="real" role="algebraic"/></variables>

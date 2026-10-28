@@ -7,7 +7,7 @@
      规范条文：§7.1（状态机与时钟）。
      `check` 通过；`simulate`（system S）exit=0（y = e^(−t) 衰减轨迹）。 -->
  <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L2_ClockSample">
-   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+   <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
    <modelTypes><modelType name="ClockPrev">
      <clock name="c" interval="0.1"/>
      <variables>

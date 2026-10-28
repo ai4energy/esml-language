@@ -5,7 +5,7 @@
      规范条文：§7（方程类别与语义）。
      方程数与未知数相等；代数未知量不进状态向量。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_EquationBasic">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="M">
     <parameters><parameter name="k" type="real" default="0.5"/></parameters>
     <variables>

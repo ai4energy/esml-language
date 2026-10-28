@@ -5,7 +5,7 @@
      规范条文：附录 F3（事件语义糖）。
      独立的 `<when>`，同刻按声明序应用（顺序近似，不是显式 priority 链）。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L2_ElseWhen">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="M">
     <discrete><variable name="mode" type="real" default="0.0"/></discrete>
     <variables><variable name="x" type="real" role="state" initial="0.0"/></variables>

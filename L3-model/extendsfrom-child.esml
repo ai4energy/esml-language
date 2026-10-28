@@ -6,7 +6,7 @@
      规范条文：§4.0（继承 `<extendsFrom>`）。
      `check` errors=0。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L3_ExtendsFromChild">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes>
     <modelType name="Base" discipline="generic">
       <parameters><parameter name="k" type="real" default="0.3"/></parameters>

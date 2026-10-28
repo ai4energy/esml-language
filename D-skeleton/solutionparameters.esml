@@ -8,7 +8,7 @@
   <solutionParameters name="sp1">
     <solver name="Tsit5" abstol="1e-6" reltol="1e-3" saveat="0.1" maxsteps="10000"/>
   </solutionParameters>
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="M">
     <parameters><parameter name="k" type="real" default="0.3"/></parameters>
     <variables><variable name="x" type="real" role="state" initial="1.0"/></variables>

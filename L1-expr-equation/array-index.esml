@@ -7,7 +7,7 @@
      规范条文：§7（数组下标与切片）＋ 附录 F8（vector 归约内建）。
      （切片归约示例：sum(T[1:4]) = 0+10+20+30 = 60）。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_ArrayIndex">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <orderedSet name="Species" static="true">
     <element>A</element><element>B</element><element>C</element>
   </orderedSet>

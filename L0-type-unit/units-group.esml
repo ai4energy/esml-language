@@ -14,7 +14,7 @@
       <unit name="N" base="kg*m*s^-2" scale="1"/>
     </unitsDerived>
   </units>
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="M" discipline="generic">
     <parameters><parameter name="x" type="real" default="3.0"/></parameters>
     <variables><variable name="y" type="real" role="algebraic"/></variables>

@@ -11,8 +11,8 @@
   </unitsBase></units>
   <variableTypes>
     <typesThermal>
-      <type name="temperature" unit="K" role="algebraic" default="300"/>
-      <type name="heatflow"    unit="W" role="algebraic" default="0"/>
+      <type name="temperature" unit="K" default="300"/>
+      <type name="heatflow"    unit="W" default="0"/>
     </typesThermal>
   </variableTypes>
   <modelTypes><modelType name="Sink">

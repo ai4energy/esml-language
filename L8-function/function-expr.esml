@@ -6,7 +6,7 @@
      规范条文：附录 I（用户函数与黑盒）。
      Der(H) = Fin − weir_flow(H, W)。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L8_FunctionExpr">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <functions>
     <function name="weir_flow">
       <inputs><input name="H"/><input name="W"/></inputs>

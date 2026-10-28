@@ -9,7 +9,7 @@
     <author>Ai4Energy ESML Syntax Examples</author>
     <provenance>re-implementation of an earlier tank model</provenance>
   </metadata>
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="M">
     <variables><variable name="x" type="real" role="algebraic"/></variables>
     <equations><equation>x = 1.0</equation></equations>

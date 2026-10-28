@@ -7,7 +7,7 @@
      见 `L5-instance/component-alias.esml`。
      规范条文：§2（收紧词法）。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L3_ComponentProbe">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="M" discipline="generic">
     <variables><variable name="y" type="real" role="algebraic"/></variables>
     <equations><equation>y = 1.0</equation></equations>

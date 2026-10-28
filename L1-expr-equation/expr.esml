@@ -6,7 +6,7 @@
      规范条文：§6.9（计算任务表）。
      `tasks` 报错（objective 文本体为空）。工作形态是把表达式直接写成文本体。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_Expr">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="M" discipline="generic">
     <parameters><parameter name="x" type="real" default="3.0"/></parameters>
     <variables><variable name="y" type="real" role="algebraic"/></variables>

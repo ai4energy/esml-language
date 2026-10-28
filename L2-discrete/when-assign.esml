@@ -7,7 +7,7 @@
      `pre(on)` 取上一事件后的保持值；事件之间离散量不变，故与当前值一致。
      初值 2.0 使第一个事件立即触发。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L2_WhenAssign">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="Hysteresis">
     <parameters>
       <parameter name="Tbar" type="real" default="0.0"/>

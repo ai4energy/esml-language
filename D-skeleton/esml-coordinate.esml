@@ -7,7 +7,7 @@
      `check` 通过，结果不受 `coordinate` 影响。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="D_Coordinate"
       coordinate="cn.ai4energy.esml.syntax:coordinate-demo:0.1" version="1.0">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="M">
     <variables><variable name="x" type="real" role="algebraic"/></variables>
     <equations><equation>x = 1.0</equation></equations>

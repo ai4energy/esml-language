@@ -11,7 +11,7 @@
      N(9) = 63.767 → N(10) = 50.000（生效）→ N(20) = 30.328（= 50·e^−0.5）。
      simulate 的时长由 tspan 参数给定，不由 schedule 推导。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L9_Reassign">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="Decay" discipline="generic">
     <parameters><parameter name="lambda" type="real" default="0.05"/></parameters>
     <variables><variable name="N" type="real" role="state" initial="100.0"/></variables>

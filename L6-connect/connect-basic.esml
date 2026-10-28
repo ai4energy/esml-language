@@ -7,7 +7,7 @@
      本例是 Src—R 串联：R 为单端电阻模型，回流端在模型内部接地；
      连接展开为 p.v 相等与 p.i 之和为零。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L6_ConnectBasic">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <portTypes><portType name="Pin" connectorFamily="electrical">
     <variables>
       <portVariable name="v" portRole="potential" type="real"/>

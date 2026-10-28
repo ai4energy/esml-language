@@ -5,7 +5,7 @@
      规范条文：§1.1（文档骨架）。
      并在模型级与系统级使用 `<description>`。`check` 与 `solve` 均通过。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="D_Skeleton">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="Decay" discipline="generic">
     <description>指数衰减：Der(N) = -lambda·N，N(0)=100（模型级 description，规范 §4）。</description>
     <parameters><parameter name="lambda" type="real" default="0.05"/></parameters>

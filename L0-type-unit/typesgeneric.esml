@@ -7,7 +7,7 @@
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L0_TypesGeneric">
   <variableTypes>
     <typesGeneric>
-      <type name="real" unit="1" default="0.0" role="algebraic"/>
+      <type name="real" unit="1" default="0.0"/>
     </typesGeneric>
   </variableTypes>
   <modelTypes><modelType name="M">

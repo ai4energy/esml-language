@@ -10,7 +10,7 @@
      `check <本文件> -L <库根>` 预期 exit≠0，并给出坐标不匹配与「是否指 …:0.1」两条信息。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="X_UseF12Mismatch">
   <use library="cn.ai4energy.esml.thermal:heat-elements:9.9.9"/>
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="Local" discipline="generic">
     <variables><variable name="y" type="real" role="algebraic"/></variables>
     <equations><equation>y = 1.0</equation></equations>

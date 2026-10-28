@@ -5,7 +5,7 @@
      规范条文：§1.1（文档骨架）。
      `check` 通过；求解时衰减模型稳态趋于 N=0。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="D_Minimal">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="Decay" discipline="generic">
     <parameters><parameter name="lambda" type="real" default="0.05"/></parameters>
     <variables><variable name="N" type="real" role="state" initial="100.0"/></variables>

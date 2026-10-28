@@ -6,7 +6,7 @@
      规范条文：§7.1（状态机与时钟）。
      容器形态与直挂 `<clock>` 等价。`check` 通过，无未声明符号告警。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L2_ClockFunctions">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="M">
     <clocks><clock name="c" interval="0.1"/></clocks>
     <parameters><parameter name="x" type="real" default="1.0"/></parameters>

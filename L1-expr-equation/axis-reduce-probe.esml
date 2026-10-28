@@ -6,7 +6,7 @@
      规范条文：§7（向量归约内建）。
      配套正例见 `axis-reduce.esml`。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_AxisReduceProbe">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes>
     <modelType name="M" discipline="generic">
       <variables>

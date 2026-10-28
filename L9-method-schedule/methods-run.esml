@@ -7,7 +7,7 @@
      规范条文：附录 F7（自由度 FREE）＋ 附录 F7b（METHOD RUN 子过程）。
      ⇒ a = (5 − 1) / 2 = 2。模型级 `<onLoad>` 见 `onload.esml`。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L9_MethodsRun">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="Calc" discipline="generic">
     <parameters><parameter name="K" type="real" default="2.0"/><parameter name="c" type="real" default="1.0"/></parameters>
     <variables><variable name="y" type="real" role="algebraic"/><variable name="a" type="real" role="algebraic"/></variables>

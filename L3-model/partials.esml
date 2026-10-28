@@ -6,7 +6,7 @@
      规范条文：§14.1（canonical 元素）。
      函数体走 `<body>`，写法是右值表达式（本例 y = x·x）。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L3_PartialsProbe">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <functions><function name="f">
     <inputs><input name="x"/></inputs>
     <outputs><output name="y"/></outputs>

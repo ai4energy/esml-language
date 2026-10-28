@@ -15,7 +15,7 @@
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="X_UseMultiLib">
   <use library="cn.ai4energy.esml.thermal:heat-elements:0.1"/>
   <use library="cn.ai4energy.esml.math:nonsmooth:0.1"/>
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="PosUse" discipline="generic">
     <description>本地模型：方程调用**库 B**（nonsmooth）的 pos() 函数。</description>
     <parameters><parameter name="x" type="real" default="350.0"/></parameters>

@@ -5,7 +5,7 @@
      规范条文：附录 F3（事件语义糖）。
      此形态用于表达互斥的多分支语义；`<elsewhen>` 见 `elsewhen.esml`。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L2_MultipleWhen">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="M">
     <discrete><variable name="mode" type="real" default="0.0"/></discrete>
     <variables><variable name="x" type="real" role="state" initial="0.0"/></variables>

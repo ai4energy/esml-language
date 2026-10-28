@@ -6,7 +6,7 @@
      规范条文：附录 B（续）— SELECTOR。
      `check` 通过；`solve`（system S）稳态解。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L3_Selector">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="M">
     <selectors><selector name="mode">
       <values><value>fast</value><value>slow</value></values>

@@ -9,7 +9,7 @@
      即 §6.6 的系统级方程（流程层方程，非 `<set>`）。
      跨 PortType 的信号连接见 `L4-port/signal-causal.esml`（附录 F2）。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_PortRolesIO">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <portTypes><portType name="IO" domain="electrical">
     <portVariable name="u" causality="input"  type="real"/>
     <portVariable name="w" causality="output" type="real"/>

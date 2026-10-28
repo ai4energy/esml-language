@@ -4,7 +4,7 @@
 <!-- 语法点 portType 内端口变量的统一写法：`<portVariable portRole="…">`；
      元素形态 `<flow>` / `<potential>` 已退役（解析期拒收）。`check` errors=0。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_FlowPotential">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <portTypes><portType name="FP">
     <variables>
       <portVariable name="c" type="real"/>

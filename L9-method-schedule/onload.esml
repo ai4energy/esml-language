@@ -10,7 +10,7 @@
      规范条文：附录 F5（on_load 预设方法）。
      `check` errors=0；`solve`（system Demo）验证这三组值。 -->
  <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L9_OnLoadPreset">
-   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+   <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
    <modelTypes>
      <modelType name="Calc" discipline="generic">
        <parameters><parameter name="K" type="real" default="1.0"/></parameters>

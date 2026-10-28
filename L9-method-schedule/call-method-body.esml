@@ -18,7 +18,7 @@
      不是本体的语义。两条路径都可复跑。
      规范条文：附录 K（METHOD × Schedule 编排）。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L9_CallMethodBody">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="Decay" discipline="generic">
     <parameters><parameter name="k" type="real" default="2.0"/></parameters>
     <variables><variable name="y" type="real" role="state" initial="1.0"/></variables>

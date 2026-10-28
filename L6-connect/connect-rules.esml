@@ -7,7 +7,7 @@
      未列出的类别对在编译期报错。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L6_ConnectRules">
   <variableTypes><typesDimensionless discipline="generic">
-    <type name="real" unit="1" default="0.0" role="algebraic"/>
+    <type name="real" unit="1" default="0.0"/>
   </typesDimensionless></variableTypes>
   <portTypes name="pt">
     <portType name="Fluid1" connectorFamily="generic"><variables><portVariable name="x"/></variables></portType>

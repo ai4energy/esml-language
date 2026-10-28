@@ -13,7 +13,7 @@
      正例见 `L5-instance/instance-condition.esml`。
      本件只演示该 token 的拼写，不是可运行样例。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L5_InstanceConditionUndecidable">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="M">
     <parameters><parameter name="k" type="real" default="2.0"/></parameters>
     <variables><variable name="y" type="real" role="algebraic"/></variables>

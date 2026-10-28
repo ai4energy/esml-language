@@ -9,7 +9,7 @@
   <units>
     <unitsBase><unit name="K" base="K" scale="1" offset="0"/></unitsBase>
   </units>
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <portTypes><portType name="HeatPort" connectorFamily="thermal">
     <portVariable name="T"      portRole="potential" type="real"/>
     <portVariable name="Q_flow" portRole="flow"      type="real"/>

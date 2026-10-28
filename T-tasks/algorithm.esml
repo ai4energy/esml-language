@@ -6,7 +6,7 @@
      规范条文：§7（算法段）。
      并由派生模型验证等价。`check` 与 `simulate` 均通过。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="T_Algorithm">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes>
     <modelType name="F" discipline="generic">
       <functions>

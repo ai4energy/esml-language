@@ -6,7 +6,7 @@
      规范条文：附录 F3（事件语义糖）。
      （相切不触发）。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L2_WhenReinit">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="Ball">
     <parameters>
       <parameter name="g"    type="real" default="9.81"/>

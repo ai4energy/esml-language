@@ -7,7 +7,7 @@
      两个 5 s 段合起来是一次 10 s 运行。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L9_ScheduleCall">
   <variableTypes>
-    <type name="real" unit="1" default="0.0" role="algebraic"/>
+    <type name="real" unit="1" default="0.0"/>
   </variableTypes>
   <modelTypes><modelType name="Decay" discipline="generic">
     <parameters><parameter name="lambda" type="real" default="0.05"/></parameters>

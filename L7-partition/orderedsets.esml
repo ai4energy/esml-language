@@ -5,7 +5,7 @@
      规范条文：附录 B（续）— ORDERED_SET 序集。
      出现时会报错并提示改用单数写法。`check` errors=0。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L7_OrderedSets">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <orderedSet name="states" static="true">
     <element>solid</element>
     <element>liquid</element>

@@ -8,7 +8,7 @@
      规范条文：§7（表达式内建）。
      y(t) = 2t − 1 + e^(−2t)，t = 0.5 → 0.36788。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_BuiltinsDelay">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes>
     <modelType name="Steady" discipline="generic">
       <parameters><parameter name="u" type="real" default="5.0"/></parameters>

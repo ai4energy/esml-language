@@ -5,7 +5,7 @@
      规范条文：§6.9（计算任务表）。
      实现作为元数据接受并跳过。`check` errors=0，`tasks` exit=0。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="T_ControlVars">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="DecayModel" discipline="generic">
     <parameters><parameter name="lambda" type="real" default="0.05"/></parameters>
     <variables><variable name="N" type="real" role="state" initial="100.0"/></variables>

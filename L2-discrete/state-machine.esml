@@ -6,7 +6,7 @@
      规范条文：§7.1（状态机与时钟）。
      `<transition priority=>` 当前不被识别，本例不使用。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L2_StateMachine">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="Fsm">
     <variables>
       <variable name="a" type="real" role="algebraic" initial="0.0"/>

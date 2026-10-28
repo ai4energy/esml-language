@@ -9,7 +9,7 @@
      规范条文：§7（向量归约内建）＋ 附录 F8（vector 归约内建）。
      `check` 只验类型层（axis 范围、形状一致、索引范围），errors=0。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_AxisReduce">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes>
     <!-- 1D + axis=0 ⇒ 标量 -->
     <modelType name="M1DAxis0" discipline="generic">

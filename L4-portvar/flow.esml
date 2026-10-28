@@ -8,7 +8,7 @@
      规范条文：§5（端口）。
      `check` errors=0；`solve`（system S）cd.port_a.Q_flow = 40.0。 -->
  <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_FlowElement">
-   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+   <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
    <portTypes><portType name="HeatPort" connectorFamily="thermal">
      <variables>
        <portVariable name="T" portRole="potential" type="real"/>

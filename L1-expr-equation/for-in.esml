@@ -7,7 +7,7 @@
      规范条文：附录 B（续）— FOR 循环。
      `check` errors=0；`solve`（system S）：lo = {1,2,3}、hi = {2,4,6}。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_ForIn">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="Ladder">
     <parameters><parameter name="n" type="integer" default="3"/></parameters>
     <variables>

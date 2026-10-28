@@ -9,7 +9,7 @@
      规范条文：§7（表达式内建）＋ 附录 F8（vector 归约内建）。
      延迟与复数用法另见 `builtins-delay.esml`、`builtins-complex.esml`。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_BuiltinsExpr">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes>
     <modelType name="B" discipline="generic">
       <parameters>

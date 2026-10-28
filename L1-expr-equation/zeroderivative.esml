@@ -10,7 +10,7 @@
      规范条文：§14.1（canonical 元素）。
      本件只演示该 token 的拼写，不是可运行样例。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_ZeroDerivative">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <functions><function name="sq">
     <inputs><input name="x"/><input name="d"/></inputs>
     <outputs><output name="z"/></outputs>

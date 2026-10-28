@@ -9,7 +9,7 @@
      规范条文：§6.7（系统初始化过程）。
      `check` errors=0（声明例，当前只解析、不参与求解）。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L2_InitProcAdvance">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="Mass" discipline="generic">
     <parameters><parameter name="k" type="real" default="2.0"/></parameters>
     <variables><variable name="x" type="real" role="state" initial="0.0"/></variables>

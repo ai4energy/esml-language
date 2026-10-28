@@ -8,7 +8,7 @@
      规范条文：§5（端口）。
      `check` errors=0；`solve`（system S）：r.a.v = 10.0、r.b.v = 0.0。 -->
  <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_PotentialElement">
-   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+   <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
    <portTypes><portType name="Pin" connectorFamily="electrical">
      <variables>
        <portVariable name="i" portRole="flow" type="real"/>

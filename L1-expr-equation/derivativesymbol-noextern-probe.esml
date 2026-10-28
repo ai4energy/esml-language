@@ -19,7 +19,7 @@
      规范条文：§14.1（canonical 元素）。
      非零退出是预期行为。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_DerivativeNoexternSymbol">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <functions><function name="f">
     <inputs><input name="x"/></inputs>
     <outputs><output name="y"/></outputs>

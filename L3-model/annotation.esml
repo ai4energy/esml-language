@@ -6,7 +6,7 @@
      这里用 `data:` 内联 SVG，示例因此自包含、不依赖旁边的图标文件。
      规范条文：L-ANNOT；手册 §8.3；判据 scripts/check-annotations.py（A1–A5）。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L3_Annotation">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes>
     <modelType name="Tagged">
       <annotation>

@@ -6,7 +6,7 @@
      规范条文：附录 I（用户函数与黑盒）。
      `check` errors=0；`solve` 验证 f(3) = 3·2 + 1 = 7。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L8_Locals">
-  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <functions>
     <function name="f" returns="real">
       <inputs><input name="x" type="real"/></inputs>
