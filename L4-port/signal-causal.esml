@@ -15,10 +15,10 @@
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_SignalCausal">
   <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <portTypes>
-    <portType name="SigOut" domain="signal">
+    <portType name="SigOut" connectorFamily="signal">
       <portVariable name="y" causality="output" type="real"/>
     </portType>
-    <portType name="SigIn" domain="signal">
+    <portType name="SigIn" connectorFamily="signal">
       <portVariable name="y" causality="input" type="real"/>
     </portType>
   </portTypes>

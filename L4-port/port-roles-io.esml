@@ -10,7 +10,7 @@
      跨 PortType 的信号连接见 `L4-port/signal-causal.esml`（附录 F2）。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_PortRolesIO">
   <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
-  <portTypes><portType name="IO" domain="electrical">
+  <portTypes><portType name="IO" connectorFamily="electrical">
     <portVariable name="u" causality="input"  type="real"/>
     <portVariable name="w" causality="output" type="real"/>
   </portType></portTypes>
