@@ -13,7 +13,7 @@
      <variables>
        <portVariable name="T" portRole="potential" type="real"/>
      </variables>
-     <flow name="Q_flow" type="real"/>
+     <portVariable name="Q_flow" type="real" portRole="flow"/>
    </portType></portTypes>
    <modelTypes>
      <modelType name="FixedT">

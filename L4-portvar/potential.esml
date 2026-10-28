@@ -13,7 +13,7 @@
      <variables>
        <portVariable name="i" portRole="flow" type="real"/>
      </variables>
-     <potential name="v" type="real"/>
+     <portVariable name="v" type="real" portRole="potential"/>
    </portType></portTypes>
    <modelTypes>
      <modelType name="Src">

@@ -8,7 +8,7 @@
      `check` errors=0（单实例 stream 对无回路，方程欠定，故本例只验声明与角色映射）。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_PortVarStream">
   <portTypes><portType name="StreamPort" connectorFamily="stream">
-    <stream name="c" type="real"/>
+    <portVariable name="c" type="real" portRole="stream"/>
   </portType></portTypes>
   <modelTypes><modelType name="Mix">
     <ports><port name="in"  portType="StreamPort"/><port name="out" portType="StreamPort"/></ports>

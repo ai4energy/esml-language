@@ -7,7 +7,7 @@
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
   <portTypes><portType name="FP">
     <variables>
-      <portVariable name="c" role="algebraic" type="real"/>
+      <portVariable name="c" type="real"/>
     </variables>
     <portVariable name="q" type="real" portRole="flow"/>
     <portVariable name="v" type="real" portRole="potential"/>
