@@ -5,12 +5,14 @@
      把多个模型 + 计算任务打包为一个工程单元。
      结构：systems（`<systemRef name src>`）→ computeTasks（叶子是 `<task name kind>`）
      → scenarioChain，各至多一个；元素名一律 camelCase，kebab 拼写不合法。
-     本例的 systemRef 指向仓内示例文件 D-skeleton/skeleton-minimal.esml 的 system S；
+     本例的 systemRef 指向同目录的 skeleton-minimal.esml（`src` 相对**本清单
+     文件目录**解析）里的 system S；`esml check` 会校验这条引用（F21），
+     `esml tasks` 直接派发下面的 computeTasks。
      任务是 simulate，载荷按 kind 取 `<tspan>` + `<solver>`。
      规范条文：§6.8（工程包装容器）。 -->
 <project xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="D_Project" version="1.0">
   <systems>
-    <systemRef name="decay" src="D-skeleton/skeleton-minimal.esml" system="S"/>
+    <systemRef name="decay" src="skeleton-minimal.esml" system="S"/>
   </systems>
   <computeTasks>
     <task name="sim" kind="simulate">
