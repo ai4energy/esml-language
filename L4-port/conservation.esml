@@ -1,8 +1,10 @@
 <?xml version="1.0"?>
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
-<!-- 语法点 `<portType conservation="balance">`：守恒由组件写（连接器不生成
-     Σflow=0）；默认 `kcl` 由连接器生成。同一节点混用 ⇒ 解析后展平报错。 -->
+<!-- 语法点 `<portType conservation="balance">`：节点 flow 是一条**共享流**——
+     连接器只写等值别名（不是 Σflow=0），衡算与各股方向的正负由组件在自己的
+     方程里写（这里 `a.m = x`）。默认 `kcl` 则由连接器写 Σflow=0。
+     同一节点混用 kcl/balance ⇒ 展平期报错。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_Conservation">
   <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <portTypes><portType name="P" conservation="balance">
@@ -14,7 +16,11 @@
   <modelTypes><modelType name="C">
     <ports><port name="a" portType="P"/></ports>
     <variables><variable name="x" type="real"/></variables>
-    <equations><equation>x = a.p</equation><equation>a.m = 1.0</equation></equations>
+    <!-- 组件写自己的流量关系（含方向的正负）；连接器不再写守恒行。 -->
+    <equations><equation>x = a.p</equation><equation>a.m = x</equation></equations>
   </modelType></modelTypes>
-  <systems><system name="S"><instances><instance name="i" type="C"/></instances></system></systems>
+  <systems><system name="S">
+    <instances><instance name="i" type="C"/><instance name="j" type="C"/></instances>
+    <connections><connection from="i.a" to="j.a"/></connections>
+  </system></systems>
 </esml>
