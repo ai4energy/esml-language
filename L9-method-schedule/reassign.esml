@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `<schedule><sequence>…<reassign path value/>…</sequence></schedule>`：
+     在该步的累计时刻（前面 `<continueFor time=>` 之和）把 path := value。
+     **REASSIGN 不是 RESET 的别名**：`<reset>` 是状态重置（ActionKind::Reinit，
+     不连续写入），`<reassign>` 是连续赋值（ActionKind::Assign，参数/代数）。
+     target 必须是 state/变量（在 flat.vars）；指到参数会显式告警且不改值，
+     故本例指向状态 g.N（Assign 对状态的效果即一次跳变，用于演示时刻与取值）。
+     `check` errors=0；`simulate`（system S，tspan 0,20，实测 2026-10-28）：
+     N(9) = 63.767 → N(10) = 50.000（生效）→ N(20) = 30.328（= 50·e^−0.5）。
+     simulate 的时长由 tspan 参数给定，不由 schedule 推导。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L9_Reassign">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes><modelType name="Decay" discipline="generic">
+    <parameters><parameter name="lambda" type="real" default="0.05"/></parameters>
+    <variables><variable name="N" type="real" role="state" initial="100.0"/></variables>
+    <equations><equation>Der(N) = -lambda * N</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="g" type="Decay"/></instances>
+    <schedule><sequence>
+      <continueFor time="10"/>
+      <reassign path="g.N" value="50.0"/>
+      <continueFor time="10"/>
+    </sequence></schedule>
+  </system></systems>
+</esml>

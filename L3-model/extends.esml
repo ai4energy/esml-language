@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `<modelType><extends name="Base"/>`（ADR-76 类级继承）：
+     基类的参数/变量/方程先并入，派生类在同名冲突处胜出。
+     本例派生类覆写参数 `k`（1.0 → 2.0），方程沿用基类。
+     `check` errors=0；`solve`（system S）：x = 0 为平衡点。
+     规范条文：ADR-76。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L3_Extends">
+  <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
+  <modelTypes>
+    <modelType name="Base" discipline="generic">
+      <parameters><parameter name="k" type="real" default="1.0"/></parameters>
+      <variables><variable name="x" type="real" role="state" initial="1.0"/></variables>
+      <equations><equation>Der(x) = -k * x</equation></equations>
+    </modelType>
+    <modelType name="Derived" discipline="generic">
+      <extends name="Base"/>
+      <parameters><parameter name="k" type="real" default="2.0"/></parameters>
+    </modelType>
+  </modelTypes>
+  <systems><system name="S">
+    <instances><instance name="d" type="Derived"/></instances>
+  </system></systems>
+</esml>

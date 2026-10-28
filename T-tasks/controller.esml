@@ -2,8 +2,9 @@
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 `<controller>`：可执行的单回路 PID 声明。属性 `kind`（p/pi/pid）/
-     `sampleTime` 等，子元素 `<gains Kp Ki Kd>` 给出控制律；控制目标由
-     `<controlled var setpoint>` 唯一给出。
+     `sampleTime`，以及抗饱和 `antiWindup`（none/conditional/backcalc）与
+     无扰切换 `bumpless`（bool）；子元素 `<gains Kp Ki Kd>` 给出控制律；
+     控制目标由 `<controlled var setpoint>` 唯一给出。
      规范条文：§6.9（计算任务表）。`check` errors=0，`tasks` exit=0。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="T_Controller">
   <variableTypes><type name="real" unit="1" default="0.0" role="algebraic"/></variableTypes>
@@ -21,7 +22,7 @@
       <tspan from="0" to="60"/>
       <mpc N="10" dt="1"/>
       <estimate name="g.lambda" initial="0.05"/>
-      <controller kind="pid" sampleTime="1">
+      <controller kind="pid" sampleTime="1" antiWindup="conditional" bumpless="true">
         <gains Kp="-0.1" Ki="-0.005" Kd="0.0"/>
       </controller>
       <controlled var="g.N" setpoint="0.0"/>
