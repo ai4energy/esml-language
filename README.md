@@ -16,6 +16,10 @@ ESML 是一种声明式、基于方程的物理系统建模语言，文档即 XM
 canonical XML 是正统语法；XML Schema 描述 canonical XML，是可机验的基准。
 文字与 schema 出现分歧时，以 schema 为准。
 
+## 手册
+
+开发 / 部署 / 运维三本手册见 [`docs/manuals/`](docs/manuals/README.md)。
+
 ## 示例目录
 
 | 目录 | 层次 |
