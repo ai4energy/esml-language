@@ -874,9 +874,8 @@
           </xs:complexType>
         </xs:element>
         <xs:element ref="esml:computeTasks" minOccurs="0" maxOccurs="1"/>
-        <!-- `<tasks>` 外层壳（规范 §6.8）：`<computeTasks>` 的可选外包装，
-             声明在 compute.xsd（内容松散透传）。 -->
-        <xs:element ref="esml:tasks" minOccurs="0" maxOccurs="1"/>
+        <!-- 旧 `<tasks>` 外层壳（规范 §6.8）已废弃：canonical-strict（2026-11）
+             起 parser F1 响亮拒收，compute.xsd 的全局元素已移除。 -->
       </xs:choice>
       <xs:attribute name="name" type="xs:string" use="optional"/>
       <xs:attribute name="schema" type="xs:string" use="optional"/>

@@ -28,7 +28,6 @@
      project | 是 | esml-canonical-project.xsd | —
      system | 是 | esml-canonical-basic.xsd | —
      systems | 是 | esml-canonical-basic.xsd | —
-     tasks | 是 | esml-canonical-compute.xsd | —
      units | 是 | esml-canonical-basic.xsd | —
      variableTypes | 是 | esml-canonical-basic.xsd | —
      ROOT-MATRIX:END
@@ -55,18 +54,19 @@
 
   <!-- 根清单 = canonical 层的**全局元素**（唯一真相 = XSD）：
        esml / units / variableTypes / portTypes / modelTypes / systems / system /
-       orderedSet / computeTasks / tasks / metadata / project。
+       orderedSet / computeTasks / metadata / project。
        逐元素对账（xsd/esml-canonical-*.xsd 的全局元素声明）：
          本层补上 metadata（basic）与 project（project）——它们在 canonical 层是
          全局元素，此前入口层没列，入口层会拒收 canonical 层认可的根。
-         `<tasks>` 同理：canonical-compute.xsd 已把 §6.8 的顶层壳升为全局元素，
-         入口层必须同步声明，否则入口层误拒 canonical 层认可的根。
+         `<tasks>` 外层壳（§6.8 旧形态）已于 canonical-strict（2026-11）删除：
+         parser F1 响亮拒收（点名 canonical 写法 `<computeTasks>`），
+         canonical-compute.xsd 的全局元素随之移除，本层同步删除。
          本层删掉 schedule / solutionParameters / variables / domain——这四个在
          canonical 层都不是全局元素（schedule 只在 <system> 内、solutionParameters
          只在 <esml> 内、variables 只在 <modelType> 内、domain 只在 <domains> 内），
          入口层却把它们当根收下，等于放行一份 canonical 层必然拒收的文档（假绿）。
        独立库文件根（units / variableTypes / systems / portTypes / system /
-       orderedSet / metadata / modelTypes）与顶层壳（computeTasks / tasks /
+       orderedSet / metadata / modelTypes）与顶层壳（computeTasks /
        project）—— 名单见文件头 ROOT-MATRIX 块，由 `docs/validate_roots.py`
        的 sync 模式生成并逐字机判。 -->
   <xs:element name="units">
@@ -108,12 +108,12 @@
   <xs:element name="modelTypes">
     <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
   </xs:element>
-  <!-- 顶层计算壳（`<computeTasks>` / `<tasks>`）：内容 lax 透传，结构由
-       esml-canonical-compute.xsd 校验。 -->
+  <!-- 顶层计算段（`<computeTasks>`，唯一 canonical 任务段）：内容 lax 透传，
+       结构由 esml-canonical-compute.xsd 校验。
+       旧 `<tasks>` 外层壳已废弃：canonical-strict（2026-11）起 parser F1
+       响亮拒收（点名 `<computeTasks>`），canonical-compute.xsd 的全局元素
+       已移除，本层同步删除。 -->
   <xs:element name="computeTasks">
-    <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
-  </xs:element>
-  <xs:element name="tasks">
     <xs:complexType><xs:sequence><xs:choice minOccurs="0" maxOccurs="unbounded"><xs:any namespace="##targetNamespace" processContents="lax"/></xs:choice></xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
   </xs:element>
   <!-- 工程壳（`<project>`）：结构由 esml-canonical-project.xsd 校验。 -->

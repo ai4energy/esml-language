@@ -1,11 +1,14 @@
 <?xml version="1.0"?>
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
-<!-- 语法点 `<tasks>`：顶层容器，内容按松散规则透传任意子元素；它是 `<computeTasks>` 之外的
-     可选外层壳，可与顶层其它元素并列。
-     本例在同一 `<esml>` 内并列写 `<tasks><computeTasks>…</computeTasks></tasks>`，
-     规范条文：§6.8（工程包装容器）。
-     验证外层容器被识别且不与 `<computeTasks>` 冲突。`tasks`（system S）exit=0。 -->
+<!-- 语法点 `<computeTasks>`：唯一 canonical 任务段 —— `<esml>` 的直接子段（或独立根），
+     多张 `<computeTasks>` 可在同一文档内并列共存。
+     旧 `<tasks>` 外层壳已废弃（canonical-strict，2026-11）：parser F1 响亮拒收
+     （legacy spelling，点名 canonical 写法 `<computeTasks>`），三份 XSD 的全局
+     元素/引用已同步移除（此前的壳裁决 docs/design/tasks-shell-adjudication.md
+     现被取代）。
+     本例在同一 `<esml>` 内并列写两张 `<computeTasks>`，验证 canonical 形态被识别
+     且并列任务表互不冲突。check errors=0（T 层）。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="T_Tasks">
   <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="DecayModel" discipline="generic">
@@ -17,12 +20,16 @@
     <instances><instance name="g" type="DecayModel"/></instances>
     <schedule><sequence><continueFor time="60"/></sequence></schedule>
   </system></systems>
-  <tasks>
-    <computeTasks name="t-outer" target="S">
-      <task name="sim" kind="simulate">
-        <tspan from="0" to="60"/>
-        <solver name="Tsit5"/>
-      </task>
-    </computeTasks>
-  </tasks>
+  <computeTasks name="t-1" target="S">
+    <task name="sim" kind="simulate">
+      <tspan from="0" to="60"/>
+      <solver name="Tsit5"/>
+    </task>
+  </computeTasks>
+  <computeTasks name="t-2" target="S">
+    <task name="sim2" kind="simulate">
+      <tspan from="0" to="30"/>
+      <solver name="Tsit5"/>
+    </task>
+  </computeTasks>
 </esml>
