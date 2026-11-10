@@ -62,5 +62,5 @@ attr	esml	coordinate	lang-wins	SPEC-L449/L454 库包坐标化 coordinate="g:a:v"
 attr	esml	version	lang-wins	同上（g:a:v 的 v 段，库级版本）；引擎 esml 根未接	2026-11-10
 attr	anon@esml-canonical-basic.xsd:19	coordinate	lang-wins	同上——esml 根匿名内联宿主同键，引擎 anon basic:19 仅 name/schema	2026-11-10
 attr	anon@esml-canonical-basic.xsd:19	version	lang-wins	同上	2026-11-10
-attr	project	schema	open	待裁：引擎 project 根声明 name/version/description（project.xsd:99-105），lang 侧 project.xsd 根仅 name/description、**无 schema 属性**（W1 cc36d37 只给 <esml> 根与 <project> 各加 coordinate/version 与 version）——「lang 独有 schema」与两侧实读相悖，需先对账谁测到了，再定方向	2026-11-10
-attr	anon@esml-canonical-project.xsd:1	schema	open	同上——project 根匿名内联宿主同键，待与 project 行一并裁	2026-11-10
+attr	project	schema	lang-wins	lang 侧真声明 xsd/esml-canonical-project.xsd:101（W1 与 <esml> 根 coordinate/version 同批补入，注释「此前靠 anyAttribute 放行，现补声明」）；引擎 schema/esml-canonical-project.xsd:99-105 仅 name/version/description + anyAttribute lax，无 schema 声明（引擎侧未接）；引擎 esml check 带/去 schema= 均 errors=0——接受但不理解，与其它「引擎侧未接」的 lang-wins 行同类	2026-11-10
+attr	anon@esml-canonical-project.xsd:1	schema	lang-wins	同上——project 根匿名内联宿主同键，与上一条同一依据（lang xsd/esml-canonical-project.xsd:101 声明、引擎 anyAttribute lax 放行）	2026-11-10
