@@ -96,6 +96,7 @@
 | 方法 | `<methods><onLoad><set path= value=/>*</onLoad><method name><run name=/>[<set path= value=/>]*</method></methods>` | on_load/RUN（附录 F5/F7b） |
 | 自由度 | `<fixed>/<free>` 系统级块 | 钉代数变量 / 参数升未知（附录 F6/F7） |
 | 调度 | `<schedule><sequence><continueFor time=.../>[<call method=.../>]*</sequence></schedule>` | （附录 K）；多段连续求解 |
+| 图形标注 | `<annotation>`（`<icon>`/`<placement>`/`<port>`） | 纯 UI 元数据（§4.2） |
 
 **收紧规则（canonical 唯一，不向后兼容旧写法）**：
 解析器对旧词法直接报错（解析器）：
@@ -1184,7 +1185,14 @@ scope := <scope instance=name><set path value/></scope>
      规则抽取），by-design 登记落在 `tools/spec-xsd-bydesign.tsv`；自证为
      **5 好 4 坏 + 1 反向自检 + 4 例真实树变异测试**（删根 / 多根 / 规范凭空加根 /
      canonical 加全局元素而入口层没收，每例都必须真变红）。
-- v1.3.x：新立 §4.2「图形标注 `<annotation>`」；端口变量三轴角色（物性 `portRole=`、信号 `causality=`、载量 `carrier=`）入规范，元素形（`<flow>` 等）删除。
+- **v1.3.4（本批）**：
+  - 端口变量角色按轴拆开：物性 `portRole=`、信号 `causality=`、载量 `carrier=`；
+    元素形（`<flow>` / `<potential>` / `<stream>` / `<constant>` / `<discrete>` /
+    `<var>` / `<variable>`）删除，解析期报错（与已合并的 XSD 改动对得上：
+    `crates`/`xsd` 侧元素形声明已删）。
+  - 新立 §4.2 图形标注 `<annotation>`：纯 UI 元数据，求解器不读，不得影响任何数值结果。
+  - 新增漂移台账：语言仓 XSD 与引擎 parser 的分歧不再两边各改一半，统一登进
+    `tools/engine-drift.tsv`（另一单在建）。
 - v0.6.7：任务层口径定为「七类问题类 + 三个辅助任务」；`TaskKindType` 放行 forecast/data/decision，辅助任务不引入新的求解角色（见 §6.9 与附录 M）。
 - v0.6.4：§6.6 系统（flowsheet）级 `<equations>` canonical 定义（引用实例量 `inst.var`，折为扁平名 `inst__var`）；basic XSD `SystemType` 加 `<equations>`。
 - v0.6.3：§6.5 条件组件（实例级 `condition`）canonical 定义；basic XSD 补 `condition` 属性，并补 `kind`/`values`、partition/crosslink/partitions。
