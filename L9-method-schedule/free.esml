@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `<free>`：`<system>` 的直接子元素（**不**在 `<schedule><sequence>` 里，
+     放 sequence 里 F1 拒收「`<free>` is not a canonical step」）。
+     `<free><scope instance="m"><set path="k"/></scope></free>`：把该自由度置为
+     自由（FREE），求解时不再作为固定值参与。
+     check errors=0。
+     规范条文：附录 F7（自由度 FREE）。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L9_Free">
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
+  <modelTypes><modelType name="M" discipline="generic">
+    <parameters>
+    <parameter name="k" type="real" default="0.0"/></parameters>
+    <variables><variable name="x" type="real" role="state" initial="1.0"/></variables>
+    <equations><equation>Der(x) = -k * x</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="M"/></instances>
+    <free><scope instance="m"><set path="k"/></scope></free>
+    <schedule><sequence><continueFor time="1"/></sequence></schedule>
+  </system></systems>
+</esml>

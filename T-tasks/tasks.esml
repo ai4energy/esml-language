@@ -8,7 +8,8 @@
      元素/引用已同步移除（此前的壳裁决 docs/design/tasks-shell-adjudication.md
      现被取代）。
      本例在同一 `<esml>` 内并列写两张 `<computeTasks>`，验证 canonical 形态被识别
-     且并列任务表互不冲突。check errors=0（T 层）。 -->
+     且并列任务表互不冲突。check errors=0（T 层）。
+     规范条文：§6.9（计算任务表）。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="T_Tasks">
   <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="DecayModel" discipline="generic">

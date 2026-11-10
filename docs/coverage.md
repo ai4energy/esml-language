@@ -28,17 +28,17 @@
 
 ## 1. 总量对照
 
-| 指标 | BEFORE `58d2c0a` | AFTER `HEAD` | 判据 |
+| 指标 | BEFORE `58d2c0a` | AFTER（预期，W4 合入后） | 判据 |
 |---|---:|---:|---|
-| 示例件数 | 136 | **141** | `find . -name '*.esml'` |
-| XSD 机验 · PASS | 130 | **136** | 检查 1 |
+| 示例件数 | 136 | **163** | `find . -name '*.esml'` |
+| XSD 机验 · PASS | 130 | **153** | 检查 1 |
 | XSD 机验 · 负例按预期失败 | 5 | 5 | 检查 1 |
 | XSD 机验 · **非负例失败** | **1** | **0** | 检查 1 |
-| SPEC → 示例：点名且存在的路径 | 0 | **71** | 检查 2 |
+| SPEC → 示例：点名且存在的路径 | 0 | **70** | 检查 2 |
 | SPEC → 示例：悬空路径 | 0 | **0** | 检查 2 |
-| 示例头部指名规范条文 | 0 / 136 | **141 / 141** | 检查 3 |
-| 被指名的编号数 | 0 | **36** | 检查 3 |
-| **无 SPEC 依据的示例** | **54 / 136** | **0 / 141** | 检查 4 |
+| 示例头部指名规范条文 | 0 / 136 | **163 / 163** | 检查 3 |
+| 被指名的编号数 | 0 | **37** | 检查 3 |
+| **无 SPEC 依据的示例** | **54 / 136** | **2 / 163** | 检查 4 |
 | `SPEC.md` 的 ```xml 段 · 自足文档级 | 0 段（`§6.8` 那段 **FAIL**） | **2 段全过** | 检查 5 |
 | `SPEC.md` 的 ```xml 段 · 子元素片段 | 15 段 | 15 段 | 检查 5 |
 | 引擎 `esml check -L <库根>` | — | rc0=**135** / 负例 6 / 非负例失败 **0** | 引擎 |
@@ -55,7 +55,7 @@
 
 ## 2. 正向对账：`SPEC.md` → 示例
 
-`SPEC.md` 正文里点名的仓内示例路径共 **71 条**，**全部存在，悬空 0 条**。
+`SPEC.md` 正文里点名的仓内示例路径共 **70 条**，**全部存在，悬空 0 条**。
 按目录归并：
 
 | 目录 | 被点名 | 路径 |
@@ -70,9 +70,9 @@
 | `L6-connect/` | 1 | `connect-rules.esml` |
 | `L7-partition/` | 4 | `domain.esml` `partition-chain.esml` `partition-crosslink.esml` `subsystem-crosslink.esml` |
 | `L8-function/` | 2 | `foreign-object.esml` `locals.esml` |
-| `L9-method-schedule/` | 3 | `fixed-preset.esml` `reassign.esml` `stop.esml` |
+| `L9-method-schedule/` | 2 | `fixed-preset.esml` `stop.esml` |
 | `T-tasks/` | 37 | 计算任务表一族（`task-*.esml` / `tasks*.esml` / `checks.esml` / `tolerance.esml` 等） |
-| **合计** | **71** | |
+| **合计** | **70** | |
 
 `SPEC.md` 里另有 7 条「示意路径 / 管线记法」（`models/ctrl.sys.esml`、
 `models/thermal-chain.esml`、`.comp.esml`、`.sys.esml` 等），它们指的是**库或
@@ -83,32 +83,32 @@
 ## 3. 反向对账：每个编号的「应当有示例」清单
 
 机验口径：示例头部「规范条文：…」一行点名的**全部**编号（以 `＋` 分隔的
-多条逐条计入）。共 **36 个编号 / 141 份示例**。
+多条逐条计入）。共 **37 个编号 / 163 份示例**。
 
 | 编号 · 条文 | 件数 | 示例（仓内路径） |
 |---|---:|---|
-| §1.1 §1.1（文档骨架与 `<metadata>`） ／ §1.1（文档骨架） | 6 | `D-skeleton/{esml-coordinate.esml,metadata.esml,provenance.esml,skeleton-doc.esml,skeleton-full.esml,skeleton-minimal.esml}` |
+| §1.1 §1.1（文档骨架与 `<metadata>`） ／ §1.1（文档骨架） | 8 | `D-skeleton/{data-scenario.esml,doc-ref.esml,esml-coordinate.esml,metadata.esml,provenance.esml,skeleton-doc.esml,skeleton-full.esml,skeleton-minimal.esml}` |
 | §14.1 §14.1（canonical 元素） | 4 | `L1-expr-equation/{derivativesymbol.esml,partial-derivative.esml,zeroderivative.esml}` `L3-model/partials.esml` |
 | §14.2 §14.2（求导三档） | 1 | `L1-expr-equation/noderivative.esml` |
 | §14.3 §14.3（C ABI 类型映射） | 1 | `L8-function/extern-cabi.esml` |
 | §2 §2（收紧词法） | 1 | `L3-model/component-probe.esml` |
 | §3 §3（单位表分组） ／ §3（类型按类别包裹） ／ §3（类型系统） ／ §3（记录类型 `<recordTypes>`） | 6 | `L0-type-unit/{record-type.esml,type-unit.esml,typesgeneric.esml,typesthermal.esml,units-group.esml,variable-roles.esml}` |
 | §4 §4（组件） | 1 | `L3-model/modeltype-basic.esml` |
-| §4.0 §4.0（继承 `<extends>`） ／ §4.0（继承 `<extendsFrom>`） | 3 | `L3-model/{extends.esml,extendsfrom-child.esml,extendsfrom.esml}` |
+| §4.0 §4.0（继承 `<extendsFrom>`） | 3 | `L3-model/{extends.esml,extendsfrom-child.esml,extendsfrom.esml}` |
 | §4.1 §4.1（复合组件） | 1 | `L3-model/members-composite.esml` |
-| §5 §5（端口） | 9 | `L4-port/{constant.esml,flow-potential.esml,flow.esml,port-roles-io.esml,porttype-electrical.esml,porttype-thermal.esml,potential.esml}` `L4-portvar/{flow.esml,potential.esml}` |
+| §5 §5（端口） | 10 | `L4-port/{constant.esml,flow-potential.esml,flow.esml,port-category-size.esml,port-roles-io.esml,porttype-electrical.esml,porttype-thermal.esml,potential.esml}` `L4-portvar/{flow.esml,potential.esml}` |
 | §6 §6（系统、实例与参数覆盖） | 3 | `L5-instance/{component-alias.esml,instance-basic.esml,instance-count.esml}` |
 | §6.0 §6.0（实例参数覆盖：scope / set / path） | 3 | `L2-discrete/initial.esml` `L5-instance/{scope-nested.esml,scope-set.esml}` |
-| §6.1 §6.1（标准库坐标引用） | 3 | `X-use/{use-f12-mismatch.esml,use-library.esml,use-multi-library.esml}` |
+| §6.1 §6.1（标准库坐标引用） | 4 | `X-use/{systemref-libroot.esml,use-f12-mismatch.esml,use-library.esml,use-multi-library.esml}` |
 | §6.10 §6.10（系统级观察与预设） | 2 | `L0-type-unit/observe-list.esml` `L9-method-schedule/fixed-preset.esml` |
 | §6.4 §6.4（partition / crosslink） ／ §6.4（计算域声明） | 5 | `L5-instance/subsystem.esml` `L7-partition/{domain.esml,partition-chain.esml,partition-crosslink.esml,subsystem-crosslink.esml}` |
 | §6.5 §6.5（条件组件） | 2 | `L5-instance/{instance-condition-undecidable.esml,instance-condition.esml}` |
 | §6.6 §6.6（系统级方程） | 1 | `L4-port/port-roles-io.esml` |
 | §6.7 §6.7（系统初始化过程） | 2 | `L2-discrete/{initialisationprocedure-advance.esml,initialisationprocedures.esml}` |
 | §6.8 §6.8（工程包装容器） | 1 | `T-tasks/tasks.esml` |
-| §6.9 §6.9（计算任务表） ／ §6.9（顶层 `<solutionParameters>` 段） | 39 | `D-skeleton/solutionparameters.esml` `L1-expr-equation/{expr.esml,reference.esml}` `L5-instance/setpoint.esml` `T-tasks/{actuator.esml,benchmarks.esml,check.esml,checks.esml,control-vars.esml,controlled-control-vars.esml,controlled.esml,controller-gains.esml,controller.esml,dataset.esml,design-vars.esml,feature.esml,features.esml,gains.esml,hyperparams.esml,outputlist.esml,reference.esml,sensor.esml,setpoint.esml,solutionparameters.esml,status.esml,target.esml,targets.esml,task-constraint.esml,task-control.esml,task-estimation.esml,task-optimize.esml,task-sensitivity.esml,task-simulate.esml,task-surrogate.esml,task-validation.esml,task-vendor-text.esml,tasks-seven.esml,tasks-auxiliary.esml,test-data.esml,tolerance.esml}` |
+| §6.9 §6.9（计算任务表） ／ §6.9（顶层 `<solutionParameters>` 段） | 46 | `D-skeleton/solutionparameters.esml` `L1-expr-equation/{expr.esml,reference.esml}` `L5-instance/setpoint.esml` `T-tasks/{actuator.esml,benchmarks.esml,check.esml,checks.esml,constraint-expr.esml,control-vars.esml,controlled-control-vars.esml,controlled.esml,controller-gains.esml,controller.esml,dataset.esml,design-vars.esml,feature.esml,features.esml,gains.esml,hyperparams.esml,method-tuning.esml,metric-tolerancepct.esml,mpc-matrices.esml,outputlist.esml,perturb-distribution.esml,reference.esml,sampling.esml,sensor.esml,setpoint.esml,solutionparameters.esml,status.esml,surrogate-model.esml,target.esml,targets.esml,task-constraint.esml,task-control.esml,task-estimation.esml,task-optimize.esml,task-sensitivity.esml,task-simulate.esml,task-surrogate.esml,task-validation.esml,task-vendor-text.esml,tasks-seven.esml,tasks-auxiliary.esml,test-data.esml,tolerance.esml}` |
 | §7 §7（分段表达式） ／ §7（向量归约内建） ／ §7（数组下标与切片） ／ §7（方程类别与语义） ／ §7（算法段） ／ §7（表达式内建） | 13 | `L1-expr-equation/{array-index-probe.esml,array-index.esml,axis-reduce-probe.esml,axis-reduce.esml,builtins-complex.esml,builtins-delay.esml,builtins-expr.esml,builtins-math.esml,equation-basic.esml,ifelse.esml,oob-probe.esml,shape-mismatch-probe.esml}` `T-tasks/algorithm.esml` |
-| §7.1 §7.1（状态机与时钟） | 4 | `L2-discrete/{clock-functions.esml,clock-sample.esml,reset-transition.esml,state-machine.esml}` |
+| §7.1 §7.1（状态机与时钟） | 5 | `L2-discrete/{clock-functions.esml,clock-sample.esml,reset-transition.esml,state-machine.esml,transition-attrs.esml}` |
 | §8 §8（连接语义） | 2 | `L6-connect/{connect-basic.esml,connect-canonical.esml}` |
 | 附录B（续） 附录 B（续）— CASE 多分支 ／ 附录 B（续）— FOR 循环 ／ 附录 B（续）— ORDERED_SET 序集 ／ 附录 B（续）— SELECTOR ／ 附录 B（续）— 模型级 IF | 6 | `L0-type-unit/ordered-set.esml` `L1-expr-equation/for-in.esml` `L2-discrete/case-branch.esml` `L3-model/{if.esml,selector-values.esml}` `L7-partition/orderedsets.esml` |
 | 附录F1 附录 F1（stream 流股） | 2 | `L4-port/{port-stream.esml,stream.esml}` |
@@ -122,20 +122,20 @@
 | 附录F8 附录 F8（vector 归约内建） | 3 | `L1-expr-equation/{array-index.esml,axis-reduce.esml,builtins-expr.esml}` |
 | 附录I 附录 I（用户函数与黑盒） | 3 | `L8-function/{foreign-object.esml,function-expr.esml,locals.esml}` |
 | 附录J 附录 J（单位语义） | 6 | `L0-type-unit/{units-anchoring.esml,units-base-offset.esml,units-base.esml,units-contradiction.esml,units-derived-scale.esml,units-derived.esml}` |
-| 附录K 附录 K（METHOD × Schedule 编排） | 4 | `L9-method-schedule/{call-method-body.esml,reassign.esml,schedule-call.esml,stop.esml}` |
+| 附录K 附录 K（METHOD × Schedule 编排） | 5 | `L9-method-schedule/{call-method-body.esml,continue-until.esml,free.esml,schedule-call.esml,stop.esml}` |
 
 ### 3.1 目录分布
 
 | 目录 | 件数 | 目录 | 件数 |
 |---|---:|---|---:|
-| `D-skeleton/` | 7 | `L6-connect/` | 3 |
+| `D-skeleton/` | 10 | `L6-connect/` | 3 |
 | `L0-type-unit/` | 14 | `L7-partition/` | 5 |
-| `L1-expr-equation/` | 19 | `L8-function/` | 4 |
-| `L2-discrete/` | 12 | `L9-method-schedule/` | 7 |
-| `L3-model/` | 9 | `T-tasks/` | 37 |
-| `L4-port/` | 10 | `X-use/` | 3 |
+| `L1-expr-equation/` | 23 | `L8-function/` | 4 |
+| `L2-discrete/` | 13 | `L9-method-schedule/` | 9 |
+| `L3-model/` | 10 | `T-tasks/` | 45 |
+| `L4-port/` | 12 | `X-use/` | 4 |
 | `L4-portvar/` | 2 | `L5-instance/` | 9 |
-| | | **合计** | **141** |
+| | | **合计** | **163** |
 
 ### 3.2 仍然**没有示例**的条款（留缺口，不补）
 
