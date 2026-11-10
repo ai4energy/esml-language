@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- control 任务的 mpc 矩阵属性（x0 / xref / umin / umax / steps / a / b / c / q / r）。 -->
+<!-- 规范条文：§6.9（计算任务表）。 -->
+<!-- check errors=0。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="T_MpcMatrices">
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
+  <modelTypes><modelType name="DecayModel" discipline="generic">
+    <parameters><parameter name="lambda" type="real" default="0.05"/></parameters>
+    <variables><variable name="N" type="real" role="state" initial="100.0"/></variables>
+    <equations><equation>Der(N) = -lambda * N</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="g" type="DecayModel"/></instances>
+    <schedule><sequence><continueFor time="60"/></sequence></schedule>
+  </system></systems>
+  <computeTasks name="t-task" target="S">
+    <task name="mpc" kind="control">
+      <mpc N="10" dt="1" x0="0.5" xref="1.0" umin="0.0" umax="10.0" steps="50" a="0.95" b="0.1" c="1.0" q="1.0" r="0.1"/>
+      <estimate name="g.lambda" initial="1.0"/>
+    </task>
+  </computeTasks>
+</esml>
