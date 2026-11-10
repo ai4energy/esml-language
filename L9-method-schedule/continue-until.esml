@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `<schedule><sequence>…<continueUntil condition maxTime/>…</sequence></schedule>`：
+     持续积分直到 condition 转真（或到 maxTime 上限）。
+     本文件判据是本仓 XSD（esml-canonical-basic.xsd L1091，`maxTime` required）
+     与 SPEC.md:1513（`maxTime` canonical 拼法，附录 C v1.3.3 kebab 退位裁决）。
+     引擎欠账记录：引擎 parser 目前只认 `max-time`，`maxTime` 触发
+     F7 unknown attribute；已登记 tools/engine-drift.tsv 追，本示例不迁就。
+     规范条文：附录 K（METHOD × Schedule 编排）。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L9_ContinueUntil">
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
+  <modelTypes><modelType name="Ramp" discipline="generic">
+    <variables><variable name="x" type="real" role="state" initial="0.0"/></variables>
+    <equations><equation>Der(x) = 1.0</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="Ramp"/></instances>
+    <schedule><sequence>
+      <continueUntil condition="m.x &lt; 1.0" maxTime="10"/>
+    </sequence></schedule>
+  </system></systems>
+</esml>

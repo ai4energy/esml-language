@@ -4,7 +4,8 @@
 <!-- 语法点 `<portType conservation="balance">`：节点 flow 是一条**共享流**——
      连接器只写等值别名（不是 Σflow=0），衡算与各股方向的正负由组件在自己的
      方程里写（这里 `a.m = x`）。默认 `kcl` 则由连接器写 Σflow=0。
-     同一节点混用 kcl/balance ⇒ 展平期报错。 -->
+     同一节点混用 kcl/balance ⇒ 展平期报错。
+     规范条文：§8（连接语义）／ §5（端口）。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_Conservation">
   <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <portTypes><portType name="P" conservation="balance">
