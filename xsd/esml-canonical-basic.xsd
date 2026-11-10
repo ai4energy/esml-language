@@ -366,9 +366,10 @@
       </xs:choice>
     </xs:sequence>
     <xs:attribute name="name" type="esml:Ident" use="required"/>
-    <!-- `domain` 保留（引擎 XSD 与 SPEC L83 仍存旧拼写讨论；仓外存量 `domain=`
-         不能失去落点）：是否退役留待单轨复核。 -->
-    <xs:attribute name="domain" type="xs:string" use="optional"/>
+    <!-- `domain` 删声明（判据纠正 2026-11-10）：原「保留仓外存量」的理由被实测推翻——
+         引擎对 `portType@domain=` 响亮拒收，不存在合法仓外存量：
+         `F1[]: parser rejected the document: legacy spelling <domain=> … — use <connectorFamily=>`
+         （compatibility expressions are no longer accepted）。 -->
     <xs:attribute name="connectorFamily" type="xs:string" use="optional"/>
     <xs:attribute name="conservation" type="xs:string" use="optional"/>
     <xs:attribute name="description" type="xs:string" use="optional"/>
@@ -379,9 +380,9 @@
     <xs:attribute name="portType" type="xs:string" use="optional"/>
     <xs:attribute name="category" type="xs:string" use="optional"/>
     <xs:attribute name="size" type="xs:string" use="optional"/>
-    <!-- `count` 保留：SPEC 属性集无此项，但引擎 XSD 在 InstRefType 上声明、
-         本类型已有，两边都留（单轨复核再定）。 -->
-    <xs:attribute name="count" type="xs:string" use="optional"/>
+    <!-- `count` 删声明（判据纠正 2026-11-10）：`count` 只属于 `InstRefType`，
+         引擎对 `<port count=>` 实测响亮拒收：
+         `F1[]: parser rejected the document: unknown attribute count on <port>`。 -->
     <xs:attribute name="connectClass" type="xs:string" use="optional"/>
     <xs:attribute name="portSet" type="xs:string" use="optional"/>
     <xs:attribute name="description" type="xs:string" use="optional"/>
@@ -428,7 +429,9 @@
     <xs:attribute name="name" type="esml:Ident" use="required"/>
     <xs:attribute name="type" type="xs:string" use="required"/>
     <xs:attribute name="domain" type="xs:string" use="optional"/>
-    <xs:attribute name="extendsFrom" type="xs:string" use="optional"/>
+    <!-- `extendsFrom` 删声明（判据纠正 2026-11-10）：引擎实测响亮拒收——
+         `F7[]: unknown attribute extendsFrom on <instance>`；引擎自己用 kebab
+         `extends-from` 但 parser 连 kebab 也 F7 拒，属引擎债，本仓两拼法都不声明。 -->
     <!-- 所属 partition id（缺省/未分区 = 0）。 -->
     <xs:attribute name="partition" type="xs:unsignedInt" use="optional"/>
     <!-- 条件组件（语言规范 §6.5）：构建期可判的布尔
