@@ -96,6 +96,7 @@
 | 方法 | `<methods><onLoad><set path= value=/>*</onLoad><method name><run name=/>[<set path= value=/>]*</method></methods>` | on_load/RUN（附录 F5/F7b） |
 | 自由度 | `<fixed>/<free>` 系统级块 | 钉代数变量 / 参数升未知（附录 F6/F7） |
 | 调度 | `<schedule><sequence><continueFor time=.../>[<call method=.../>]*</sequence></schedule>` | （附录 K）；多段连续求解 |
+| 图形标注 | `<annotation>`（`<icon>`/`<placement>`/`<port>`） | 纯 UI 元数据（§4.2） |
 
 **收紧规则（canonical 唯一，不向后兼容旧写法）**：
 解析器对旧词法直接报错（解析器）：
@@ -119,10 +120,10 @@
 > **机验基准是 XSD**（`xsd/esml-v1.xsd` + `xsd/esml-canonical-*.xsd`）：规范与本表若与
 > XSD 不一致，以 **XSD 为准**。附录 D 仅说明旧版文档的边界，不构成本线词法。
 >
-> **一处有意的例外**：端口变量的**角色元素形态**（`<flow>` / `<potential>` / `<stream>` /
-> `<constant>` / `<discrete>` / `<var>` / `<variable>`）与 `<portVariable role=…>` 并存，
-> **元素名即角色声明**（§5 有专例）。这是「名字给角色」与「属性给角色」两种写法并存，
-> 不是同一语义的同义改名（`<connection>`/`<connect>` 那种），故不在本节收紧之列。
+> **端口变量一律属性形，且角色按轴分开给**：物性 `portRole=`（`potential|flow|stream`）、
+> 信号 `causality=`（`input|output`）、流股载量 `carrier=`（§5）。元素形
+> （`<flow>` / `<potential>` / `<stream>` / `<constant>` / `<discrete>` / `<var>` /
+> `<variable>`）**不接受**，解析期报错。
 > 其余一切：同一语义只留一个名字。
 
 **文件扩展名**：官方扩展名 = **`.esml`** ——
@@ -155,8 +156,14 @@
 - `role=state` 的变量参与微分 `Der(...)`；`role=flow` 的变量在连接里守恒
   （隐式连接器电学 `PortType.vars`）。`role=stream` 是元数据（不守恒），由
   Mixer 等单元做组分加权（详附录 F1）。
-- `portVariable` 的**因果角色用 `role`**：`role=potential`（势，连接相等）/ `role=flow`
-  （流，节点守恒）/ `role=stream`（流股，不守恒）/ `role=input|output`（信号因果）。
+- `portVariable` 的角色按**三个正交轴**分开给（详 §5）：
+
+  | 轴 | 属性 | 值域 | 管什么 |
+  |---|---|---|---|
+  | 物性 | `portRole=` | `potential` / `flow` / `stream` | 节点等势 / 节点守恒 / 流量加权 |
+  | 信号 | `causality=` | `input` / `output` | 不进节点方程，只做 `dst := src` 配对 |
+  | 载量 | `carrier=` | 变量名 | 仅 `portRole="stream"` 时有意义，选加权流 |
+
   `var=` 不是合法写法，出现即报错。
 - 差值/仿射换算等按类型定义推进（quantity/delta 属后续类型扩展项）；
   单位/量纲语义由 `VariableType.unit/quantity` 标注，**数值层用裸数**
@@ -306,6 +313,24 @@ ESML 原生作者优先**组合（§4.1）/参数覆盖**；`<extendsFrom>` 主�
   用壳自身端口显式接线建模。撕裂/去冗余/降阶不在此（中间表示之后）。
 - 示例：复合组件 `Chain`（壳端口 L/R + 成员 a/b 串联），信号从 Src(5) 经 Chain 传到 Snk。
 
+### 4.2 图形标注 `<annotation>`
+
+`<annotation>` 是**纯 UI 元数据**：求解器不读，不得影响任何数值结果。它携带的图标、
+布局与端口标注只供前端渲染，引擎 `check` 通过但 `solve` 完全忽略。
+
+三处宿主（已核对 XSD）：`<modelType>`（basic.xsd:531）、`<system>`（:667）、
+文档根 `<esml>`（:804）。
+
+| 元素 | 类型 | 属性 | 必填 |
+|---|---|---|---|
+| `<icon>` | `IconType` | `src` `w` `h` | `src` 必填；`w`/`h` 可省 |
+| `<placement>` | `PlacementType` | `x` `y` `w` `h` `rot` | 全可省 |
+| `<port>` | `PortMarkType` | `name` `side` `offset` | `name`/`side` 必填；`offset` 可省 |
+
+三者均可 0..unbounded，可并列多份。
+
+示例：`L3-model/annotation.esml`。
+
 ## 5. 端口（portType / port）
 
 - **PortType = 类型**：声明一组端口变量（可带 role potential/flow/stream/input/output，也可为
@@ -318,8 +343,8 @@ ESML 原生作者优先**组合（§4.1）/参数覆盖**；`<extendsFrom>` 主�
 <portTypes name="electrical-portTypes">
   <portType name="ElecPin" connectorFamily="electrical">
     <variables>
-      <portVariable name="v" role="potential" type="voltage"/>
-      <portVariable name="i" role="flow"      type="current"/>
+      <portVariable name="v" portRole="potential" type="voltage"/>
+      <portVariable name="i" portRole="flow"      type="current"/>
     </variables>
   </portType>
 </portTypes>
@@ -375,16 +400,11 @@ ESML 原生作者优先**组合（§4.1）/参数覆盖**；`<extendsFrom>` 主�
 **展开**：声明期展开为逐元素端口变量，索引写作 `port.pvar[i]`；
 `<connection>` 对数组端口逐元素建相等约束，流程层无需手工绑定。
 
-**`<constant>` 元素形态**：`PortVariableType` 接受 `<constant>` 作为
-portVariable 子元素，语义等价于 `<portVariable role="parameter">`（`constant` 这个
-角色词归一到 `parameter`，见 §5 的角色词表）。两种写法一致：
-```xml
-<portVariable name="g" role="parameter" type="real" default="9.81"/>
-<constant name="g" type="real" default="9.81"/>
-```
+**参数**：走 `<parameters><parameter …/></parameters>` 容器，不靠端口变量角色。
+`portRole="parameter"` 不是合法值，引擎响亮拒收。
 
 **端口壳 / 外部 I/O（信号）建模约定**：需要把"外部输入"接进组件/单机时，用**信号口**
-（`role="input|output"`，附录 F2/F10）而不是外部改参数：
+（`causality="input|output"`，附录 F2/F10）而不是外部改参数：
 - 被控/单机暴露 **command 口（input）**收操纵量、**measurement 口（output）**回读可观测量；
   驱动/源/控制器作为独立组件经 `connect`（output→input）接上——操纵量由此从"参数"变成
   **input 口代数变量**（由连接相等定值），不再靠 `<set>`/外部写参数驱动。
@@ -1107,7 +1127,7 @@ compiler expansion / extern / analytic·fd·opaque。
 ```
 esml   := <esml> variableTypes? portTypes? modelTypes? systems? </esml>
 portType := <portType name domain> portVariable+ </portType>
-portVariable := <portVariable name role=potential|flow type/>
+portVariable := <portVariable name portRole=potential|flow|stream causality=input|output carrier? type/>
 modelType := <modelType name domain> ports? parameters? variables?
               equations? members? connections? </modelType>
 member := <members><instance name type/></members>
@@ -1147,10 +1167,8 @@ scope := <scope instance=name><set path value/></scope>
      `lowerBound`/`upperBound`、§6.7 的 `<moveTo>`/`<jumpTo>`/
      `<initialisationProcedure>`、§6.8 的 `<task>` 与 `<systemRef name src>`、
      附录 K 的 `maxTime`、附录 B（续）的 `portSet`、附录 L.1 的术语表）。
-     另补一条**有意的例外**：端口变量的角色元素形态（`<flow>`/`<potential>`/
-     `<stream>`/`<constant>`/`<discrete>`/`<var>`/`<variable>`）与
-     `<portVariable role=…>` 并存，属「名字给角色」与「属性给角色」两种写法，
-     不是同义改名。
+     端口变量统一 `<portVariable>` 属性形；元素形（`<flow>` 等）已随单轨裁决删除。
+     角色按轴给：物性 `portRole=`、信号 `causality=`、载量 `carrier=`。
      本轮再补（残余对账）：§13 补**文档根清单**（12 个 = canonical 层全局元素集，
      入口层根清单同集）与 `esml-canonical-project.xsd` 一行（此前表里缺这一行，
      而 `<project>` 正是它声明的根），并点名 `<schedule>` / `<solutionParameters>` /
@@ -1167,6 +1185,14 @@ scope := <scope instance=name><set path value/></scope>
      规则抽取），by-design 登记落在 `tools/spec-xsd-bydesign.tsv`；自证为
      **5 好 4 坏 + 1 反向自检 + 4 例真实树变异测试**（删根 / 多根 / 规范凭空加根 /
      canonical 加全局元素而入口层没收，每例都必须真变红）。
+- **v1.3.4（本批）**：
+  - 端口变量角色按轴拆开：物性 `portRole=`、信号 `causality=`、载量 `carrier=`；
+    元素形（`<flow>` / `<potential>` / `<stream>` / `<constant>` / `<discrete>` /
+    `<var>` / `<variable>`）删除，解析期报错（与已合并的 XSD 改动对得上：
+    `crates`/`xsd` 侧元素形声明已删）。
+  - 新立 §4.2 图形标注 `<annotation>`：纯 UI 元数据，求解器不读，不得影响任何数值结果。
+  - 新增漂移台账：语言仓 XSD 与引擎 parser 的分歧不再两边各改一半，统一登进
+    `tools/engine-drift.tsv`（另一单在建）。
 - v0.6.7：任务层口径定为「七类问题类 + 三个辅助任务」；`TaskKindType` 放行 forecast/data/decision，辅助任务不引入新的求解角色（见 §6.9 与附录 M）。
 - v0.6.4：§6.6 系统（flowsheet）级 `<equations>` canonical 定义（引用实例量 `inst.var`，折为扁平名 `inst__var`）；basic XSD `SystemType` 加 `<equations>`。
 - v0.6.3：§6.5 条件组件（实例级 `condition`）canonical 定义；basic XSD 补 `condition` 属性，并补 `kind`/`values`、partition/crosslink/partitions。
@@ -1220,7 +1246,7 @@ canonical 语法对旧词法直接报错（§2）。
   自定义类别(如 node/connector)预留、连接规则后置。不再使用 dir/direction/in-out。
   变量级 `input/output` 保留给信号 causal role（不得当端口方向词用）。
 - PORTSET（参数沿流股传播）：`<port … portSet="flow">`（同模型同 portSet 参数等值）。
-- `<portType>` 变量：`role="potential|flow|stream|input|output|parameter"` 或省略。
+- `<portType>` 变量：物性 `portRole="potential|flow|stream"`、信号 `causality="input|output"`，或省略。
   省略 = 显式域变量束（thermal/water/gas/process），连接=逐位置相等，无守恒 role。
 - Connection-Type 参数：`<portType><parameters><parameter …/></parameters>` → 组件自动带
   `<leaf>__<p>`；构建期按连接/portSet 值统一 + 冲突检测。
@@ -1282,8 +1308,8 @@ CASE/多区/滞回：配 SELECTOR + `<events><when>`(STN)，方程用 `ifelse(se
 ### 附录 F1 — stream 流股组成（组分加权混合）
 - 流股语义：连接处变量**逐相等**（1:1 链），多股汇合的组分加权在单元（Mixer）内完成，
   而非连接层加权。隐式域才需要连接级加权；ESML 显式域采用同一约定。
-- 组分变量可用 `role="stream"`（可选 `flow-reference="Q"` 标出载量参考）作元数据；它在
-  PortType bundle 中是普通变量，**不要**标 `role="flow"` 等 role —— role 只留给隐式连接器（electric 等），
+- 组分变量可用 `portRole="stream"`（可选 `carrier="Q"` 标出载量参考）作元数据；它在
+  PortType bundle 中是普通变量，**不要**标 `portRole="flow"` 等 —— `portRole` 只留给隐式连接器（electric 等），
   否则实现会对该变量走隐式 wire KCL（求和=0）叠加在显式相等上，造成符号翻转/过定。
 - 连接端点=同型 PortType 的真实实例端口 → 逐 pvar 相等（从 HydraulicPort 泛化到任意
   PortType：`f.port.pvar == t.port.pvar`，两端同型否则报错）。守恒/加权在单元内。

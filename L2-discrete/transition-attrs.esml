@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 <transition> 的 priority 与 immediate 属性：priority 控制多迁移竞争时的优先级，
+     immediate=true 表示迁移在当前时刻立即生效（不等下个采样点）。
+     本例 A→B 带 priority=2 immediate=true。
+     规范条文：§7.1（状态机与时钟）。
+     引擎债：synchronize 属性由引擎 IE8 SynchronizeUnsupported 响亮拒收，本例不写。
+     check errors=0。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L2_TransitionAttrs">
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
+  <modelTypes><modelType name="Fsm">
+    <variables>
+      <variable name="a" type="real" role="algebraic" initial="0.0"/>
+      <variable name="b" type="real" role="algebraic" initial="0.0"/>
+    </variables>
+    <equations>
+      <equation>a = activeState(A)</equation>
+      <equation>b = activeState(B)</equation>
+    </equations>
+    <stateMachine name="fsm">
+      <state name="A" initialState="true"/>
+      <state name="B"/>
+      <transition from="A" to="B" condition="time &gt; 1" priority="2" immediate="true"/>
+      <transition from="B" to="A" condition="time &gt; 2"/>
+    </stateMachine>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="Fsm"/></instances>
+    <schedule><sequence><continueFor time="3"/></sequence></schedule>
+  </system></systems>
+</esml>

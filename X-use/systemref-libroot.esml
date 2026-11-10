@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 <systemRef> 的 libroot 属性：库根路径，只存不解析，是清单元数据，不参与求解。
+     本例 libroot=/nonexistent-root 也 check 通过，正说明引擎不解析该值。
+     规范条文：§6.8（工程包装容器）。
+     check errors=0。 -->
+<project name="X_SysRefLibroot" version="1.0" xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1">
+  <systems>
+    <systemRef name="port_flow" src="../L4-port/flow.esml" libroot="/nonexistent-root"/>
+  </systems>
+  <computeTasks>
+    <task name="t1" kind="simulate" target="port_flow">
+      <tspan from="0" to="1"/>
+    </task>
+  </computeTasks>
+</project>
