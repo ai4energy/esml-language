@@ -245,7 +245,7 @@
          <icon src="..." w="..." h="..."/>          类型级；仓内相对路径或 data:image/svg+xml;base64,...
          <placement x y w h rot/>                   实例级；rot 默认 0
          <port name side offset/>                   端口落点；side=top|bottom|left|right|center
-       ★ 方向不新增字段 ✗ —— 由 <portVariable role="potential|flow"> 推导
+       ★ 方向不新增字段 ✗ —— 由 <portVariable portRole="potential|flow"> 推导
        ★ dims 属于真语义 ⇒ 不在 L-ANNOT 本期（开另一只活） -->
   <xs:complexType name="IconType">
     <xs:attribute name="src" type="xs:string" use="required"/>
