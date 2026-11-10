@@ -238,6 +238,8 @@
     <xs:attribute name="horizon" type="xs:string" use="optional"/>
     <xs:attribute name="sampleTime" type="xs:string" use="optional"/>
     <xs:attribute name="controlHorizon" type="xs:string" use="optional"/>
+    <xs:attribute name="antiWindup" type="xs:string" use="optional"/>
+    <xs:attribute name="bumpless" type="xs:string" use="optional"/>
     <xs:anyAttribute processContents="lax"/>
   </xs:complexType>
 

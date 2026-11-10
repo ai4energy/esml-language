@@ -96,6 +96,10 @@
       </xs:sequence>
       <xs:attribute name="name" type="xs:string" use="optional"/>
       <xs:attribute name="description" type="xs:string" use="optional"/>
+      <!-- `schema` 版本判别属性：与 `<esml>` 根同形态（`<esml>` 根早已声明），
+           引擎 esml check 接受 project@schema；此前靠 anyAttribute 放行，现补声明。 -->
+      <xs:attribute name="schema" type="xs:string" use="optional"/>
+      <xs:attribute name="version" type="xs:string" use="optional"/>
       <xs:anyAttribute processContents="lax"/>
     </xs:complexType>
   </xs:element>
