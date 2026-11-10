@@ -50,9 +50,11 @@ _KIND_REAL = {"attr": "attr", "child": "child", "root": "root"}
 
 
 def norm(s):
-    """台账 / 实测 item 的归一键：台账以**任一侧拼写**记分歧（如引擎侧
-    `a-part` 对语言侧 `aPart`），比对时按小写去连字符折叠，避免同一逻辑
-    属性因驼峰/连字符差异被漏配。"""
+    """**仅用于把台账行配到实测分歧**的折叠键：台账以**任一侧拼写**记分歧
+    （如引擎侧 `a-part` 对语言侧 `aPart`），按小写去连字符折叠后两者配到同一条。
+    ⚠ 折叠**绝不**用于判分歧是否存在——`aPart` 与 `a-part` 都折成 `apart`，
+    拿折叠集判存在性会把 kebab/camel 分歧本身吞掉而误判「已消解」
+    （存在性判定见 `diff_sides` 的已消解循环：用**原样成员**）。"""
     return s.lower().replace("-", "").replace("_", "")
 
 
@@ -245,7 +247,8 @@ def diff_sides(lang, eng, norm_index, report):
             if rec is None:
                 undetected.append(("%s 分歧 %s：%s 侧%s，台账无记录"
                                    % (kind, host, item, side)))
-            # 台账有记录 ⇔ 已裁决（拼写按 norm() 折叠后命中）
+            # 台账有记录 ⇔ 已裁决（item 拼写按 norm() 折叠后配到台账行；
+            # 存在性本身仍按上方**原样**成员判，见已消解循环）
 
     # ①② 宿主（命名 complexType + 全局元素）：属性集 / 子元素集
     for host in sorted(set(l_hosts) | set(e_hosts)):
@@ -261,10 +264,13 @@ def diff_sides(lang, eng, norm_index, report):
     check("root", "—", l_roots, e_roots, ("lang", "engine"))
 
     # 台账里「已消解」记录：实测已无此分歧。
-    # 分歧「仍在」⇔ item 恰在一侧出现（in_l != in_e）。否则（两侧都有 / 都没有 /
-    # 宿主表里根本没有该 item）⇒ 已消解。item 用 norm() 折叠后在实测集里查。
+    # 判据（**原样成员**，绝不 norm 折叠）：分歧「仍在」⇔ 实测集里存在某个
+    # **原样** item x，满足 norm(x)==nitem 且 (x in lang) != (x in eng)。
+    # 不能拿 norm() 折叠后的集合判存在性——那样 aPart 与 a-part 都折成 apart、
+    # 两侧「都含」apart，kebab/camel 这一分歧本身会被吞掉而恒判「已消解」
+    # （正是本次反证出的假阳性）。折叠只用于把**台账行**配到实测分歧。
     for (kind, host, nitem), rec in sorted(norm_index.items()):
-        item = nitem  # 归一键，仅用于在实测集里 norm 折叠后匹配
+        item = nitem  # 归一键，仅用于打印；存在性判定用原样成员
         tkind = _KIND_REAL.get(kind)
         if tkind is None:
             die_self("台账 kind 非法：%r（应为 %s）"
@@ -275,10 +281,9 @@ def diff_sides(lang, eng, norm_index, report):
         else:
             lset, eset = tables[tkind].get(host, ([], []))
             host_eff = host
-        # 实测集按 norm() 折叠后查：台账 item（归一键）是否恰在一侧。
-        l_norm = {norm(x) for x in lset}
-        e_norm = {norm(x) for x in eset}
-        if (nitem in l_norm) != (nitem in e_norm):
+        live = any(norm(x) == nitem and (x in lset) != (x in eset)
+                   for x in set(lset) | set(eset))
+        if live:
             continue  # 分歧实测仍在 ⇒ 已裁决（上方 check 已确认有记录）
         resolved.append((tkind, host_eff, item, rec))
     return undetected, resolved, tables
@@ -348,7 +353,36 @@ def self_test():
             (l_hosts, l_anons, l_roots), (e_hosts2, e_anons, e_roots), tsv_good, None)
         if not any("T" in u and "z" in u for u in und2):
             die_selftest("坏树未红：未登记分歧未被检出（%s）" % und2)
-    print("[self-test] 好树 0 红 / 坏树（未登记分歧）必红 / 已消解记录不红：PASS")
+        # —— 假阳性护栏：台账记 `a-part`，两侧分别是 `aPart` / `a-part`
+        #    （norm 折叠后都是 `apart`）。分歧**实测仍在**，闸门必须判
+        #    「分歧仍在」（台账记录匹配上、不报已消解），**不**判未裁决红。
+        #    若已消解循环误用 norm 折叠判存在性，会把此分歧吞成「已消解」
+        #    而漏红 —— 正是本次反证出的缺陷，故自证必须覆盖。
+        write_schema(eng,
+                     '<xs:complexType name="T"><xs:attribute name="a-part" type="xs:string"/>'
+                     '<xs:sequence><xs:element name="c" type="xs:string"/></xs:sequence>'
+                     '</xs:complexType>')  # 引擎侧 T 含 a-part
+        write_schema(lang,
+                     '<xs:complexType name="T"><xs:attribute name="aPart" type="xs:string"/>'
+                     '<xs:sequence><xs:element name="c" type="xs:string"/></xs:sequence>'
+                     '</xs:complexType>')  # 语言侧 T 含 aPart
+        e_hosts3, e_anons3, e_roots3 = load_side(eng)
+        l_hosts3, l_anons3, l_roots3 = load_side(lang)
+        tsv_a = {("attr", "T", "a-part"): ("lang-wins", "自证", "2026-01-01")}
+        norm_a = {("attr", "T", "apart"): tsv_a[("attr", "T", "a-part")]}
+        und3, res3, _ = diff_sides(
+            (l_hosts3, l_anons3, l_roots3),
+            (e_hosts3, e_anons3, e_roots3), norm_a, None)
+        # aPart / a-part 两侧各一个、norm 后同键 apart ⇒ 台账记录 a-part 匹配上：
+        # 分歧「已裁决」（不红）。旧实现里 a-part 侧不叫 aPart ⇒ 未裁决红（假漏红
+        # 的反面：把已裁决的活分歧报成未裁决）——断言必须 0 未裁决。
+        if und3:
+            die_selftest("kebab/camel 活分歧未匹配到台账记录（%s）" % und3)
+        # 同时绝不能把它报成「已消解」——分歧实测仍在，折叠不得吞掉它。
+        if any(r[2] == "apart" for r in res3):
+            die_selftest("norm 折叠假阳性：aPart/a-part 活分歧被误判为已消解（%s）" % res3)
+    print("[self-test] 好树 0 红 / 坏树（未登记分歧）必红 / 已消解记录不红 / "
+          "norm 折叠不吞 kebab-camel 分歧：PASS")
 
 
 def main():

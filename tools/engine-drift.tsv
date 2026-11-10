@@ -21,10 +21,6 @@ attr	ConnectType	b-part	lang-wins	aliases.tsv:88	2026-11-10
 attr	ConnectType	interface	lang-wins	aliases.tsv:96	2026-11-10
 attr	ConnectType	portType	engine-wins	引擎侧已单轨	2026-11-10
 attr	DecisionRefType	rate	engine-wins	引擎侧新增，语言仓待评	2026-11-10
-attr	TaskType	mode	engine-wins	8e16c782 mpc-constraints M1	2026-11-10
-attr	TaskType	rho	engine-wins	同上	2026-11-10
-attr	TaskType	wOver	engine-wins	同上	2026-11-10
-attr	TaskType	wUnder	engine-wins	同上	2026-11-10
 attr	VendorControllerType	antiWindup	lang-wins	W1 补入	2026-11-10
 attr	VendorControllerType	bumpless	lang-wins	W1 补入	2026-11-10
 attr	VendorControllerType	derivativeOn	engine-wins	引擎侧新增，语言仓待评	2026-11-10
