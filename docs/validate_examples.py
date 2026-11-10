@@ -21,19 +21,31 @@
 用法：
     python3 docs/validate_examples.py            # 全量
     python3 docs/validate_examples.py --quiet    # 只出汇总行
+    python3 docs/validate_examples.py --strict   # 追加第 6 道：撤通配判别力闸
+
+`--strict`（第 6 道）：把 `xsd/*.xsd` 读进内存，删掉所有 `anyAttribute` 与
+`xs:any` 节点，再落**临时目录**让 xmlschema 从文件重新加载（纯内存树无法解析
+跨文件 include，故必须经文件重建；临时目录在 /tmp，不往仓里落第二份 XSD）。
+用这套「无通配」schema 重校全部示例，打印：
+  ①「靠通配符才通过」的件数与清单（普通 schema 过、无通配 schema 不过）；
+  ②「撤通配后非负例失败件数」一个数，与 `docs/audit/strict-baseline.txt` 的
+  基线比较：低于基线只打印改进；高于基线退出码 1；基线文件缺失则只打印。
+`--strict` 只**追加**这道检查：五道既有检查的判定、输出、退出码逐字不变。
 
 依赖：xmlschema（README「校验与运行」一节已写明这是本仓的校验器）。
 """
 import argparse
 import re
 import sys
+import tempfile
 from collections import Counter, defaultdict
 from pathlib import Path
 
 try:
     import xmlschema
+    from lxml import etree as _etree
 except ImportError:  # pragma: no cover
-    sys.exit("需要 xmlschema：pip install xmlschema")
+    sys.exit("需要 xmlschema（含 lxml）：pip install xmlschema")
 
 REPO = Path(__file__).resolve().parent.parent
 XSD = REPO / "xsd"
@@ -243,9 +255,80 @@ def check_spec_blocks(quiet):
     return not bad
 
 
+XS = "{http://www.w3.org/2001/XMLSchema}"
+STRICT_BASELINE = REPO / "docs" / "audit" / "strict-baseline.txt"
+
+
+def strict_schema():
+    """撤掉全部 anyAttribute / xs:any 的 canonical schema（临时目录重建，仓内不落盘）。"""
+    with tempfile.TemporaryDirectory(prefix="esml-strict-xsd-") as td:
+        dst = Path(td)
+        for f in sorted(XSD.glob("*.xsd")):
+            root = _etree.parse(str(f)).getroot()
+            for tag in (XS + "anyAttribute", XS + "any"):
+                for el in list(root.iter(tag)):
+                    el.getparent().remove(el)
+            root.getroottree().write(str(dst / f.name),
+                                     xml_declaration=True, encoding="utf-8")
+        return {f.name: xmlschema.XMLSchema(str(f))
+                for f in sorted(dst.glob("*.xsd"))}
+
+
+def check_strict(quiet):
+    """第 6 道：无通配 schema 重校，量出「靠通配符才通过」的判别力缺口。"""
+    sch = strict_schema()
+    files = examples()
+    wildcard_only, strict_flip = [], []
+    for p in files:
+        rel = p.relative_to(REPO).as_posix()
+        text = p.read_text(encoding="utf-8")
+        xsd = ROUTE.get(root_of(text), "esml-v1.xsd")
+        # ①「靠通配符才通过」：普通 schema 过、无通配 schema 不过（负例也在内，
+        #   它们「过」本身就是靠通配放行的证据，判别力审计需要看到）。
+        try:
+            schema(xsd).validate(text)
+        except Exception:
+            plain_pass = False
+        else:
+            plain_pass = True
+        try:
+            sch[xsd].validate(text)
+        except Exception:
+            strict_pass = False
+        else:
+            strict_pass = True
+        if plain_pass and not strict_pass:
+            wildcard_only.append(rel)
+        # ② 撤通配后非负例失败件数：与基线比口径——非负例且无通配 schema 不过。
+        #   （普通 schema 就不过的件同样计入，它们是仓内既有欠账，不属本闸回归。）
+        if not is_negative(p, text) and not strict_pass:
+            strict_flip.append(rel)
+    print("== 6. 撤通配判别力（--strict） ==")
+    print("   靠通配符才通过（普通 PASS、撤 anyAttribute+xs:any 后 FAIL）：%d 件"
+          % len(wildcard_only))
+    for rel in wildcard_only:
+        print("     %-46s" % rel)
+    print("   撤通配后非负例失败件数：%d" % len(strict_flip))
+    if STRICT_BASELINE.exists():
+        base = int(re.search(r"\d+", STRICT_BASELINE.read_text(encoding="utf-8")).group())
+        if len(strict_flip) > base:
+            print("   [闸红] 高于基线 %d（新增的撤通配回归，需逐件裁决）" % base)
+            return False
+        if len(strict_flip) < base:
+            print("   [改进] 低于基线 %d" % base)
+        else:
+            print("   与基线 %d 持平" % base)
+    else:
+        print("   （未找到基线文件 %s，只打印不比较）"
+              % STRICT_BASELINE.relative_to(REPO))
+    return True
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--quiet", action="store_true", help="只出汇总行")
+    ap.add_argument("--strict", action="store_true",
+                    help="追加第 6 道：撤通配判别力闸（只加校验，不改既有判定）")
     args = ap.parse_args()
     ok = True
     ok &= check_xsd(args.quiet)
@@ -253,11 +336,14 @@ def main():
     ok &= check_cited(args.quiet)
     ok &= check_rare(args.quiet)
     ok &= check_spec_blocks(args.quiet)
+    strict_ok = True
+    if args.strict:
+        strict_ok = check_strict(args.quiet)
     print()
     print("verdict: %s" % ("OK" if ok else "有非负例的 XSD 失败 / 有悬空路径 / "
                                          "有示例未指名章节 / 有无 SPEC 依据的示例 / "
                                          "自足示例段校验失败"))
-    return 0 if ok else 1
+    return 0 if ok and strict_ok else 1
 
 
 if __name__ == "__main__":

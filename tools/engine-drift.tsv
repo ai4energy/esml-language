@@ -1,0 +1,55 @@
+kind	host	item	direction	依据	裁决日
+attr	PortVariableType	role	engine-wins	SPEC-L363 role= 不接受	2026-11-10
+attr	PortVariableType	portRole	lang-wins	W1 补入	2026-11-10
+attr	PortVariableType	causality	lang-wins	W1 补入	2026-11-10
+attr	PortVariableType	carrier	lang-wins	W1 补入	2026-11-10
+attr	PortTypeDef	domain	lang-wins	SPEC-L83 domain= 旧拼写	2026-11-10
+attr	PortTypeDef	connectorFamily	lang-wins	W1 补入	2026-11-10
+attr	PortTypeDef	conservation	lang-wins	W1 补入	2026-11-10
+attr	PortTypeDef	description	lang-wins	W1 补入	2026-11-10
+attr	PortInstanceType	count	lang-wins	SPEC-L84 属性集无 count	2026-11-10
+attr	PortInstanceType	connectClass	lang-wins	W1 补入	2026-11-10
+attr	PortInstanceType	portSet	lang-wins	SPEC-L1222	2026-11-10
+attr	PortInstanceType	description	lang-wins	W1 补入	2026-11-10
+attr	InstRefType	count	engine-wins	引擎把 count 放实例引用上	2026-11-10
+attr	InstRefType	extends-from	lang-wins	aliases.tsv:94 camelCase	2026-11-10
+attr	ModelType	desc	lang-wins	aliases.tsv:91 desc 是 legacy 缩写	2026-11-10
+attr	SystemType	desc	lang-wins	aliases.tsv:91	2026-11-10
+attr	ScheduleContinueUntilType	max-time	lang-wins	SPEC-L1512 maxTime	2026-11-10
+attr	ConnectType	a-part	lang-wins	aliases.tsv:87	2026-11-10
+attr	ConnectType	b-part	lang-wins	aliases.tsv:88	2026-11-10
+attr	ConnectType	interface	lang-wins	aliases.tsv:96	2026-11-10
+attr	ConnectType	portType	engine-wins	引擎侧已单轨	2026-11-10
+attr	DecisionRefType	rate	engine-wins	引擎侧新增，语言仓待评	2026-11-10
+attr	VendorControllerType	antiWindup	lang-wins	W1 补入	2026-11-10
+attr	VendorControllerType	bumpless	lang-wins	W1 补入	2026-11-10
+attr	VendorControllerType	derivativeOn	engine-wins	引擎侧新增，语言仓待评	2026-11-10
+attr	VendorControllerType	setpointWeight	engine-wins	同上	2026-11-10
+attr	VendorControllerType	tauD	engine-wins	同上	2026-11-10
+attr	VendorControllerType	trackingTime	engine-wins	同上	2026-11-10
+root	—	domain	lang-wins	SPEC-L1001 不是文档根	2026-11-10
+root	—	schedule	lang-wins	SPEC-L1001	2026-11-10
+root	—	solutionParameters	lang-wins	SPEC-L1001	2026-11-10
+root	—	variables	lang-wins	SPEC-L1001	2026-11-10
+child	InitialStateType	var	engine-wins	estimation 初值块，SPEC 未点名；引擎侧新增，语言仓待评	2026-11-10
+child	ModelType	extends	engine-wins	SPEC-L1133 附录 C 已删 <extends>（留 <extendsFrom>）；引擎侧残留旧拼写，lang-wins 语义已裁定	2026-11-10
+child	PortTypeDef	variable	lang-wins	legacy 同义元素；canonical 仅 <portVariable>（W1 三条轴 portRole=/causality=/carrier=）	2026-11-10
+child	PortTypeDef	var	lang-wins	legacy 同义元素；canonical 仅 <portVariable>	2026-11-10
+child	PortTypeDef	flow	lang-wins	legacy 同义元素；canonical 仅 <portVariable>（effort 并入 potential，§16）	2026-11-10
+child	PortTypeDef	potential	lang-wins	legacy 同义元素；canonical 仅 <portVariable>	2026-11-10
+child	PortTypeDef	stream	lang-wins	legacy 同义元素；canonical 仅 <portVariable>	2026-11-10
+child	PortTypeDef	constant	lang-wins	legacy 同义元素；canonical 仅 <portVariable>	2026-11-10
+child	PortTypeDef	discrete	lang-wins	legacy 同义元素；canonical 仅 <portVariable>	2026-11-10
+child	TaskType	initialState	engine-wins	estimation 初值，引擎侧新增；SPEC 仅 <state initialState/>，待评	2026-11-10
+attr	project	version	engine-wins	SPEC-L648 <project name version/> 引擎已对齐	2026-11-10
+attr	anon@esml-canonical-compute.xsd:14	lowerBound	engine-wins	<controlled> 扩展属性（SPEC-L1147），引擎已加，语言仓待补	2026-11-10
+attr	anon@esml-canonical-compute.xsd:14	upperBound	engine-wins	<controlled> 扩展属性（SPEC-L1147），引擎已加，语言仓待补	2026-11-10
+attr	anon@esml-canonical-compute.xsd:7	mode	engine-wins	mpc 8e16c782 M1 约束参数（匿名 mpc 宿主）	2026-11-10
+attr	anon@esml-canonical-compute.xsd:7	rho	engine-wins	mpc 8e16c782 M1 约束参数（匿名 mpc 宿主）	2026-11-10
+attr	anon@esml-canonical-compute.xsd:7	wOver	engine-wins	mpc 8e16c782 M1 约束参数（匿名 mpc 宿主）	2026-11-10
+attr	anon@esml-canonical-compute.xsd:7	wUnder	engine-wins	mpc 8e16c782 M1 约束参数（匿名 mpc 宿主）	2026-11-10
+attr	anon@esml-canonical-project.xsd:1	version	engine-wins	SPEC-L648 <project name version/> 引擎已对齐	2026-11-10
+attr	anon@esml-v1.xsd:13	name	engine-wins	引擎 orderedSet 内联匿名多记 name（lang 全局 orderedSet 已带）；同义，engine 残留	2026-11-10
+attr	anon@esml-v1.xsd:13	static	engine-wins	引擎 orderedSet 内联匿名多记 static；SPEC-L93 <orderedSet name static=> 两侧语义同，engine 残留	2026-11-10
+attr	anon@esml-v1.xsd:7	name	lang-wins	lang 入口层 orderedSet 内联匿名多记 name；engine 侧漏记，lang-wins	2026-11-10
+attr	anon@esml-v1.xsd:7	static	lang-wins	lang 入口层 orderedSet 内联匿名多记 static；SPEC-L93 两侧语义同，lang-wins	2026-11-10
