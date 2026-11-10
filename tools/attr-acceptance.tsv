@@ -1,0 +1,56 @@
+# 属性验收台账 —— XSD 声明但本仓示例零使用的属性 + 三件「引擎收不收没把握」。
+# 生成 2026-11-10（W5）。verdict 由 W5 注入实验实测：把属性注进一份基线 errors=0
+#   的示例 → 写源件同目录临时件（保 systemRef 相对路径）→ esml check → 删临时件。
+#   单次引擎调用 3.6 ms，判定当场可复算（check-attr-acceptance.py --engine-check）。
+# 列：kind  name(complexType)  attr  host(宿主元素)  verdict  owner  evidence(一行可复核)
+# verdict 值域：accepted / rejected-f7 / rejected-legacy / rejected-ie / no-example
+#   accepted        引擎 errors=0，属性可用，**应当有示例**（当前全仓零使用 ⇒ 待落地）
+#   rejected-f7     引擎 F7[] unknown attribute
+#   rejected-legacy 引擎 F1[] 响亮拒收旧拼写（count/side 报 unknown attribute 并指路；domain 报 legacy spelling）
+#   rejected-ie     引擎 IE8[] 未实现响亮拒收（synchronize）
+#   no-example      宿主元素在仓内示例零出现，无基线可注入
+# 共 42 行
+# 待落地：30 行（accepted 且示例还没进 **/*.esml；rejected-* / no-example 不在此列。
+#   闸门对 owner=W3/W4 的 accepted 行只警告不红，对 W5/engine-debt 才红。）
+attribute	MpcType	a	mpc	accepted	W4	注入 T-tasks/control-vars.esml 的 <mpc> 后 errors=0
+attribute	ConnectType	aPart	connection	rejected-f7	engine-debt	error: F7[]: unknown attribute `aPart` on `<connection>` at <probe> — remove or rename; canonical attributes are in `unknown::KNOWN_ATTRS`
+attribute	MpcType	b	mpc	accepted	W4	注入 T-tasks/control-vars.esml 的 <mpc> 后 errors=0
+attribute	ConnectType	bPart	connection	rejected-f7	engine-debt	error: F7[]: unknown attribute `bPart` on `<connection>` at <probe> — remove or rename; canonical attributes are in `unknown::KNOWN_ATTRS`
+attribute	MpcType	c	mpc	accepted	W4	注入 T-tasks/control-vars.esml 的 <mpc> 后 errors=0
+attribute	PortVariableType	category	portVariable	accepted	W4	注入 D-skeleton/skeleton-full.esml 的 <portVariable> 后 errors=0
+attribute	PortInstanceType	count	port	rejected-legacy	W5	error: F1[]: parser rejected the document: unknown attribute `count` on <port 'p'> at <col>:<row> — canonical attributes are ["name", "portType", "category", "connectClass", "size", "portSet", "description"] (c
+attribute	PerturbType	distribution	perturb	accepted	W4	注入 T-tasks/task-sensitivity.esml 的 <perturb> 后 errors=0
+attribute	PortTypeDef	domain	portType	rejected-legacy	W5	error: F1[]: parser rejected the document: legacy spelling `<domain=>` at <col>:<row> — use `<connectorFamily=>` (compatibility expressions are no longer accepted) at <probe>
+attribute	ConstraintType	expr	constraint	accepted	W4	注入 T-tasks/task-constraint.esml 的 <constraint> 后 errors=0
+attribute	InstRefType	extendsFrom	instance	rejected-f7	W5	error: F7[]: unknown attribute `extendsFrom` on `<instance>` at <probe> — remove or rename; canonical attributes are in `unknown::KNOWN_ATTRS`
+attribute	MethodType	generations	method	accepted	W4	注入 L8-function/foreign-object.esml 的 <method> 后 errors=0
+attribute	TransitionType	immediate	transition	accepted	W4	注入 L2-discrete/reset-transition.esml 的 <transition> 后 errors=0
+attribute	SystemRefType	libroot	systemRef	accepted	W4	注入 D-skeleton/project.esml 的 <systemRef> 后 errors=0
+attribute	ContinueUntilType	maxTime	continueUntil	rejected-f7	W3	error: F7[]: unknown attribute `maxTime` on `<continueUntil>` at <probe> — remove or rename; canonical attributes are in `unknown::KNOWN_ATTRS`（宿主 <continueUntil> 仓内零出现，以 <doc>-anchor 整块注入实测）
+attribute	SurrogateType	model	surrogate	accepted	W4	注入 T-tasks/task-surrogate.esml 的 <surrogate> 后 errors=0
+attribute	VariableType	nominal	variable	rejected-f7	engine-debt	error: F7[]: unknown attribute `nominal` on `<variable>` at <probe> — remove or rename; canonical attributes are in `unknown::KNOWN_ATTRS`
+attribute	SetType	param	set	accepted	engine-debt	注入 L2-discrete/initialisationprocedure-advance.esml 的 <set> 后 errors=0
+attribute	ClockType	phase	clock	rejected-f7	engine-debt	error: F7[]: unknown attribute `phase` on `<clock>` at <probe> — remove or rename; canonical attributes are in `unknown::KNOWN_ATTRS`
+attribute	MethodType	population	method	accepted	W4	注入 L8-function/foreign-object.esml 的 <method> 后 errors=0
+attribute	PortInstanceType	portSet	port	accepted	engine-debt	注入 D-skeleton/skeleton-full.esml 的 <port> 后 errors=0
+attribute	TransitionType	priority	transition	accepted	W4	注入 L2-discrete/reset-transition.esml 的 <transition> 后 errors=0
+attribute	MpcType	q	mpc	accepted	W4	注入 T-tasks/control-vars.esml 的 <mpc> 后 errors=0
+attribute	VariableType	quantity	variable	rejected-f7	engine-debt	error: F7[]: unknown attribute `quantity` on `<variable>` at <probe> — remove or rename; canonical attributes are in `unknown::KNOWN_ATTRS`
+attribute	MpcType	r	mpc	accepted	W4	注入 T-tasks/control-vars.esml 的 <mpc> 后 errors=0
+attribute	DocRefType	ref	doc	accepted	W4	整块注入 <doc name title ref/> 后 errors=0（宿主 <doc> 仓内零使用，待落地补示例）
+attribute	MethodType	samples	method	accepted	W4	注入 L8-function/foreign-object.esml 的 <method> 后 errors=0
+attribute	PortInstanceType	side	port	rejected-legacy	W5	error: F1[]: parser rejected the document: unknown attribute `side` on <port 'p'> at <col>:<row> — canonical attributes are ["name", "portType", "category", "connectClass", "size", "portSet", "description"] (ca
+attribute	PortInstanceType	size	port	accepted	W4	注入 D-skeleton/skeleton-full.esml 的 <port> 后 errors=0
+attribute	ContinueForType	solver	continueFor	accepted	engine-debt	注入 D-skeleton/esml-coordinate.esml 的 <continueFor> 后 errors=0
+attribute	MpcType	steps	mpc	accepted	W4	注入 T-tasks/control-vars.esml 的 <mpc> 后 errors=0
+attribute	DocRefType	summary	doc	accepted	W4	整块注入 <doc name title summary/> 后 errors=0（宿主 <doc> 仓内零使用，待落地补示例）
+attribute	TransitionType	synchronize	transition	rejected-ie	engine-debt	error: IE8[]: SynchronizeUnsupported: transition 'A' -> 'B' uses synchronize="true", which is not implemented at <stateMachine 'fsm'> — remove synchronize="true", or implement synchronize; silently dropping it 
+attribute	DataType	t	data	accepted	W3	注入 T-tasks/tasks-seven.esml 的 <data> 后 errors=0
+attribute	ScenarioType	tasks	scenario	no-example	W3	宿主 <scenario> 在仓内示例零出现（无基线 errors=0 可注入件）
+attribute	MethodType	timestep	method	accepted	W4	注入 L8-function/foreign-object.esml 的 <method> 后 errors=0
+attribute	DocRefType	title	doc	accepted	W4	整块注入 <doc name title/> 后 errors=0（宿主 <doc> 仓内零使用，待落地补示例）
+attribute	MetricType	tolerancePct	metric	accepted	W4	注入 T-tasks/check.esml 的 <metric> 后 errors=0
+attribute	MpcType	umax	mpc	accepted	W4	注入 T-tasks/control-vars.esml 的 <mpc> 后 errors=0
+attribute	MpcType	umin	mpc	accepted	W4	注入 T-tasks/control-vars.esml 的 <mpc> 后 errors=0
+attribute	MpcType	x0	mpc	accepted	W4	注入 T-tasks/control-vars.esml 的 <mpc> 后 errors=0
+attribute	MpcType	xref	mpc	accepted	W4	注入 T-tasks/control-vars.esml 的 <mpc> 后 errors=0
