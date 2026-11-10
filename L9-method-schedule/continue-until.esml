@@ -1,13 +1,12 @@
 <?xml version="1.0"?>
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
-<!-- 语法点 `<schedule><sequence>…<continueUntil condition max-time/>…</sequence></schedule>`：
-     持续积分直到 condition 转真（或到 max-time 上限）。
-     XSD canonical 是 `maxTime`（esml-canonical-basic.xsd L1091，required），
-     引擎侧目前只认 `max-time`（F1 parser 层拒收 missing max-time；
-     `maxTime` 触发 F7 unknown attribute）—— 引擎债，本示例按引擎实测
-     用 `max-time` 跑绿，canonical 拼法待引擎侧接上后换回 `maxTime`。
-     check errors=0（附录 K · 段步 continueUntil）。
+<!-- 语法点 `<schedule><sequence>…<continueUntil condition maxTime/>…</sequence></schedule>`：
+     持续积分直到 condition 转真（或到 maxTime 上限）。
+     本文件判据是本仓 XSD（esml-canonical-basic.xsd L1091，`maxTime` required）
+     与 SPEC.md:1513（`maxTime` canonical 拼法，附录 C v1.3.3 kebab 退位裁决）。
+     引擎欠账记录：引擎 parser 目前只认 `max-time`，`maxTime` 触发
+     F7 unknown attribute；已登记 tools/engine-drift.tsv 追，本示例不迁就。
      规范条文：附录 K（METHOD × Schedule 编排）。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L9_ContinueUntil">
   <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
@@ -18,7 +17,7 @@
   <systems><system name="S">
     <instances><instance name="m" type="Ramp"/></instances>
     <schedule><sequence>
-      <continueUntil condition="m.x &lt; 1.0" max-time="10"/>
+      <continueUntil condition="m.x &lt; 1.0" maxTime="10"/>
     </sequence></schedule>
   </system></systems>
 </esml>
