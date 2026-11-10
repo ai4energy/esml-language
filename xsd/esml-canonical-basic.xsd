@@ -366,6 +366,9 @@
       </xs:choice>
     </xs:sequence>
     <xs:attribute name="name" type="esml:Ident" use="required"/>
+    <!-- `domain` 保留（引擎 XSD 与 SPEC L83 仍存旧拼写讨论；仓外存量 `domain=`
+         不能失去落点）：是否退役留待单轨复核。 -->
+    <xs:attribute name="domain" type="xs:string" use="optional"/>
     <xs:attribute name="connectorFamily" type="xs:string" use="optional"/>
     <xs:attribute name="conservation" type="xs:string" use="optional"/>
     <xs:attribute name="description" type="xs:string" use="optional"/>
