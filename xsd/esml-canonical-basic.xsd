@@ -193,6 +193,9 @@
       <xs:any namespace="##other" processContents="skip"
               minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
+    <xs:attribute name="name" type="esml:Ident" use="optional"/>
+    <xs:attribute name="abstol" type="xs:double" use="optional"/>
+    <xs:attribute name="reltol" type="xs:double" use="optional"/>
     <xs:anyAttribute processContents="lax"/>
   </xs:complexType>
 
@@ -330,9 +333,13 @@
        注：`role` 与 `array` 正交 —— 显式域端口（工艺/热/流）通常**无 role**。 -->
   <xs:complexType name="PortVariableType">
     <xs:attribute name="name" type="esml:Ident" use="required"/>
-    <xs:attribute name="role" type="xs:string" use="optional"/>
     <xs:attribute name="type" type="xs:string" use="optional"/>
     <xs:attribute name="array" type="xs:string" use="optional"/>
+    <!-- `portRole` / `causality` / `carrier`：端口变量的角色属性形（单轨拼法，
+         见 SPEC §5）。元素名给角色的写法（`<flow>` 等）已按单轨裁决删除。 -->
+    <xs:attribute name="portRole" type="xs:string" use="optional"/>
+    <xs:attribute name="causality" type="xs:string" use="optional"/>
+    <xs:attribute name="carrier" type="xs:string" use="optional"/>
     <!-- `initial` / `default`：端口变量的初值/类型默认。注意端口变量的**值**由连接
          或单元内方程给（§8），这里的两项只是**求解起点**，不是"钉值"。 -->
     <xs:attribute name="initial" type="xs:string" use="optional"/>
@@ -342,41 +349,26 @@
   </xs:complexType>
   <xs:complexType name="PortTypeDef">
     <xs:sequence>
-      <!-- 端口变量可直接声明在 <portType> 下（不限于 <variables> 内）；识别的标签：
-             var, variable, port-variable, portVariable, flow, potential,
-             stream, constant, discrete. 宽松形式
-           `<portType><var .../></portType>` 同样被接受。
-           —— 这一族是**有意的并行写法**（元素名即角色声明，SPEC §5 + §2 例外说明），
-           不是同义改名：角色由元素名给出，或由 role= 属性给出。 -->
+      <!-- 单轨（裁决 A，2026-11-10）：端口变量只认 `<portVariable>`（角色由
+           `portRole=` 属性给出）；元素名给角色的写法（`<var>` `<flow>` 等 7 种
+           拼法）是同语义的并行拼法，已从两处 choice 中删除。 -->
       <xs:choice minOccurs="0" maxOccurs="unbounded">
         <!-- 端口类型的就地短文档（`parse_doc_ref`，与 metadata 里的 `<doc>` 同型）。 -->
         <xs:element name="doc" type="esml:DocRefType"/>
         <xs:element name="variables" minOccurs="0">
           <xs:complexType><xs:sequence>
             <xs:choice minOccurs="0" maxOccurs="unbounded">
-              <xs:element name="var"           type="esml:PortVariableType"/>
-              <xs:element name="variable"      type="esml:PortVariableType"/>
               <xs:element name="portVariable"  type="esml:PortVariableType"/>
-              <xs:element name="flow"          type="esml:PortVariableType"/>
-              <xs:element name="potential"     type="esml:PortVariableType"/>
-              <xs:element name="stream"        type="esml:PortVariableType"/>
-              <xs:element name="constant"      type="esml:PortVariableType"/>
-              <xs:element name="discrete"      type="esml:PortVariableType"/>
             </xs:choice>
           </xs:sequence></xs:complexType>
         </xs:element>
-        <xs:element name="var"          type="esml:PortVariableType"/>
-        <xs:element name="variable"      type="esml:PortVariableType"/>
         <xs:element name="portVariable"  type="esml:PortVariableType"/>
-        <xs:element name="flow"          type="esml:PortVariableType"/>
-        <xs:element name="potential"     type="esml:PortVariableType"/>
-        <xs:element name="stream"        type="esml:PortVariableType"/>
-        <xs:element name="constant"      type="esml:PortVariableType"/>
-        <xs:element name="discrete"      type="esml:PortVariableType"/>
       </xs:choice>
     </xs:sequence>
     <xs:attribute name="name" type="esml:Ident" use="required"/>
-    <xs:attribute name="domain" type="xs:string" use="optional"/>
+    <xs:attribute name="connectorFamily" type="xs:string" use="optional"/>
+    <xs:attribute name="conservation" type="xs:string" use="optional"/>
+    <xs:attribute name="description" type="xs:string" use="optional"/>
     <xs:anyAttribute processContents="lax"/>
   </xs:complexType>
   <xs:complexType name="PortInstanceType">
@@ -384,7 +376,12 @@
     <xs:attribute name="portType" type="xs:string" use="optional"/>
     <xs:attribute name="category" type="xs:string" use="optional"/>
     <xs:attribute name="size" type="xs:string" use="optional"/>
+    <!-- `count` 保留：SPEC 属性集无此项，但引擎 XSD 在 InstRefType 上声明、
+         本类型已有，两边都留（单轨复核再定）。 -->
     <xs:attribute name="count" type="xs:string" use="optional"/>
+    <xs:attribute name="connectClass" type="xs:string" use="optional"/>
+    <xs:attribute name="portSet" type="xs:string" use="optional"/>
+    <xs:attribute name="description" type="xs:string" use="optional"/>
     <xs:anyAttribute processContents="lax"/>
   </xs:complexType>
 
@@ -434,6 +431,8 @@
     <!-- 条件组件（语言规范 §6.5）：构建期可判的布尔
          表达式，为假时该实例及其连接被排除；缺省 = 恒真。 -->
     <xs:attribute name="condition" type="xs:string" use="optional"/>
+    <!-- 与 PortInstanceType 同型：实例重复份数（两边都留，单轨复核再定）。 -->
+    <xs:attribute name="count" type="xs:string" use="optional"/>
     <xs:anyAttribute processContents="lax"/>
   </xs:complexType>
   <xs:complexType name="ConnectType">
@@ -623,7 +622,9 @@
       </xs:choice>
 </xs:choice>
     <xs:attribute name="name" type="esml:Ident" use="required"/>
+    <!-- `domain` 是否退役留待单轨复核（SPEC L186 用 `discipline=`；引擎 XSD 亦用 `domain`）。 -->
     <xs:attribute name="domain" type="xs:string" use="optional"/>
+    <xs:attribute name="discipline" type="xs:string" use="optional"/>
     <xs:anyAttribute processContents="lax"/>
   </xs:complexType>
 
@@ -792,7 +793,9 @@
       <xs:element name="presets" type="xs:anyType" minOccurs="0" maxOccurs="unbounded"/>
 </xs:choice>
     <xs:attribute name="name" type="esml:Ident" use="required"/>
+    <!-- `domain` 是否退役留待单轨复核（SPEC L186 用 `discipline=`；引擎 XSD 亦用 `domain`）。 -->
     <xs:attribute name="domain" type="xs:string" use="optional"/>
+    <xs:attribute name="discipline" type="xs:string" use="optional"/>
     <xs:anyAttribute processContents="lax"/>
   </xs:complexType>
 
@@ -879,6 +882,8 @@
       </xs:choice>
       <xs:attribute name="name" type="xs:string" use="optional"/>
       <xs:attribute name="schema" type="xs:string" use="optional"/>
+      <xs:attribute name="coordinate" type="xs:string" use="optional"/>
+      <xs:attribute name="version" type="xs:string" use="optional"/>
       <xs:anyAttribute processContents="lax"/>
     </xs:complexType>
   </xs:element>
