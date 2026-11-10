@@ -53,3 +53,14 @@ attr	anon@esml-v1.xsd:13	name	engine-wins	引擎 orderedSet 内联匿名多记 n
 attr	anon@esml-v1.xsd:13	static	engine-wins	引擎 orderedSet 内联匿名多记 static；SPEC-L93 <orderedSet name static=> 两侧语义同，engine 残留	2026-11-10
 attr	anon@esml-v1.xsd:7	name	lang-wins	lang 入口层 orderedSet 内联匿名多记 name；engine 侧漏记，lang-wins	2026-11-10
 attr	anon@esml-v1.xsd:7	static	lang-wins	lang 入口层 orderedSet 内联匿名多记 static；SPEC-L93 两侧语义同，lang-wins	2026-11-10
+attr	ModelType	discipline	lang-wins	SPEC-L186 modelType 带 discipline=；引擎 basic.xsd:560-559 宿主仍只 name+anyAttribute，未接（W1 cc36d37 补入，引擎侧待接）	2026-11-10
+attr	SystemType	discipline	lang-wins	同上（SPEC-L404 system 带 discipline=；引擎 SystemType 宿主亦无 discipline 声明，basic.xsd:502 仅在 PartitionType）	2026-11-10
+attr	SolutionParametersType	name	lang-wins	SPEC-L778 子元素形态 <solutionParameters name="sp1">；引擎同名宿主仅 anyAttribute（引擎侧未接）	2026-11-10
+attr	SolutionParametersType	abstol	lang-wins	SPEC-L777 属性形态 <solutionParameters reltol= abstol=/>；引擎同名宿主未接	2026-11-10
+attr	SolutionParametersType	reltol	lang-wins	同上（SPEC-L777 同一属性形态行）	2026-11-10
+attr	esml	coordinate	lang-wins	SPEC-L449/L454 库包坐标化 coordinate="g:a:v"（Maven 风格）；引擎 esml 根仅 name/schema	2026-11-10
+attr	esml	version	lang-wins	同上（g:a:v 的 v 段，库级版本）；引擎 esml 根未接	2026-11-10
+attr	anon@esml-canonical-basic.xsd:19	coordinate	lang-wins	同上——esml 根匿名内联宿主同键，引擎 anon basic:19 仅 name/schema	2026-11-10
+attr	anon@esml-canonical-basic.xsd:19	version	lang-wins	同上	2026-11-10
+attr	project	schema	open	待裁：引擎 project 根声明 name/version/description（project.xsd:99-105），lang 侧 project.xsd 根仅 name/description、**无 schema 属性**（W1 cc36d37 只给 <esml> 根与 <project> 各加 coordinate/version 与 version）——「lang 独有 schema」与两侧实读相悖，需先对账谁测到了，再定方向	2026-11-10
+attr	anon@esml-canonical-project.xsd:1	schema	open	同上——project 根匿名内联宿主同键，待与 project 行一并裁	2026-11-10
