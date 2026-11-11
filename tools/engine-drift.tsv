@@ -42,17 +42,13 @@ child	PortTypeDef	constant	lang-wins	legacy 同义元素；canonical 仅 <portVa
 child	PortTypeDef	discrete	lang-wins	legacy 同义元素；canonical 仅 <portVariable>	2026-11-10
 child	TaskType	initialState	engine-wins	estimation 初值，引擎侧新增；SPEC 仅 <state initialState/>，待评	2026-11-10
 attr	project	version	engine-wins	SPEC-L648 <project name version/> 引擎已对齐	2026-11-10
-attr	anon@esml-canonical-compute.xsd:14	lowerBound	engine-wins	<controlled> 扩展属性（SPEC-L1147），引擎已加，语言仓待补	2026-11-10
-attr	anon@esml-canonical-compute.xsd:14	upperBound	engine-wins	<controlled> 扩展属性（SPEC-L1147），引擎已加，语言仓待补	2026-11-10
-attr	anon@esml-canonical-compute.xsd:7	mode	engine-wins	mpc 8e16c782 M1 约束参数（匿名 mpc 宿主）	2026-11-10
-attr	anon@esml-canonical-compute.xsd:7	rho	engine-wins	mpc 8e16c782 M1 约束参数（匿名 mpc 宿主）	2026-11-10
-attr	anon@esml-canonical-compute.xsd:7	wOver	engine-wins	mpc 8e16c782 M1 约束参数（匿名 mpc 宿主）	2026-11-10
-attr	anon@esml-canonical-compute.xsd:7	wUnder	engine-wins	mpc 8e16c782 M1 约束参数（匿名 mpc 宿主）	2026-11-10
-attr	anon@esml-canonical-project.xsd:1	version	engine-wins	SPEC-L648 <project name version/> 引擎已对齐	2026-11-10
-attr	anon@esml-v1.xsd:13	name	engine-wins	引擎 orderedSet 内联匿名多记 name（lang 全局 orderedSet 已带）；同义，engine 残留	2026-11-10
-attr	anon@esml-v1.xsd:13	static	engine-wins	引擎 orderedSet 内联匿名多记 static；SPEC-L93 <orderedSet name static=> 两侧语义同，engine 残留	2026-11-10
-attr	anon@esml-v1.xsd:7	name	lang-wins	lang 入口层 orderedSet 内联匿名多记 name；engine 侧漏记，lang-wins	2026-11-10
-attr	anon@esml-v1.xsd:7	static	lang-wins	lang 入口层 orderedSet 内联匿名多记 static；SPEC-L93 两侧语义同，lang-wins	2026-11-10
+attr	anon@esml-canonical-compute.xsd:controlled	lowerBound	engine-wins	<controlled> 扩展属性（SPEC-L1147），引擎已加，语言仓待补	2026-11-10
+attr	anon@esml-canonical-compute.xsd:controlled	upperBound	engine-wins	<controlled> 扩展属性（SPEC-L1147），引擎已加，语言仓待补	2026-11-10
+attr	anon@esml-canonical-compute.xsd:mpc	mode	engine-wins	mpc 8e16c782 M1 约束参数（匿名 mpc 宿主）	2026-11-10
+attr	anon@esml-canonical-compute.xsd:mpc	rho	engine-wins	mpc 8e16c782 M1 约束参数（匿名 mpc 宿主）	2026-11-10
+attr	anon@esml-canonical-compute.xsd:mpc	wOver	engine-wins	mpc 8e16c782 M1 约束参数（匿名 mpc 宿主）	2026-11-10
+attr	anon@esml-canonical-compute.xsd:mpc	wUnder	engine-wins	mpc 8e16c782 M1 约束参数（匿名 mpc 宿主）	2026-11-10
+attr	anon@esml-canonical-project.xsd:project	version	engine-wins	SPEC-L648 <project name version/> 引擎已对齐	2026-11-10
 attr	algorithm-for	range	lang-wins	W19 静默错答：SPEC-L1282 拼写之外，in= 在算法段被引擎静默忽略（零次迭代，solve 得 0.0，check errors=0），本行记属性名口径	2026-11-10
 attr	algorithm-for	in	lang-wins	W19 静默错答：算法段 in= 拼写（1..3 / 1:3）均被引擎静默忽略，零次迭代且不报错，solve m.y=0.0；与 range= 同宿主二选一，in 是 canonical（方程级 for 读 in）但算法段引擎只认 range	2026-11-10
 child	algorithm-for	body	lang-wins	W19 静默错答：算法段 for 加 <body> 壳后整块不展开（零次迭代），check errors=0，solve m.y=0.0；方程级 for 有/无 <body> 等价，算法段相反	2026-11-10
@@ -125,18 +121,18 @@ child	VariableTypesType	type	lang-wins	W9 真声明	2026-11-10
 child	VariableTypesType	typesDimensionless	lang-wins	W9 真声明	2026-11-10
 child	VariableTypesType	typesGeneric	lang-wins	W9 真声明	2026-11-10
 child	VariableTypesType	typesThermal	lang-wins	W9 真声明	2026-11-10
-attr	anon@esml-canonical-basic.xsd:18	coordinate	lang-wins	W9 真声明	2026-11-10
-attr	anon@esml-canonical-basic.xsd:18	name	lang-wins	W9 真声明	2026-11-10
-attr	anon@esml-canonical-basic.xsd:18	schema	lang-wins	W9 真声明	2026-11-10
-attr	anon@esml-canonical-basic.xsd:18	version	lang-wins	W9 真声明	2026-11-10
-attr	anon@esml-canonical-basic.xsd:19	schema	lang-wins	W9 真声明	2026-11-10
-attr	anon@esml-canonical-basic.xsd:20	name	lang-wins	W9 真声明	2026-11-10
-attr	anon@esml-canonical-basic.xsd:22	value	lang-wins	W9 真声明	2026-11-10
-attr	anon@esml-canonical-basic.xsd:23	condition	lang-wins	W9 真声明	2026-11-10
-attr	anon@esml-canonical-project.xsd:1	schema	lang-wins	同上——project 根匿名内联宿主同键，与上一条同一依据（lang xsd/esml-canonical-project.xsd:101 声明、引擎 anyAttribute lax 放行）	2026-11-10
+attr	anon@esml-canonical-basic.xsd:links	coordinate	lang-wins	W9 真声明	2026-11-10
+attr	anon@esml-canonical-basic.xsd:links	name	lang-wins	W9 真声明	2026-11-10
+attr	anon@esml-canonical-basic.xsd:links	schema	lang-wins	W9 真声明	2026-11-10
+attr	anon@esml-canonical-basic.xsd:links	version	lang-wins	W9 真声明	2026-11-10
+attr	anon@esml-canonical-basic.xsd:sets	schema	lang-wins	W9 真声明	2026-11-10
+attr	anon@esml-canonical-basic.xsd:schedule	name	lang-wins	W9 真声明	2026-11-10
+attr	anon@esml-canonical-basic.xsd:fixed	value	lang-wins	W9 真声明	2026-11-10
+attr	anon@esml-canonical-basic.xsd:initialisationProcedures	condition	lang-wins	W9 真声明	2026-11-10
+attr	anon@esml-canonical-project.xsd:project	schema	lang-wins	同上——project 根匿名内联宿主同键，与上一条同一依据（lang xsd/esml-canonical-project.xsd:101 声明、引擎 anyAttribute lax 放行）	2026-11-10
 child	AlgorithmType	while	lang-wins	SPEC-L846 算法段 while（引擎 KNOWN_SUB_TAGS 无此名）	2026-11-10
-attr	anon@esml-canonical-basic.xsd:19	coordinate	lang-wins	同上——esml 根匿名内联宿主同键，引擎 anon basic:19 仅 name/schema	2026-11-10
-attr	anon@esml-canonical-basic.xsd:19	version	lang-wins	同上	2026-11-10
+attr	anon@esml-canonical-basic.xsd:sets	coordinate	lang-wins	同上——esml 根匿名内联宿主同键，引擎 anon basic:19 仅 name/schema	2026-11-10
+attr	anon@esml-canonical-basic.xsd:sets	version	lang-wins	同上	2026-11-10
 attr	EquationCaseType	on	lang-wins	W20 真声明：SPEC §6.6 方程级 <case on>；L2-discrete/case-branch.esml	2026-11-11
 child	EquationCaseType	branch	lang-wins	W20 真声明：SPEC §6.6 <branch value>；L2-discrete/case-branch.esml	2026-11-11
 child	EquationForType	body	lang-wins	W20 真声明：方程级 for <body> 壳（for-in.esml 头注：有/无 body 等价）	2026-11-11
@@ -153,31 +149,31 @@ attr	EquationType	name	lang-wins	W20 真声明：原 anyType 占位收为 Equati
 child	DiscreteSegmentType	variable	lang-wins	W20 真声明：L2-discrete/elsewhen.esml <discrete><variable name type default/>	2026-11-11
 child	MethodOnLoadType	fix	lang-wins	W20 真声明：SPEC:1526 <onLoad> 内 <fix>（修前 XSD FAIL/引擎 errors=0 实测）	2026-11-11
 child	MethodOnLoadType	vary	lang-wins	W20 真声明：SPEC:1526 <onLoad> 内 <vary>（引擎 F7 未认，引擎欠账）	2026-11-11
-attr	anon@esml-canonical-basic.xsd:13	value	lang-wins	W20 真声明：<case><branch value>（L2-discrete/case-branch.esml）	2026-11-11
-attr	anon@esml-canonical-basic.xsd:15	path	lang-wins	W20 真声明：initialSelectors <initialSelector path value>（SPEC:1279，L3-model/selector-values.esml 系统级段）	2026-11-11
-attr	anon@esml-canonical-basic.xsd:15	value	lang-wins	W20 真声明：同上	2026-11-11
-attr	anon@esml-canonical-basic.xsd:19	name	lang-wins	引擎 nth 键碰撞伪分歧：引擎侧 basic:19 单例恰为 esml 根（name/schema），lang 侧 :19 为 <sets>（无属性）；本仓真声明为 <sets>，按 lang-wins 记	2026-11-11
-attr	anon@esml-canonical-basic.xsd:24	name	lang-wins	W20 真声明：initialisationProcedure name（SPEC §6.7 表，L2-discrete initproc 示例）	2026-11-11
-attr	anon@esml-canonical-basic.xsd:26	path	lang-wins	W20 真声明：start 内 set/replace <path value>（SPEC §6.7 表）	2026-11-11
-attr	anon@esml-canonical-basic.xsd:26	value	lang-wins	W20 真声明：同上	2026-11-11
-attr	anon@esml-canonical-basic.xsd:30	unit	lang-wins	W20 真声明：next/advance <unit>（SPEC §6.7 表）	2026-11-11
-attr	anon@esml-canonical-basic.xsd:31	unit	lang-wins	W20 真声明：next/complete <unit>（SPEC §6.7 表）	2026-11-11
-attr	anon@esml-canonical-basic.xsd:33	from	lang-wins	W20 真声明：connectRules <rule from to>（SPEC:1366 附录F4，L6-connect/connect-rules.esml，SPEC 明写必填）	2026-11-11
-attr	anon@esml-canonical-basic.xsd:33	to	lang-wins	W20 真声明：同上	2026-11-11
-attr	anon@esml-canonical-basic.xsd:34	name	lang-wins	W20 真声明：observe name（SPEC §6.10，L0-type-unit/observe-list.esml）	2026-11-11
-attr	anon@esml-canonical-basic.xsd:35	name	lang-wins	W20 真声明：observe <var path name>（SPEC §6.10）	2026-11-11
-attr	anon@esml-canonical-basic.xsd:35	path	lang-wins	W20 真声明：同上	2026-11-11
-attr	anon@esml-canonical-basic.xsd:37	lower	lang-wins	W20 真声明：presets <preset path value lower upper>（SPEC §6.10，L9-method-schedule/fixed-preset.esml）	2026-11-11
-attr	anon@esml-canonical-basic.xsd:37	path	lang-wins	W20 真声明：同上	2026-11-11
-attr	anon@esml-canonical-basic.xsd:37	upper	lang-wins	W20 真声明：同上	2026-11-11
-attr	anon@esml-canonical-basic.xsd:37	value	lang-wins	W20 真声明：同上	2026-11-11
-attr	anon@esml-canonical-basic.xsd:38	coordinate	lang-wins	W20 真声明：esml 根属性（原 :18 键随文档序移位至 :38；引擎侧无此属性）	2026-11-11
-attr	anon@esml-canonical-basic.xsd:38	name	lang-wins	W20 真声明：esml 根属性（原 :18 键随文档序移位至 :38；引擎侧无此属性）	2026-11-11
-attr	anon@esml-canonical-basic.xsd:38	schema	lang-wins	W20 真声明：esml 根属性（原 :18 键随文档序移位至 :38）	2026-11-11
-attr	anon@esml-canonical-basic.xsd:38	version	lang-wins	W20 真声明：esml 根属性（原 :18 键随文档序移位至 :38）	2026-11-11
-attr	anon@esml-canonical-basic.xsd:39	name	lang-wins	W20 真声明：recordTypes 段 <recordType name>（原 :25 键随文档序移位至 :39）	2026-11-11
-attr	anon@esml-canonical-basic.xsd:40	value	lang-wins	W20 真声明：算法段 <return value>（原 :20 键随文档序移位至 :40）	2026-11-11
-attr	anon@esml-canonical-basic.xsd:41	condition	lang-wins	W20 真声明：算法段 <while condition>（原 :23 键随文档序移位至 :41）	2026-11-11
+attr	anon@esml-canonical-basic.xsd:branch	value	lang-wins	W20 真声明：<case><branch value>（L2-discrete/case-branch.esml）	2026-11-11
+attr	anon@esml-canonical-basic.xsd:initialSelector	path	lang-wins	W20 真声明：initialSelectors <initialSelector path value>（SPEC:1279，L3-model/selector-values.esml 系统级段）	2026-11-11
+attr	anon@esml-canonical-basic.xsd:initialSelector	value	lang-wins	W20 真声明：同上	2026-11-11
+attr	anon@esml-canonical-basic.xsd:sets	name	lang-wins	引擎 nth 键碰撞伪分歧：引擎侧 basic:19 单例恰为 esml 根（name/schema），lang 侧 :19 为 <sets>（无属性）；本仓真声明为 <sets>，按 lang-wins 记	2026-11-11
+attr	anon@esml-canonical-basic.xsd:initialisationProcedure	name	lang-wins	W20 真声明：initialisationProcedure name（SPEC §6.7 表，L2-discrete initproc 示例）	2026-11-11
+attr	anon@esml-canonical-basic.xsd:replace	path	lang-wins	W20 真声明：start 内 set/replace <path value>（SPEC §6.7 表）	2026-11-11
+attr	anon@esml-canonical-basic.xsd:replace	value	lang-wins	W20 真声明：同上	2026-11-11
+attr	anon@esml-canonical-basic.xsd:advance	unit	lang-wins	W20 真声明：next/advance <unit>（SPEC §6.7 表）	2026-11-11
+attr	anon@esml-canonical-basic.xsd:complete	unit	lang-wins	W20 真声明：next/complete <unit>（SPEC §6.7 表）	2026-11-11
+attr	anon@esml-canonical-basic.xsd:rule	from	lang-wins	W20 真声明：connectRules <rule from to>（SPEC:1366 附录F4，L6-connect/connect-rules.esml，SPEC 明写必填）	2026-11-11
+attr	anon@esml-canonical-basic.xsd:rule	to	lang-wins	W20 真声明：同上	2026-11-11
+attr	anon@esml-canonical-basic.xsd:observe	name	lang-wins	W20 真声明：observe name（SPEC §6.10，L0-type-unit/observe-list.esml）	2026-11-11
+attr	anon@esml-canonical-basic.xsd:var	name	lang-wins	W20 真声明：observe <var path name>（SPEC §6.10）	2026-11-11
+attr	anon@esml-canonical-basic.xsd:var	path	lang-wins	W20 真声明：同上	2026-11-11
+attr	anon@esml-canonical-basic.xsd:preset	lower	lang-wins	W20 真声明：presets <preset path value lower upper>（SPEC §6.10，L9-method-schedule/fixed-preset.esml）	2026-11-11
+attr	anon@esml-canonical-basic.xsd:preset	path	lang-wins	W20 真声明：同上	2026-11-11
+attr	anon@esml-canonical-basic.xsd:preset	upper	lang-wins	W20 真声明：同上	2026-11-11
+attr	anon@esml-canonical-basic.xsd:preset	value	lang-wins	W20 真声明：同上	2026-11-11
+attr	anon@esml-canonical-basic.xsd:esml	coordinate	lang-wins	W20 真声明：esml 根属性（原 :18 键随文档序移位至 :38；引擎侧无此属性）	2026-11-11
+attr	anon@esml-canonical-basic.xsd:esml	name	lang-wins	W20 真声明：esml 根属性（原 :18 键随文档序移位至 :38；引擎侧无此属性）	2026-11-11
+attr	anon@esml-canonical-basic.xsd:esml	schema	lang-wins	W20 真声明：esml 根属性（原 :18 键随文档序移位至 :38）	2026-11-11
+attr	anon@esml-canonical-basic.xsd:esml	version	lang-wins	W20 真声明：esml 根属性（原 :18 键随文档序移位至 :38）	2026-11-11
+attr	anon@esml-canonical-basic.xsd:recordTypes	name	lang-wins	W20 真声明：recordTypes 段 <recordType name>（原 :25 键随文档序移位至 :39）	2026-11-11
+attr	anon@esml-canonical-basic.xsd:return	value	lang-wins	W20 真声明：算法段 <return value>（原 :20 键随文档序移位至 :40）	2026-11-11
+attr	anon@esml-canonical-basic.xsd:while	condition	lang-wins	W20 真声明：算法段 <while condition>（原 :23 键随文档序移位至 :41）	2026-11-11
 child	anon-child@esml-canonical-basic.xsd:sequence	reassign	lang-wins	canonical 唯一拼写是 <reset>，语言仓 89039d7 已裁决、负例 L5-instance/reassign-probe.esml 断言 XSD 拒收；引擎 XSD 仍声明 reassign = 引擎债（W67 盲区修复后现形）	2026-11-11
 child	anon-child@esml-canonical-basic.xsd:locals	local	lang-wins	语言仓声明 <local>（FunctionLocalType）；引擎侧 <locals> 内为 <xs:any processContents="skip"> 无具名子元素 = 引擎债（W67 盲区修复后现形）	2026-11-11
 child	anon-child@esml-canonical-basic.xsd:members	component	lang-wins	语言仓 89039d7 单轨裁决：<members> 只认 <instance>（规范 §2 收紧词法），引擎侧多声明 <component> = 引擎侧 legacy 残留（W67 盲区修复后现形）	2026-11-11

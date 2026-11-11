@@ -5,7 +5,7 @@
 比三样，逐组分歧对 `tools/engine-drift.tsv` 台账裁决：
 
   1. 同名 complexType 的**属性集**（含同名单一元素的匿名内联类型属性集，
-     宿主命名 `anon@文件名:来源行`）；
+     宿主命名 `anon@文件名:元素名`）；
   2. 同名 complexType 的**子元素集**（递归：sequence/choice 里每一层都算，
      同一宿主里重名子元素只计一次）；
   3. **全局根元素集**（schema 直接子元素）。
@@ -145,7 +145,7 @@ def child_names(elem):
 def hosts_of(doc):
     """本文件全部宿主：命名 complexType + 全局元素，均带来源行与内联属性集。
     宿主 = (host名, attrs, children)。匿名内联类型不入宿主表——它们与命名宿主
-    在「同宿主不同名」时按各自宿主名（匿名者以 `anon@文件:行` 命名）分别比对。"""
+    在「同宿主不同名」时按各自宿主名（匿名者以 `anon@文件:元素名` 命名）分别比对。"""
     hosts = {}
     root = doc.getroot()
     for e in root.iter():
@@ -179,13 +179,13 @@ def hosts_of(doc):
 
 
 def anon_singletons(doc, fname):
-    """同名单一元素的匿名内联类型属性集：`anon@文件名:nth`。
+    """同名单一元素的匿名内联类型属性集：`anon@文件名:元素名`。
 
     「同名单一」= 该元素名在**本文件**里只出现一次（跨 include 闭包重名
-    的常见元素如 <partition> 不入此列，它们按宿主名比）。键用「本文件里
-    第 nth 个（文档序）带匿名内联 complexType 的同名单一元素」，而非原始
-    行号——行号在两侧文件间不稳定（引擎 / 语言仓排版不同），无法作为
-    跨仓比对键；nth 计数在两侧各自文件里按同一规则得出，可比。"""
+    的常见元素如 <partition> 不入此列，它们按宿主名比）。键用**元素名**
+    而非文档序 nth：nth 会随任一侧新增/删除带匿名 complexType 的元素而
+    整体位移（S3 给 presets 补真声明后引擎侧 nth +2，产生 7 条伪分歧），
+    元素名在两侧语义一致，才是稳定跨仓键。与 `anon_children` 同口径。"""
     out = {}
     root = doc.getroot()
     counts = {}
@@ -193,15 +193,13 @@ def anon_singletons(doc, fname):
         n = e.get("name")
         if n:
             counts[n] = counts.get(n, 0) + 1
-    nth = 0
     for e in root.iter(XS + "element"):
         n = e.get("name")
         if not n or counts[n] != 1:
             continue
         if e.find(XS + "complexType") is None:
             continue
-        nth += 1
-        out["anon@%s:%d" % (fname, nth)] = attr_names(e.find(XS + "complexType"))
+        out["anon@%s:%s" % (fname, n)] = attr_names(e.find(XS + "complexType"))
     return out
 
 
@@ -480,8 +478,26 @@ def self_test():
             (e_hosts4, e_anons4, e_ac4, e_roots4), {}, None)
         if not any("c2" in u and "anon-child@" in u for u in und4):
             die_selftest("匿名类型子元素集分歧未红：盲区未修复（%s）" % und4)
+        # —— 匿名类型**属性集**（name 键，S3 后修正）：两侧同名单一元素 <ua> 的
+        #    匿名 complexType 属性集不同（引擎侧多 q），台账未登记 ⇒ 必红；
+        #    键必须是 anon@s.xsd:ua —— 旧 nth 键会随任一侧带匿名 complexType 的
+        #    元素增删整体位移（S3 补 presets 真声明后实测 7 条伪分歧），故自证钉 name 键。
+        ua_l = ('<xs:element name="ua"><xs:complexType>'
+                '<xs:attribute name="p" type="xs:string"/></xs:complexType></xs:element>')
+        ua_e = ('<xs:element name="ua"><xs:complexType>'
+                '<xs:attribute name="p" type="xs:string"/>'
+                '<xs:attribute name="q" type="xs:string"/></xs:complexType></xs:element>')
+        write_schema(lang, ua_l)
+        write_schema(eng, ua_e)
+        l_h5, l_a5, l_ac5, l_r5 = load_side(lang)
+        e_h5, e_a5, e_ac5, e_r5 = load_side(eng)
+        und5, _, _ = diff_sides(
+            (l_h5, l_a5, l_ac5, l_r5), (e_h5, e_a5, e_ac5, e_r5), {}, None)
+        if not any("anon@s.xsd:ua" in u and "q" in u for u in und5):
+            die_selftest("匿名类型属性集分歧未红（name 键）：%s" % und5)
     print("[self-test] 好树 0 红 / 坏树（未登记分歧）必红 / 已消解记录不红 / "
-          "norm 折叠不吞 kebab-camel 分歧 / 匿名类型子元素集必红：PASS")
+          "norm 折叠不吞 kebab-camel 分歧 / 匿名类型子元素集必红 / "
+          "匿名类型属性集（name 键）必红：PASS")
 
 
 def main():
