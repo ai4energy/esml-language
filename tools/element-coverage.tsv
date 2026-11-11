@@ -6,19 +6,18 @@
 # 方向 A：pending 且 owner∈{W1,W3,W4} ⇒ 警告不红；owner=engine-debt ⇒ 红。
 # 方向 B：只有 by-design 行能豁免；pending 不算（用了就是用了）。
 # 台账行必须与当天重算差集闭合：补了示例/声明 ⇒ 删行或改 verdict；闸门机判闭合，过时即红。
-# 共 7 行
-# pending：4 行（方向 A 4；by-design 3 不计入。W20/W21 落地后 20 行已删，2026-11-11 合并收口重算）
+# 共 3 行
+# pending：0 行（方向 A 4 行 pending 由 W25 2026-11-11 补正例落地后删：
+#   <derivativeSymbol>/<noDerivative>/<zeroDerivative> 见 L1-expr-equation/derivative-analytic.esml，
+#   <replace> 见 L2-discrete/initialisationprocedures.esml 的 <start>；by-design 3 不计入。
+#   W20/W21 落地后 20 行已删，2026-11-11 合并收口重算。）
 #
-# —— 方向 A：声明了、非负例示例零使用（7 个）。
-# 4 个 = W21 在办补示例；3 个导数符号只活在 schema 级负例里（L1-expr-equation/*）。
-element	<derivativeSymbol>	pending	W1	只在 schema 级负例出现（L1-expr-equation/derivativesymbol.esml 等）；非负例示例零使用，暂无补例工单
-element	<noDerivative>	pending	W1	只在 schema 级负例出现（L1-expr-equation/noderivative.esml）；非负例示例零使用，暂无补例工单
-element	<zeroDerivative>	pending	W1	只在 schema 级负例出现（L1-expr-equation/zeroderivative.esml）；非负例示例零使用，暂无补例工单
-element	<replace>	pending	W4	W20 已在 <start> 内声明（SPEC:636），暂无示例；下一轮补 initialisationProcedure 示例
+# —— 方向 A：声明了、非负例示例零使用（0 个）。
+# W25 收口：原 4 个 pending（3 个导数 token + <replace>）已补正例，行删。
 #
 # —— 方向 B：非负例示例在用、XSD 未命名声明（19 个）。
 # component 因 schema 负例（L3-model/component-probe.esml）跳过而**不在**差集 —— 符合预期，故无行。
-# 3 个 = <metadata> 宽松子结构 by-design（author/license/provenance）；4 个方向 A pending = 3 个导数声明（W1）+ 1 个 <replace>（W4）。
+# 3 个 = <metadata> 宽松子结构 by-design（author/license/provenance）。
 example	<author>	by-design	W3	<metadata> 子结构不固定、schema 放行任意子元素（SPEC.md:65）；现见于 D-skeleton/metadata.esml:7
 example	<license>	by-design	W3	<metadata> 子结构不固定、schema 放行任意子元素（SPEC.md:65）；现见于 D-skeleton/metadata.esml:8
 example	<provenance>	by-design	W3	<metadata> 子结构不固定、schema 放行任意子元素（SPEC.md:65）；现见于 D-skeleton/provenance.esml:8

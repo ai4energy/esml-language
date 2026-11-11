@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- W25 正例：`<derivative mode="analytic">` 内三 token 并列。SPEC:1098-1103（求导三档表 + 三 token 语义）：
+     `<derivativeSymbol order="2" symbol="d2y"/>` — 声明二阶导数符号（SPEC:1102 高阶用 order=2）；
+     `<zeroDerivative wrt="c"/>` — 声明对输入 c 的偏导恒 0（SPEC:1102 省 Jacobian 项、省调用）；
+     `<noDerivative wrt="b"/>` — 声明对输入 b 无解析导数（SPEC:1094-1100 绝不静默，符号层响亮）。
+     三者可在同一 `<derivative>` 内并列：XSD `DerivativeType` 是 choice 无上限（basic.xsd:1576-1583）。
+     **不写** `<body>`：`FunctionType` choice 里 `<body>` 与 `<extern>+<derivative>` 互斥（maxOccurs=1，
+     basic.xsd:1615-1627）；互斥的红色示范件是 `L1-expr-equation/derivativesymbol.esml`（它
+     body+derivative 同给，canonical XSD 应报互斥错；实现侧 check 仍放行，属规范↔实现缺口，
+     docs/coverage.md）。
+     导数契约三档 SPEC:1094-1100（analytic 填 Jacobian 最准）；`<function kind="external">` 须绑
+     `<extern ffi library symbol threadSafe/>`（SPEC §14.3；形状照 L8-function/extern-cabi.esml）。
+     `esml check` 实测（W25 2026-11-11）：
+       ok（errors=0 warnings=0 models=2 systems=1 types=1 portTypes=0 units=0 functions=1 five_level=ok）——三 token 全收（引擎 KNOWN_SUB_TAGS 含 derivativeSymbol/zeroDerivative/noDerivative，非引擎债）
+     规范条文：SPEC §14.2（求导三档，绝不静默）+ §14.1（canonical 元素）。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_DerivativeAnalytic">
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
+  <functions>
+    <function name="f2" kind="external" returns="real">
+      <inputs><input name="x" type="real" unit="K"/><input name="b" type="real"/><input name="c" type="real"/></inputs>
+      <extern ffi="c" library="libesml_extern_testlib.so" symbol="demo_f2" threadSafe="true"/>
+      <derivative mode="analytic">
+        <derivativeSymbol order="2" symbol="d2y"/>
+        <zeroDerivative wrt="c"/>
+        <noDerivative wrt="b"/>
+      </derivative>
+    </function>
+  </functions>
+  <modelTypes><modelType name="M" discipline="generic">
+    <parameters><parameter name="T" type="real" default="300.0"/></parameters>
+    <variables><variable name="q" type="real" role="algebraic"/></variables>
+    <equations><equation>q = f2(T, 0.0, 0.0)</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="Demo"><instances><instance name="m" type="M"/></instances></system></systems>
+</esml>
