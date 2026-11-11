@@ -44,6 +44,8 @@ PY=.venv/bin/python make check                                  # 全绿 = 可�
 
 每个文件都是一份完整的 ESML 文档，头部的注释块写明它演示的语法点。
 
+> **可运行口径**：① `esml check` 全绿（errors=0）；② 求解面按 [`tools/solve-smoke.tsv`](tools/solve-smoke.tsv) 普查口径——`ok` / `ok-simulate` 为可运行，求解层未通过的件在 [`tools/engine-example-debt.tsv`](tools/engine-example-debt.tsv) 的 `stage=solve` 行登记（引擎侧债务，示例本身不动）。
+
 ## 阅读规范
 
 `SPEC.md` 的章节编号稳定，schema 与示例都按该编号引用。
