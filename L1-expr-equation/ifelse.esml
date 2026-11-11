@@ -1,12 +1,17 @@
 <?xml version="1.0"?>
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
-<!-- 语法点 `ifelse(c, t, f)`：分段表达式（光滑分段，不是事件）。
-     独立变量用 t（规范 O-15：独立变量是 t，不是 time）。
+<!-- 语法点 `ifelse(c, t, f)`：分段表达式（非事件；光滑分段）。
+     独立变量用 t（规范 O-15：独立变量是 t，不是 time；引擎仓 spec :1487 明文）。
      本件是瞬态 DAE：Der(x) = ifelse(t < 0.5, 2.0, 0.0)，x(0)=0.0 ⇒
-       t ∈ [0, 0.5): x(t) = 2t；t ∈ [0.5, 1]: x = 1.0（常数）。
-     期望值（simulate，W66 实测命令：ESML_PROPS=off esml simulate L1-expr-equation/ifelse.esml）：
-       t=0.5 时 m.x = 1.0；t=1.0 时 m.x = 1.0（solve 会正确报 no steady state）。
+       解析解：t ∈ [0, 0.5): x(t) = 2t；t ∈ [0.5, 1]: x = 1.0（常数）。
+     实测值（ESML_PROPS=off esml simulate L1-expr-equation/ifelse.esml，加 steps 标志）：
+       steps=100：t=0.5 时 m.x = 0.98667；t=1.0 时 m.x = 0.99
+       steps=200：t=0.5 时 m.x = 0.99333；t=1.0 时 m.x = 0.995
+     偏差说明：ifelse 是分段函数（非事件），t=0.5 处导数间断（2.0→0.0），
+       固定步 BDF2 跨间断会降阶并缓慢爬升（0.9933→0.995），这是积分器对
+       该类不连续的已知行为，不是语义错误；步数不同数值不同。
+     solve 会正确报 no steady state（残差恒 2.0，与 x 无关；纯积分器）。
      规范条文：§7（分段表达式）。
      c ≠ 0 取 t 分支，否则取 f；分支切换精度由积分器容差决定。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_IfElse">
