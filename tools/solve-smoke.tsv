@@ -1,163 +1,163 @@
 # 逐件求解冒烟台账（W52，2026-11-11 当场重算；引擎：ESML v1.9.3 · Energy System Modeling Language · Ai4Energy · 商业版（深圳鼎拓智控科技有限公司专有软件，无规模限制） · 深圳鼎拓智控科技有限公司专有软件 · 学术版/商业版 · mingtao.li@gmail.com）
-# 列：path  has_system(1/0,lxml 判定)  solve_rc  unknowns(解出未知量数)  status  evidence(错误首行,≤200 字)
-# 普查口径：负例判据照 tools/check-engine-examples.py（is_negative，W47b 收紧版）；158 件非负例逐件 `ESML_PROPS=off esml solve <file>`（X-use/ 库件加 -L ~/esml-engine-user3/library），120 s/件超时
-# status 值域：ok / na-no-system / fail / timeout；evidence 只放错误首行
-# 共 158 行 / ok 127 / na 4 / fail 27 / timeout 0
-D-skeleton/data-scenario.esml	0	N/A	N/A	na-no-system	
-D-skeleton/doc-ref.esml	1	0	1	ok	
-D-skeleton/esml-coordinate.esml	1	0	1	ok	
-D-skeleton/metadata.esml	1	0	1	ok	
-D-skeleton/project.esml	0	N/A	N/A	na-no-system	
-D-skeleton/provenance.esml	1	0	1	ok	
-D-skeleton/skeleton-doc.esml	1	0	1	ok	
-D-skeleton/skeleton-full.esml	1	0	1	ok	
-D-skeleton/skeleton-minimal.esml	1	0	1	ok	
-D-skeleton/solutionparameters.esml	1	0	1	ok	
-L0-type-unit/literal-enum.esml	1	1	0	fail	error[F7]: L0-type-unit/literal-enum.esml:16:7 — unknown element `<literal>`
-L0-type-unit/observe-list.esml	1	0	2	ok	
-L0-type-unit/ordered-set.esml	1	0	1	ok	
-L0-type-unit/record-type.esml	0	N/A	N/A	na-no-system	
-L0-type-unit/type-unit.esml	1	0	3	ok	
-L0-type-unit/typesgeneric.esml	1	0	1	ok	
-L0-type-unit/typesthermal.esml	1	0	1	ok	
-L0-type-unit/units-anchoring.esml	1	0	1	ok	
-L0-type-unit/units-base-offset.esml	1	0	1	ok	
-L0-type-unit/units-base.esml	1	0	1	ok	
-L0-type-unit/units-derived-scale.esml	1	0	1	ok	
-L0-type-unit/units-derived.esml	1	0	1	ok	
-L0-type-unit/units-group.esml	1	0	1	ok	
-L0-type-unit/variable-roles.esml	1	0	3	ok	
-L1-expr-equation/array-index.esml	1	0	3	ok	
-L1-expr-equation/axis-reduce.esml	1	1	0	fail	error: undeclared symbol(s) referenced during flatten: m__x — these names do not resolve in the bound scope. Common causes: (a) typo / wrong case in the path; (b) the model that declares them was not 
-L1-expr-equation/builtins-complex.esml	1	0	8	ok	
-L1-expr-equation/builtins-delay.esml	1	0	2	ok	
-L1-expr-equation/builtins-expr.esml	1	0	28	ok	
-L1-expr-equation/builtins-math.esml	1	1	0	fail	error: undeclared symbol(s) referenced during flatten: time — these names do not resolve in the bound scope. Common causes: (a) typo / wrong case in the path; (b) the model that declares them was not 
-L1-expr-equation/derivative-analytic.esml	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm
-L1-expr-equation/equation-basic.esml	1	0	2	ok	
-L1-expr-equation/expr.esml	1	0	1	ok	
-L1-expr-equation/for-in.esml	1	0	6	ok	
-L1-expr-equation/for-over-orderedset.esml	1	0	4	ok	
-L1-expr-equation/ifelse.esml	1	1	0	fail	error: undeclared symbol(s) referenced during flatten: time — these names do not resolve in the bound scope. Common causes: (a) typo / wrong case in the path; (b) the model that declares them was not 
-L1-expr-equation/reference.esml	1	0	1	ok	
-L2-discrete/case-branch.esml	1	0	1	ok	
-L2-discrete/clock-functions.esml	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm
-L2-discrete/clock-sample.esml	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm
-L2-discrete/elsewhen.esml	1	0	2	ok	
-L2-discrete/initial.esml	1	0	1	ok	
-L2-discrete/initialisationprocedure-advance.esml	1	0	1	ok	
-L2-discrete/initialisationprocedures.esml	1	0	1	ok	
-L2-discrete/reset-transition.esml	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm
-L2-discrete/state-machine.esml	1	0	4	ok	
-L2-discrete/transition-attrs.esml	1	0	4	ok	
-L2-discrete/when-assign.esml	1	0	3	ok	
-L2-discrete/when-multiple.esml	1	0	2	ok	
-L2-discrete/when-reinit.esml	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm
-L3-model/annotation.esml	1	0	1	ok	
-L3-model/extends.esml	1	0	1	ok	
-L3-model/extendsfrom-child.esml	1	0	1	ok	
-L3-model/extendsfrom.esml	1	0	4	ok	
-L3-model/if.esml	1	0	1	ok	
-L3-model/members-composite.esml	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm
-L3-model/modeltype-basic.esml	1	0	1	ok	
-L3-model/partials.esml	1	0	1	ok	
-L3-model/selector-values.esml	1	0	2	ok	
-L4-port/conservation.esml	1	0	6	ok	
-L4-port/flow-potential.esml	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm
-L4-port/flow.esml	1	0	8	ok	
-L4-port/port-carrier.esml	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm
-L4-port/port-category-size.esml	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm
-L4-port/port-roles-io.esml	1	0	2	ok	
-L4-port/port-stream.esml	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm
-L4-port/porttype-electrical.esml	1	0	2	ok	
-L4-port/porttype-thermal.esml	1	0	2	ok	
-L4-port/potential.esml	1	0	8	ok	
-L4-port/signal-causal.esml	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm
-L4-port/stream.esml	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm
-L4-portvar/flow.esml	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm
-L4-portvar/potential.esml	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm
-L5-instance/component-alias.esml	1	0	2	ok	
-L5-instance/instance-basic.esml	1	0	1	ok	
-L5-instance/instance-condition.esml	1	0	2	ok	
-L5-instance/instance-count.esml	1	0	3	ok	
-L5-instance/scope-nested.esml	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm
-L5-instance/scope-set.esml	1	0	2	ok	
-L5-instance/setpoint.esml	1	0	1	ok	
-L5-instance/subsystem.esml	1	0	1	ok	
-L6-connect/composite-internal.esml	1	0	6	ok	
-L6-connect/connect-basic.esml	1	0	4	ok	
-L6-connect/connect-canonical.esml	1	0	4	ok	
-L6-connect/connect-rules.esml	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm
-L6-connect/port-array.esml	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm
-L6-connect/variable-level.esml	1	0	2	ok	
-L7-partition/domain.esml	1	0	1	ok	
-L7-partition/orderedsets.esml	1	0	1	ok	
-L7-partition/partition-chain.esml	1	0	5	ok	
-L7-partition/partition-crosslink.esml	1	0	3	ok	
-L7-partition/subsystem-crosslink.esml	1	0	1	ok	
-L8-function/algorithm-for.esml	1	0	1	ok	
-L8-function/algorithm-if.esml	1	0	1	ok	
-L8-function/algorithm-return.esml	1	0	1	ok	
-L8-function/algorithm-while.esml	1	1	0	fail	error[F7]: L8-function/algorithm-while.esml:20:9 — unknown element `<while>`
-L8-function/extern-cabi.esml	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm
-L8-function/foreign-object.esml	1	0	1	ok	
-L8-function/function-expr.esml	1	0	3	ok	
-L8-function/locals.esml	1	0	1	ok	
-L9-method-schedule/call-method-body.esml	1	0	1	ok	
-L9-method-schedule/continue-until.esml	1	1	0	fail	error[F7]: L9-method-schedule/continue-until.esml:20:7 — unknown attribute `maxTime` on `<continueUntil>`
-L9-method-schedule/fixed-preset.esml	1	0	1	ok	
-L9-method-schedule/free.esml	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm
-L9-method-schedule/method-vary.esml	1	1	0	fail	error[F7]: L9-method-schedule/method-vary.esml:23:9 — unknown element `<vary>`
-L9-method-schedule/methods-run.esml	1	0	1	ok	
-L9-method-schedule/onload.esml	1	0	3	ok	
-L9-method-schedule/reset.esml	1	0	1	ok	
-L9-method-schedule/schedule-call.esml	1	0	1	ok	
-L9-method-schedule/stop.esml	1	0	1	ok	
-T-tasks/actuator.esml	1	0	1	ok	
-T-tasks/algorithm.esml	1	0	1	ok	
-T-tasks/benchmarks.esml	1	0	1	ok	
-T-tasks/check.esml	1	0	1	ok	
-T-tasks/checks.esml	1	0	1	ok	
-T-tasks/constraint-expr.esml	1	0	1	ok	
-T-tasks/control-vars.esml	1	0	1	ok	
-T-tasks/controlled-control-vars.esml	1	0	1	ok	
-T-tasks/controlled.esml	1	0	1	ok	
-T-tasks/controller-gains.esml	1	0	1	ok	
-T-tasks/controller.esml	1	0	1	ok	
-T-tasks/dataset.esml	1	0	1	ok	
-T-tasks/design-vars.esml	1	0	1	ok	
-T-tasks/feature.esml	1	0	1	ok	
-T-tasks/features.esml	1	0	1	ok	
-T-tasks/gains.esml	1	0	1	ok	
-T-tasks/hyperparams.esml	1	1	0	fail	error[F7]: T-tasks/hyperparams.esml:30:22 — unknown element `<param>`
-T-tasks/method-tuning.esml	1	0	1	ok	
-T-tasks/metric-tolerancepct.esml	1	0	1	ok	
-T-tasks/mpc-matrices.esml	1	0	1	ok	
-T-tasks/outputlist.esml	1	0	1	ok	
-T-tasks/perturb-distribution.esml	1	0	1	ok	
-T-tasks/reference.esml	1	0	1	ok	
-T-tasks/sampling.esml	1	0	1	ok	
-T-tasks/sensor.esml	1	0	1	ok	
-T-tasks/setpoint.esml	1	0	1	ok	
-T-tasks/solutionparameters.esml	1	0	1	ok	
-T-tasks/status.esml	1	0	1	ok	
-T-tasks/surrogate-model.esml	1	0	1	ok	
-T-tasks/target.esml	1	0	1	ok	
-T-tasks/targets.esml	1	0	1	ok	
-T-tasks/task-constraint.esml	1	0	1	ok	
-T-tasks/task-control.esml	1	0	1	ok	
-T-tasks/task-estimation.esml	1	0	1	ok	
-T-tasks/task-optimize.esml	1	0	1	ok	
-T-tasks/task-sensitivity.esml	1	0	1	ok	
-T-tasks/task-simulate.esml	1	0	1	ok	
-T-tasks/task-surrogate.esml	1	0	1	ok	
-T-tasks/task-validation.esml	1	0	1	ok	
-T-tasks/task-vendor-text.esml	1	0	1	ok	
-T-tasks/tasks-auxiliary.esml	1	0	1	ok	
-T-tasks/tasks-seven.esml	1	0	1	ok	
-T-tasks/tasks.esml	1	0	1	ok	
-T-tasks/test-data.esml	1	0	1	ok	
-T-tasks/tolerance.esml	1	0	1	ok	
-X-use/systemref-libroot.esml	0	N/A	N/A	na-no-system	
-X-use/use-library.esml	1	0	8	ok	
-X-use/use-multi-library.esml	1	0	10	ok	
+# 列：path  has_system(1/0,lxml 判定)  solve_rc  unknowns(解出未知量数)  status  evidence(错误首行,≤200 字)  simulate_rc
+# 普查口径：负例判据照 tools/check-engine-examples.py（is_negative，W47b 收紧版）；158 件非负例逐件 `ESML_PROPS=off esml solve <file>`（X-use/ 库件加 -L ~/esml-engine-user3/library），120 s/件超时；solve 面的 fail 件 W52 续件逐件再跑 `ESML_PROPS=off esml simulate <file>`（X-use/ 加 -L），simulate 成功者记 ok-simulate（solve 稳态不适用），fail 只留 solve 与 simulate 双红件
+# status 值域：ok / ok-simulate（simulate 成功、solve 稳态不适用）/ na-no-system / fail / timeout
+# 共 158 行 / ok 127 / ok-simulate 6 / na 4 / fail 21
+D-skeleton/data-scenario.esml	0	N/A	N/A	na-no-system		
+D-skeleton/doc-ref.esml	1	0	1	ok		
+D-skeleton/esml-coordinate.esml	1	0	1	ok		
+D-skeleton/metadata.esml	1	0	1	ok		
+D-skeleton/project.esml	0	N/A	N/A	na-no-system		
+D-skeleton/provenance.esml	1	0	1	ok		
+D-skeleton/skeleton-doc.esml	1	0	1	ok		
+D-skeleton/skeleton-full.esml	1	0	1	ok		
+D-skeleton/skeleton-minimal.esml	1	0	1	ok		
+D-skeleton/solutionparameters.esml	1	0	1	ok		
+L0-type-unit/literal-enum.esml	1	1	0	fail	error[F7]: L0-type-unit/literal-enum.esml:16:7 — unknown element `<literal>` ｜ simulate rc=1 双红：error[F7]: L0-type-unit/literal-enum.esml:16:7 — unknown element `<literal>`	1
+L0-type-unit/observe-list.esml	1	0	2	ok		
+L0-type-unit/ordered-set.esml	1	0	1	ok		
+L0-type-unit/record-type.esml	0	N/A	N/A	na-no-system		
+L0-type-unit/type-unit.esml	1	0	3	ok		
+L0-type-unit/typesgeneric.esml	1	0	1	ok		
+L0-type-unit/typesthermal.esml	1	0	1	ok		
+L0-type-unit/units-anchoring.esml	1	0	1	ok		
+L0-type-unit/units-base-offset.esml	1	0	1	ok		
+L0-type-unit/units-base.esml	1	0	1	ok		
+L0-type-unit/units-derived-scale.esml	1	0	1	ok		
+L0-type-unit/units-derived.esml	1	0	1	ok		
+L0-type-unit/units-group.esml	1	0	1	ok		
+L0-type-unit/variable-roles.esml	1	0	3	ok		
+L1-expr-equation/array-index.esml	1	0	3	ok		
+L1-expr-equation/axis-reduce.esml	1	1	0	fail	error: undeclared symbol(s) referenced during flatten: m__x — these names do not resolve in the bound scope. Common causes: (a) typo / wrong case in the path; (b) the model that declares them was not  ｜ simulate rc=1 双红：error: undeclared symbol(s) referenced during flatten: m__x — these names do not	1
+L1-expr-equation/builtins-complex.esml	1	0	8	ok		
+L1-expr-equation/builtins-delay.esml	1	0	2	ok		
+L1-expr-equation/builtins-expr.esml	1	0	28	ok		
+L1-expr-equation/builtins-math.esml	1	1	0	fail	error: undeclared symbol(s) referenced during flatten: time — these names do not resolve in the bound scope. Common causes: (a) typo / wrong case in the path; (b) the model that declares them was not  ｜ simulate rc=1 双红：error: undeclared symbol(s) referenced during flatten: time — these names do not	1
+L1-expr-equation/derivative-analytic.esml	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm ｜ simulate rc=1 双红：error: simulate (during L7 DAE time integration) — `simulate_dae` wraps the IDA-	1
+L1-expr-equation/equation-basic.esml	1	0	2	ok		
+L1-expr-equation/expr.esml	1	0	1	ok		
+L1-expr-equation/for-in.esml	1	0	6	ok		
+L1-expr-equation/for-over-orderedset.esml	1	0	4	ok		
+L1-expr-equation/ifelse.esml	1	1	0	fail	error: undeclared symbol(s) referenced during flatten: time — these names do not resolve in the bound scope. Common causes: (a) typo / wrong case in the path; (b) the model that declares them was not  ｜ simulate rc=1 双红：error: undeclared symbol(s) referenced during flatten: time — these names do not	1
+L1-expr-equation/reference.esml	1	0	1	ok		
+L2-discrete/case-branch.esml	1	0	1	ok		
+L2-discrete/clock-functions.esml	1	1	0	ok-simulate	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm ｜ simulate rc=0（solve 不适用）	0
+L2-discrete/clock-sample.esml	1	1	0	ok-simulate	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm ｜ simulate rc=0（solve 不适用）	0
+L2-discrete/elsewhen.esml	1	0	2	ok		
+L2-discrete/initial.esml	1	0	1	ok		
+L2-discrete/initialisationprocedure-advance.esml	1	0	1	ok		
+L2-discrete/initialisationprocedures.esml	1	0	1	ok		
+L2-discrete/reset-transition.esml	1	1	0	ok-simulate	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm ｜ simulate rc=0（solve 不适用）	0
+L2-discrete/state-machine.esml	1	0	4	ok		
+L2-discrete/transition-attrs.esml	1	0	4	ok		
+L2-discrete/when-assign.esml	1	0	3	ok		
+L2-discrete/when-multiple.esml	1	0	2	ok		
+L2-discrete/when-reinit.esml	1	1	0	ok-simulate	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm ｜ simulate rc=0（solve 不适用）	0
+L3-model/annotation.esml	1	0	1	ok		
+L3-model/extends.esml	1	0	1	ok		
+L3-model/extendsfrom-child.esml	1	0	1	ok		
+L3-model/extendsfrom.esml	1	0	4	ok		
+L3-model/if.esml	1	0	1	ok		
+L3-model/members-composite.esml	1	1	0	ok-simulate	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm ｜ simulate rc=0（solve 不适用）	0
+L3-model/modeltype-basic.esml	1	0	1	ok		
+L3-model/partials.esml	1	0	1	ok		
+L3-model/selector-values.esml	1	0	2	ok		
+L4-port/conservation.esml	1	0	6	ok		
+L4-port/flow-potential.esml	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm ｜ simulate rc=1 双红：error: simulate (during scheduled run) — the document has a <schedule>; `simulat	1
+L4-port/flow.esml	1	0	8	ok		
+L4-port/port-carrier.esml	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm ｜ simulate rc=1 双红：error: simulate (during L7 DAE time integration) — `simulate_dae` wraps the IDA-	1
+L4-port/port-category-size.esml	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm ｜ simulate rc=1 双红：error: simulate (during scheduled run) — the document has a <schedule>; `simulat	1
+L4-port/port-roles-io.esml	1	0	2	ok		
+L4-port/port-stream.esml	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm ｜ simulate rc=1 双红：error: simulate (during scheduled run) — the document has a <schedule>; `simulat	1
+L4-port/porttype-electrical.esml	1	0	2	ok		
+L4-port/porttype-thermal.esml	1	0	2	ok		
+L4-port/potential.esml	1	0	8	ok		
+L4-port/signal-causal.esml	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm ｜ simulate rc=1 双红：error: simulate (during scheduled run) — the document has a <schedule>; `simulat	1
+L4-port/stream.esml	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm ｜ simulate rc=1 双红：error: simulate (during scheduled run) — the document has a <schedule>; `simulat	1
+L4-portvar/flow.esml	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm ｜ simulate rc=1 双红：error: simulate (during scheduled run) — the document has a <schedule>; `simulat	1
+L4-portvar/potential.esml	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm ｜ simulate rc=1 双红：error: simulate (during scheduled run) — the document has a <schedule>; `simulat	1
+L5-instance/component-alias.esml	1	0	2	ok		
+L5-instance/instance-basic.esml	1	0	1	ok		
+L5-instance/instance-condition.esml	1	0	2	ok		
+L5-instance/instance-count.esml	1	0	3	ok		
+L5-instance/scope-nested.esml	1	1	0	ok-simulate	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm ｜ simulate rc=0（solve 不适用）	0
+L5-instance/scope-set.esml	1	0	2	ok		
+L5-instance/setpoint.esml	1	0	1	ok		
+L5-instance/subsystem.esml	1	0	1	ok		
+L6-connect/composite-internal.esml	1	0	6	ok		
+L6-connect/connect-basic.esml	1	0	4	ok		
+L6-connect/connect-canonical.esml	1	0	4	ok		
+L6-connect/connect-rules.esml	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm ｜ simulate rc=1 双红：error: simulate (during L7 DAE time integration) — `simulate_dae` wraps the IDA-	1
+L6-connect/port-array.esml	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm ｜ simulate rc=1 双红：error: simulate (during L7 DAE time integration) — `simulate_dae` wraps the IDA-	1
+L6-connect/variable-level.esml	1	0	2	ok		
+L7-partition/domain.esml	1	0	1	ok		
+L7-partition/orderedsets.esml	1	0	1	ok		
+L7-partition/partition-chain.esml	1	0	5	ok		
+L7-partition/partition-crosslink.esml	1	0	3	ok		
+L7-partition/subsystem-crosslink.esml	1	0	1	ok		
+L8-function/algorithm-for.esml	1	0	1	ok		
+L8-function/algorithm-if.esml	1	0	1	ok		
+L8-function/algorithm-return.esml	1	0	1	ok		
+L8-function/algorithm-while.esml	1	1	0	fail	error[F7]: L8-function/algorithm-while.esml:20:9 — unknown element `<while>` ｜ simulate rc=1 双红：error[F7]: L8-function/algorithm-while.esml:20:9 — unknown element `<while>`	1
+L8-function/extern-cabi.esml	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm ｜ simulate rc=1 双红：error: simulate (during L7 DAE time integration) — `simulate_dae` wraps the IDA-	1
+L8-function/foreign-object.esml	1	0	1	ok		
+L8-function/function-expr.esml	1	0	3	ok		
+L8-function/locals.esml	1	0	1	ok		
+L9-method-schedule/call-method-body.esml	1	0	1	ok		
+L9-method-schedule/continue-until.esml	1	1	0	fail	error[F7]: L9-method-schedule/continue-until.esml:20:7 — unknown attribute `maxTime` on `<continueUntil>` ｜ simulate rc=1 双红：error[F7]: L9-method-schedule/continue-until.esml:20:7 — unknown attribute `maxT	1
+L9-method-schedule/fixed-preset.esml	1	0	1	ok		
+L9-method-schedule/free.esml	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm ｜ simulate rc=1 双红：error: simulate (during scheduled run) — the document has a <schedule>; `simulat	1
+L9-method-schedule/method-vary.esml	1	1	0	fail	error[F7]: L9-method-schedule/method-vary.esml:23:9 — unknown element `<vary>` ｜ simulate rc=1 双红：error[F7]: L9-method-schedule/method-vary.esml:23:9 — unknown element `<vary>`	1
+L9-method-schedule/methods-run.esml	1	0	1	ok		
+L9-method-schedule/onload.esml	1	0	3	ok		
+L9-method-schedule/reset.esml	1	0	1	ok		
+L9-method-schedule/schedule-call.esml	1	0	1	ok		
+L9-method-schedule/stop.esml	1	0	1	ok		
+T-tasks/actuator.esml	1	0	1	ok		
+T-tasks/algorithm.esml	1	0	1	ok		
+T-tasks/benchmarks.esml	1	0	1	ok		
+T-tasks/check.esml	1	0	1	ok		
+T-tasks/checks.esml	1	0	1	ok		
+T-tasks/constraint-expr.esml	1	0	1	ok		
+T-tasks/control-vars.esml	1	0	1	ok		
+T-tasks/controlled-control-vars.esml	1	0	1	ok		
+T-tasks/controlled.esml	1	0	1	ok		
+T-tasks/controller-gains.esml	1	0	1	ok		
+T-tasks/controller.esml	1	0	1	ok		
+T-tasks/dataset.esml	1	0	1	ok		
+T-tasks/design-vars.esml	1	0	1	ok		
+T-tasks/feature.esml	1	0	1	ok		
+T-tasks/features.esml	1	0	1	ok		
+T-tasks/gains.esml	1	0	1	ok		
+T-tasks/hyperparams.esml	1	1	0	fail	error[F7]: T-tasks/hyperparams.esml:30:22 — unknown element `<param>` ｜ simulate rc=1 双红：error[F7]: T-tasks/hyperparams.esml:30:22 — unknown element `<param>`	1
+T-tasks/method-tuning.esml	1	0	1	ok		
+T-tasks/metric-tolerancepct.esml	1	0	1	ok		
+T-tasks/mpc-matrices.esml	1	0	1	ok		
+T-tasks/outputlist.esml	1	0	1	ok		
+T-tasks/perturb-distribution.esml	1	0	1	ok		
+T-tasks/reference.esml	1	0	1	ok		
+T-tasks/sampling.esml	1	0	1	ok		
+T-tasks/sensor.esml	1	0	1	ok		
+T-tasks/setpoint.esml	1	0	1	ok		
+T-tasks/solutionparameters.esml	1	0	1	ok		
+T-tasks/status.esml	1	0	1	ok		
+T-tasks/surrogate-model.esml	1	0	1	ok		
+T-tasks/target.esml	1	0	1	ok		
+T-tasks/targets.esml	1	0	1	ok		
+T-tasks/task-constraint.esml	1	0	1	ok		
+T-tasks/task-control.esml	1	0	1	ok		
+T-tasks/task-estimation.esml	1	0	1	ok		
+T-tasks/task-optimize.esml	1	0	1	ok		
+T-tasks/task-sensitivity.esml	1	0	1	ok		
+T-tasks/task-simulate.esml	1	0	1	ok		
+T-tasks/task-surrogate.esml	1	0	1	ok		
+T-tasks/task-validation.esml	1	0	1	ok		
+T-tasks/task-vendor-text.esml	1	0	1	ok		
+T-tasks/tasks-auxiliary.esml	1	0	1	ok		
+T-tasks/tasks-seven.esml	1	0	1	ok		
+T-tasks/tasks.esml	1	0	1	ok		
+T-tasks/test-data.esml	1	0	1	ok		
+T-tasks/tolerance.esml	1	0	1	ok		
+X-use/systemref-libroot.esml	0	N/A	N/A	na-no-system		
+X-use/use-library.esml	1	0	8	ok		
+X-use/use-multi-library.esml	1	0	10	ok		
