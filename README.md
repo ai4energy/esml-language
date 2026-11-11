@@ -10,12 +10,17 @@ ESML 是一种声明式、基于方程的物理系统建模语言，文档即 XM
 |---|---|
 | [`SPEC.md`](SPEC.md) | 语言规范：词法、类型系统、组件、端口、系统、方程、展开与求解约定 |
 | [`xsd/`](xsd/) | XML Schema：入口 schema 一份，canonical 子集四份（共享 primitive / 模型体系 / 计算体系 / 项目容器） |
-| [`docs/`](docs/) | 机验对账：[`validate_roots.py`](docs/validate_roots.py)（入口层根清单 ⇄ canonical 全局元素）与 [`validate_examples.py`](docs/validate_examples.py)（规范 ⇄ 示例，五道检查）、[`coverage.md`](docs/coverage.md)（对账表与逐条裁决）、[`design/`](docs/design/)（裁决记录） |
+| [`docs/`](docs/) | 机验对账：[`validate_roots.py`](docs/validate_roots.py)（入口层根清单 ⇄ canonical 全局元素）与 [`validate_examples.py`](docs/validate_examples.py)（规范 ⇄ 示例，五道检查）、[`coverage.md`](docs/coverage.md)（对账表与逐条裁决）、[`design/`](docs/design/)（裁决记录）、[`audit/`](docs/audit/)（strict 基线等审计件） |
 | [`tools/`](tools/) | 台账闸：[`element-coverage.tsv`](tools/element-coverage.tsv)（元素覆盖双向台账）、[`attr-acceptance.tsv`](tools/attr-acceptance.tsv)（属性验收台账）、[`engine-drift.tsv`](tools/engine-drift.tsv)（跨仓 schema 漂移裁决）、[`aliases.tsv`](tools/aliases.tsv)（legacy 拼法清单）、[`negatives.tsv`](tools/negatives.tsv) / [`neg-debt.tsv`](tools/neg-debt.tsv)（负例清单与债务处置） |
 | `D-skeleton/` … `X-use/` | 每个语法点一份可运行文档，按语言层次分目录（见下表） |
 
 canonical XML 是正统语法；XML Schema 描述 canonical XML，是可机验的基准。
 文字与 schema 出现分歧时，以 schema 为准。
+
+```sh
+python3 -m venv .venv && .venv/bin/pip install xmlschema lxml   # 一次装齐四道闸的依赖
+PY=.venv/bin/python make check                                  # 全绿 = 可以提交
+```
 
 ## 手册
 
@@ -166,6 +171,14 @@ SPEC 写了 XSD 不认的根 = 规范与 schema 对不上。确有据可查、�
 语言变更先落为规范修订：一处改动同时涉及 `SPEC.md`、它蕴含的 XSD 变更，以及
 至少一份演示该语法的示例。拼写单轨——同一语义只有一种写法，其余写法一律报错，
 不做静默兼容。
+
+新增一个语法点的完整工序（缺一步闸门会替你抓住）：
+
+1. `SPEC.md` 落条文（带编号，示例要能引用它）；
+2. `xsd/*.xsd` 落声明；
+3. 至少一份示例演示**合法写法**（头注指名 SPEC 条文）；被拒的写法补负例并登记
+   [`tools/negatives.tsv`](tools/negatives.tsv)；
+4. `make check` 全绿；元素/属性覆盖闸若报「声明了没示例」，在对应台账登记或补示例。
 
 ## 许可
 
