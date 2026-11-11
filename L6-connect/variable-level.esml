@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 变量级连接：from="a.x" to="b.y"（x/y 是实例变量，非端口）→ b_y = a_x 直接相等。
+     规范条文：§8「变量级连接」条（from/to 指向实例变量时展开为两变量直接相等，不经端口势流语义）。
+     本例：a(Fix) 钉 a.x=5.0；b(Copy) 的 b.y 无自身方程；连接 from="a.x" to="b.y"。
+     连接展开为 b.y = a.x 直接相等 ⇒ b.y 被强制 5.0。
+     期望（ESML_PROPS=off esml solve 实测，2 未知）：a.x=5.0、b.y=5.0（b.y==a.x）。
+     check errors=0。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L6_VariableLevel">
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
+  <modelTypes>
+    <modelType name="Fix">
+      <variables><variable name="x" type="real" role="algebraic"/></variables>
+      <equations><equation>x = 5.0</equation></equations>
+    </modelType>
+    <modelType name="Copy">
+      <variables><variable name="y" type="real" role="algebraic"/></variables>
+    </modelType>
+  </modelTypes>
+  <systems><system name="S">
+    <instances><instance name="a" type="Fix"/><instance name="b" type="Copy"/></instances>
+    <connections><connection from="a.x" to="b.y"/></connections>
+  </system></systems>
+</esml>

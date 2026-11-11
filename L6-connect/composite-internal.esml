@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 复合 modelType 内部 <connections>：壳端口 L/R + 成员 a/b，内部用裸成员口名
+     （from="a.port" to="b.port"，无实例头）接成员端口；展开时逐层加 父__ 前缀并入系统连接表。
+     规范条文：§4.1 复合组件（§6.4:290-312 示例片段；:312「内部接线…逐层加 父__ 前缀」）、§8 逐 pvar 相等。
+     本例：成员 a(FixA) 钉 a.port.v=5.0；成员 b(Out) 是纯读出口、无自身方程；壳端口 L/R 在
+     系统层闭合（Src(5.0)→chain.L、chain.R→Snk(5.0)）。
+     唯一给 b 定值的方程就是内部裸名连接 a.port→b.port ⇒ chain.b.port.v 被强制 5.0。
+     这正是本语法点要证明的：裸成员口名内部接线展开成 父__ 前缀逐层相等、带出确定数值。
+     期望（ESML_PROPS=off esml solve 实测，6 未知全 5.0）：
+       src.p.v=5.0  chain.L.v=5.0  chain.R.v=5.0  chain.a.port.v=5.0  chain.b.port.v=5.0  snk.p.v=5.0
+     check errors=0。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L6_CompositeInternal">
+<variableTypes><type name="real" unit="1" default="0.0"/></variableTypes><portTypes><portType name="Pin" connectorFamily="generic"><variables><portVariable name="v" portRole="potential" type="real"/></variables></portType></portTypes><modelTypes><modelType name="FixA"><ports><port name="port" portType="Pin"/></ports><parameters><parameter name="Vset" type="real" default="5.0"/></parameters><variables><variable name="port.v" type="real" role="algebraic"/></variables><equations><equation>port.v = Vset</equation></equations></modelType><modelType name="Out"><ports><port name="port" portType="Pin"/></ports><variables><variable name="port.v" type="real" role="algebraic"/></variables></modelType><modelType name="Chain"><ports><port name="L" portType="Pin"/><port name="R" portType="Pin"/></ports><members><instance name="a" type="FixA"/><instance name="b" type="Out"/></members><connections><connection from="a.port" to="b.port"/></connections></modelType><modelType name="Src"><ports><port name="p" portType="Pin"/></ports><parameters><parameter name="V" type="real" default="5.0"/></parameters><variables><variable name="p.v" type="real" role="algebraic"/></variables><equations><equation>p.v = V</equation></equations></modelType><modelType name="Snk"><ports><port name="p" portType="Pin"/></ports><parameters><parameter name="V" type="real" default="5.0"/></parameters><variables><variable name="p.v" type="real" role="algebraic"/></variables><equations><equation>p.v = V</equation></equations></modelType></modelTypes><systems><system name="S"><instances><instance name="src" type="Src"/><instance name="chain" type="Chain"/><instance name="snk" type="Snk"/></instances><connections><connection from="src.p" to="chain.L"/><connection from="chain.R" to="snk.p"/></connections></system></systems></esml>
