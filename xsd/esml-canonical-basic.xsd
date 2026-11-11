@@ -130,14 +130,6 @@
     <xs:anyAttribute processContents="lax"/>
   </xs:complexType>
 
-  <!-- 元数据自由文本子元素（author/license/description/provenance）：
-       纯文本承载，无属性、无子元素（SPEC：「写什么都不改变方程数」）。 -->
-  <xs:complexType name="MetadataFreeTextType">
-    <xs:simpleContent>
-      <xs:extension base="xs:string"/>
-    </xs:simpleContent>
-  </xs:complexType>
-
   <!-- 文档元数据：author/license/description/provenance 等自由键值块；
        仅存于文档根，子结构不被强制消费。
        SPEC §1.1：「常用子元素 `<author>` / `<license>` / `<description>` /
@@ -149,11 +141,8 @@
        是**条文与通配撤除的既定冲突**——SPEC 点名「放行任意子元素」，
        撤掉通配即推翻条文，故这 3 件是规范债（条文欠账），非示例错、
        非 schema 欠账，基线 `docs/audit/strict-baseline.txt` 即其口径。
-       SPEC 点名的四者 + `<doc>` 另在**全局元素层**有真声明（下）：
-       嵌套在 `<esml>` 根的 `<metadata>` 下走本容器通配（见上条），
-       全局层声明保留是为「库根 `<metadata>` 独立文档」这一 SPEC §13
-       点名的合法根形态——当前语料无此根（`root_of` 计数只有
-       esml/project），若 SPEC 日后增补该形态的示例，直接可用。 -->
+       这四个自由文本子元素 + `<doc>` **不是文档根**，只在 `<metadata>` 下
+       经本容器 `xs:any` 通配放行，故不在全局元素层声明（见「独立根 `<metadata>`」注释）。 -->
   <xs:complexType name="MetadataType" mixed="true">
     <xs:sequence>
       <xs:any namespace="##targetNamespace" processContents="lax"
@@ -1058,17 +1047,15 @@
   <xs:element name="orderedSet" type="esml:OrderedSetType"/>
 
   <!-- 独立根 `<metadata>` 块（文档根元数据；子结构不被消费，lax 通过）。
-       SPEC §1.1 点名的四个自由文本子元素 + T-DOCREF 的 `<doc>` 在此补**全局
-       真声明**：库根 `<metadata>` 文档（`D-skeleton/metadata.esml` 等）里
-       `<author>`/`<license>`/`<description>`/`<provenance>`/`<doc>` 走这些
-       全局元素，strict 闸（撤 xs:any）下仍绿——通配只兜 SPEC 未点名的
-       自由键值（条文要求放行任意子元素，见 MetadataType 注释）。 -->
+       SPEC §1.1 点名的四个自由文本子元素 `<author>`/`<license>`/`<description>`/
+       `<provenance>` 与 T-DOCREF 的 `<doc>` **不是文档根**——它们只是 `<metadata>`
+       的子元素。库根 `<metadata>` 文档（`D-skeleton/metadata.esml` 等）里，它们
+       靠 `MetadataType` 的 `xs:any namespace="##targetNamespace"` 通配（lax）放行，
+       故 plain 校验绿；strict 闸（撤 xs:any）下 `metadata`/`provenance`/`doc-ref`
+       三件仍红——这是条文「子结构不固定、放行任意子元素」与撤通配的**既定冲突**，
+       记在 `docs/audit/strict-baseline.txt` 基线 3 里，属规范债，**不靠把它们提成
+       全局根来假绿**（提成全局根会污染 canonical 全局元素集、反与入口 schema 失配）。 -->
   <xs:element name="metadata" type="esml:MetadataType"/>
-  <xs:element name="author" type="esml:MetadataFreeTextType"/>
-  <xs:element name="license" type="esml:MetadataFreeTextType"/>
-  <xs:element name="description" type="esml:MetadataFreeTextType"/>
-  <xs:element name="provenance" type="esml:MetadataFreeTextType"/>
-  <xs:element name="doc" type="esml:DocRefType"/>
   <xs:element name="modelTypes">
     <xs:complexType><xs:sequence>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
@@ -1147,30 +1134,117 @@
       </xs:extension>
     </xs:simpleContent>
   </xs:complexType>
-  <!-- `<algorithm>` 语句集（附录 I + SPEC「算法段降级」段 + 附录 F3 同族）：
-       `<assign>` 逐句赋值；`<if><condition>…</condition><then>…[<else>…]</then></if>`
-       条件分支（降级期静态展开为 `ifelse`，故 `<then>` 至多一次、`<else>` 至多一次
-       且仅在 `<then>` 内）；`<while condition="c">…</while>` 循环（**仅常量
-       false** 条件可处理，运行时条件是响亮错误——循环体 schema 层不机验，
-       与 `<body>` 同纪律）。语料实测：当前仅 `<assign>` 出现
-       （`T-tasks/algorithm.esml`、`L8-function/locals.esml`）；`<if>` / `<for>`
-       / `<return>` 为 SPEC 点名的降级对象（SPEC「算法段降级为纯表达式」：
-       `assign` 代入、`if/else`→`ifelse`、常量 `for` 展开），按条文封入。
-       封闭 choice、未知语句自此响亮拒收——此前整段是 `mixed + xs:any skip`
-       裸兜底，strict 闸下撤掉即红。 -->
+  <!-- `<algorithm>` 语句集（W14 按**引擎实测**重封，非 SPEC 字面猜）：
+       五件 `assign` / `if` / `for` / `return` / `while`。
+       依据：W14 实测表（引擎 esml check/solve）—— T1-T8 全 errors=0，
+       <for>/<return> 引擎真吃、<if condition=> 属性形引擎真读（components.rs:311）；
+       W9 旧版只封 assign/if/while 且 <if> 用 <condition> 子元素 + <then> 必填，
+       致 T2/T3/T4/T7 被 XSD 假拒收。本单恢复 for/return，<if> 改属性形 + <then>
+       可选，<while> condition 改 optional default=false。
+       分支体声明引擎实测过且有仓内示例的语句（至少 assign），铺不满的写注释。
+       引擎欠账三行（T5/T6/T8 errors=0 但算错）与本 XSD 无关，见 engine-drift.tsv。 -->
   <xs:complexType name="AlgorithmType">
     <xs:sequence>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <!-- <assign>：逐句赋值（引擎 components.rs assign 分支，实测 T1） -->
         <xs:element name="assign" type="esml:AssignType"/>
+        <!-- <if condition="...">：condition 是**属性**（引擎 components.rs:311
+             attr_or(ch,"condition","") 读属性非子元素）；分支体 = 非 <else> 子元素
+             （components.rs:312-316），故 <then> 是可选壳。
+             算法段 <if> **不**用 <condition> 子元素（那是模型级 <if> 读点
+             model.rs:217-250，另一套，本单不动）。 -->
         <xs:element name="if">
           <xs:complexType>
             <xs:sequence>
-              <xs:element name="condition" type="esml:ConditionType"/>
-              <xs:element name="then" type="esml:AlgorithmThenType" minOccurs="1" maxOccurs="1"/>
-              <xs:element name="else" type="esml:AlgorithmThenType" minOccurs="0" maxOccurs="1"/>
+              <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element name="assign" type="esml:AssignType"/>
+                <!-- <then> 壳：引擎 bug（T8 静默错算），不在 XSD 合法化；
+                     但引擎文档可出现 <then>（components.rs:312-316 非 <else> 子元素
+                     全当 then 体），本 schema 放行 <then> 以不假拒收合法文档。 -->
+                <xs:element name="then">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:choice minOccurs="0" maxOccurs="unbounded">
+                        <xs:element name="assign" type="esml:AssignType"/>
+                      </xs:choice>
+                    </xs:sequence>
+                    <xs:anyAttribute processContents="lax"/>
+                  </xs:complexType>
+                </xs:element>
+                <!-- <else> 壳：引擎 <if> 找 <else> 作为 else 分支
+                     （components.rs:318-322），<else> 内的子元素是 else 体。
+                     本 schema 放行 <else>（引擎 errors=0 接受它）。 -->
+                <xs:element name="else">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:choice minOccurs="0" maxOccurs="unbounded">
+                        <xs:element name="assign" type="esml:AssignType"/>
+                      </xs:choice>
+                    </xs:sequence>
+                    <xs:anyAttribute processContents="lax"/>
+                  </xs:complexType>
+                </xs:element>
+                <!-- <for>/<return>/嵌套 <if> 引擎也吃得下（exec_algorithm 递归），
+                     但本仓尚无对应示例，按 W14 不铺——写注释留待补 -->
+              </xs:choice>
             </xs:sequence>
+            <xs:attribute name="condition" type="xs:string" use="optional"/>
+            <xs:anyAttribute processContents="lax"/>
           </xs:complexType>
         </xs:element>
+        <!-- <for var="i" in="lo..hi">：SPEC:241/1282/1298 写 in="lo..hi"
+             （方程级 <for> 读点 model.rs:527），`in` 是 canonical。
+             但**算法段** `<for>` 引擎只认 `range="a:b"`（components.rs:345），
+             `in=` 在此宿主被静默忽略（零次迭代、不报错、solve 得 0.0），
+             六拼法里唯一能算对的就是 `range="a:b"` 且无 <body> 壳——
+             静默错答，严重度高于普通拼写漂移。全表见
+             L8-function/algorithm-for.esml 头注；台账 engine-drift.tsv
+             attr algorithm-for 三行 + docs/coverage.md §5.3。
+             本 schema 声明 in 与 range 皆 optional：in 是 canonical，
+             range 是引擎算法段唯一有效拼写（见下表）。 -->
+        <xs:element name="for">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element name="assign" type="esml:AssignType"/>
+                <!-- <body> 壳：引擎 bug（T6 静默错算），不在 XSD 合法化；
+                     但引擎文档可出现 <body>（components.rs:345 直取 children），
+                     本 schema 放行 <body> 以不假拒收合法文档。 -->
+                <xs:element name="body">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:choice minOccurs="0" maxOccurs="unbounded">
+                        <xs:element name="assign" type="esml:AssignType"/>
+                      </xs:choice>
+                    </xs:sequence>
+                    <xs:anyAttribute processContents="lax"/>
+                  </xs:complexType>
+                </xs:element>
+
+              </xs:choice>
+            </xs:sequence>
+            <xs:attribute name="var" type="xs:string" use="optional"/>
+            <xs:attribute name="in" type="xs:string" use="optional"/>
+            <!-- range：引擎算法段唯一有效拼写（components.rs:345），
+                 `in` 在此宿主静默不算（零次迭代、不报错，见上方六拼法表）。
+                 台账 engine-drift.tsv attr algorithm-for 三行；
+                 canonical 拼写仍是 in（方程级 <for> 读 in，SPEC:241/1282/1298）。 -->
+            <xs:attribute name="range" type="xs:string" use="optional"/>
+            <xs:anyAttribute processContents="lax"/>
+          </xs:complexType>
+        </xs:element>
+        <!-- <return value="..."/>：引擎 components.rs return 分支，实测 T2/T3 -->
+        <xs:element name="return">
+          <xs:complexType>
+            <xs:attribute name="value" type="xs:string" use="optional"/>
+            <xs:anyAttribute processContents="lax"/>
+          </xs:complexType>
+        </xs:element>
+        <!-- <while condition="c">：SPEC:846-848 点名（规范意图），保留。
+             引擎 KNOWN_SUB_TAGS 无 while（unknown.rs），F7 拒收——引擎欠账，
+             已登记 engine-drift.tsv（child algorithm while lang-wins SPEC-L846）。
+             condition 改 optional default=false：SPEC 说仅常量 false 可处理，
+             false 是语义缺省，required 是无线据加严。 -->
         <xs:element name="while">
           <xs:complexType>
             <xs:sequence>
@@ -1178,7 +1252,7 @@
                 <xs:element name="assign" type="esml:AssignType"/>
               </xs:choice>
             </xs:sequence>
-            <xs:attribute name="condition" type="xs:string" use="required"/>
+            <xs:attribute name="condition" type="xs:string" use="optional" default="false"/>
             <xs:anyAttribute processContents="lax"/>
           </xs:complexType>
         </xs:element>
@@ -1194,7 +1268,8 @@
     </xs:sequence>
     <xs:anyAttribute processContents="lax"/>
   </xs:complexType>
-  <xs:complexType name="ExternType">
+
+    <xs:complexType name="ExternType">
     <xs:attribute name="ffi" type="esml:FfiKindType" use="optional" default="c"/>
     <xs:attribute name="library" type="xs:string" use="required"/>
     <xs:attribute name="symbol" type="xs:string" use="required"/>

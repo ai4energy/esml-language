@@ -53,3 +53,86 @@ attr	anon@esml-v1.xsd:13	name	engine-wins	引擎 orderedSet 内联匿名多记 n
 attr	anon@esml-v1.xsd:13	static	engine-wins	引擎 orderedSet 内联匿名多记 static；SPEC-L93 <orderedSet name static=> 两侧语义同，engine 残留	2026-11-10
 attr	anon@esml-v1.xsd:7	name	lang-wins	lang 入口层 orderedSet 内联匿名多记 name；engine 侧漏记，lang-wins	2026-11-10
 attr	anon@esml-v1.xsd:7	static	lang-wins	lang 入口层 orderedSet 内联匿名多记 static；SPEC-L93 两侧语义同，lang-wins	2026-11-10
+child	algorithm	while	lang-wins	SPEC-L846	2026-11-10
+attr	algorithm-for	range	lang-wins	W19 静默错答：SPEC-L1282 拼写之外，in= 在算法段被引擎静默忽略（零次迭代，solve 得 0.0，check errors=0），本行记属性名口径	2026-11-10
+attr	algorithm-for	in	lang-wins	W19 静默错答：算法段 in= 拼写（1..3 / 1:3）均被引擎静默忽略，零次迭代且不报错，solve m.y=0.0；与 range= 同宿主二选一，in 是 canonical（方程级 for 读 in）但算法段引擎只认 range	2026-11-10
+child	algorithm-for	body	lang-wins	W19 静默错答：算法段 for 加 <body> 壳后整块不展开（零次迭代），check errors=0，solve m.y=0.0；方程级 for 有/无 <body> 等价，算法段相反	2026-11-10
+child	AlgorithmThenType	assign	lang-wins	W14 算法段 then 壳声明	2026-11-10
+child	AlgorithmType	assign	lang-wins	W14 算法段 assign 语句	2026-11-10
+child	AlgorithmType	for	lang-wins	W14 算法段 for 语句（引擎 components.rs:345）	2026-11-10
+child	AlgorithmType	if	lang-wins	W14 算法段 if 语句（引擎 components.rs:311）	2026-11-10
+child	AlgorithmType	return	lang-wins	W14 算法段 return 语句	2026-11-10
+attr	AssignType	name	lang-wins	W9 真声明	2026-11-10
+attr	AssignType	path	lang-wins	W9 真声明	2026-11-10
+attr	AssignType	unit	lang-wins	W9 真声明	2026-11-10
+attr	AssignType	value	lang-wins	W9 真声明	2026-11-10
+attr	ComputeTaskLiteType	kind	lang-wins	W9 真声明	2026-11-10
+attr	ComputeTaskLiteType	name	lang-wins	W9 真声明	2026-11-10
+attr	ComputeTaskLiteType	target	lang-wins	W9 真声明	2026-11-10
+attr	esml	coordinate	lang-wins	W9 真声明	2026-11-10
+attr	esml	version	lang-wins	W9 真声明	2026-11-10
+attr	FunctionLocalType	name	lang-wins	W9 真声明	2026-11-10
+attr	LiteralType	name	lang-wins	W9 真声明	2026-11-10
+attr	MethodDefType	name	lang-wins	W9 真声明	2026-11-10
+attr	MethodFixType	name	lang-wins	W9 真声明	2026-11-10
+attr	MethodFixType	value	lang-wins	W9 真声明	2026-11-10
+attr	MethodFreeType	name	lang-wins	W9 真声明	2026-11-10
+attr	MethodRunType	name	lang-wins	W9 真声明	2026-11-10
+attr	MethodSetType	path	lang-wins	W9 真声明	2026-11-10
+attr	MethodSetType	value	lang-wins	W9 真声明	2026-11-10
+attr	MethodVaryType	name	lang-wins	W9 真声明	2026-11-10
+attr	ModelType	discipline	lang-wins	W9 真声明	2026-11-10
+attr	ProjectDecisionType	lower	lang-wins	W9 真声明	2026-11-10
+attr	ProjectDecisionType	name	lang-wins	W9 真声明	2026-11-10
+attr	ProjectDecisionType	upper	lang-wins	W9 真声明	2026-11-10
+attr	project	schema	lang-wins	W9 真声明	2026-11-10
+attr	ProjectSolverType	abstol	lang-wins	W9 真声明	2026-11-10
+attr	ProjectSolverType	maxsteps	lang-wins	W9 真声明	2026-11-10
+attr	ProjectSolverType	name	lang-wins	W9 真声明	2026-11-10
+attr	ProjectSolverType	reltol	lang-wins	W9 真声明	2026-11-10
+attr	ProjectSolverType	saveat	lang-wins	W9 真声明	2026-11-10
+attr	ProjectTspanType	from	lang-wins	W9 真声明	2026-11-10
+attr	ProjectTspanType	to	lang-wins	W9 真声明	2026-11-10
+attr	SolutionParametersType	abstol	lang-wins	W9 真声明	2026-11-10
+attr	SolutionParametersType	name	lang-wins	W9 真声明	2026-11-10
+attr	SolutionParametersType	reltol	lang-wins	W9 真声明	2026-11-10
+attr	SolverType	abstol	lang-wins	W9 真声明	2026-11-10
+attr	SolverType	maxsteps	lang-wins	W9 真声明	2026-11-10
+attr	SolverType	name	lang-wins	W9 真声明	2026-11-10
+attr	SolverType	reltol	lang-wins	W9 真声明	2026-11-10
+attr	SolverType	saveat	lang-wins	W9 真声明	2026-11-10
+attr	SystemType	discipline	lang-wins	W9 真声明	2026-11-10
+attr	TypesCategoryType	discipline	lang-wins	W9 真声明	2026-11-10
+child	ComputeTaskLiteType	decision	lang-wins	W9 真声明	2026-11-10
+child	ComputeTaskLiteType	objective	lang-wins	W9 真声明	2026-11-10
+child	ComputeTaskLiteType	solver	lang-wins	W9 真声明	2026-11-10
+child	ComputeTaskLiteType	tspan	lang-wins	W9 真声明	2026-11-10
+child	ComputeTasksType	task	lang-wins	W9 真声明	2026-11-10
+child	MethodDefType	fix	lang-wins	W9 真声明	2026-11-10
+child	MethodDefType	free	lang-wins	W9 真声明	2026-11-10
+child	MethodDefType	run	lang-wins	W9 真声明	2026-11-10
+child	MethodDefType	set	lang-wins	W9 真声明	2026-11-10
+child	MethodDefType	vary	lang-wins	W9 真声明	2026-11-10
+child	MethodOnLoadType	set	lang-wins	W9 真声明	2026-11-10
+child	MethodsType	fix	lang-wins	W9 真声明	2026-11-10
+child	MethodsType	free	lang-wins	W9 真声明	2026-11-10
+child	MethodsType	method	lang-wins	W9 真声明	2026-11-10
+child	MethodsType	onLoad	lang-wins	W9 真声明	2026-11-10
+child	MethodsType	run	lang-wins	W9 真声明	2026-11-10
+child	MethodsType	vary	lang-wins	W9 真声明	2026-11-10
+child	SolutionParametersType	solver	lang-wins	W9 真声明	2026-11-10
+child	VariableType	literal	lang-wins	W9 真声明	2026-11-10
+child	VariableTypesType	type	lang-wins	W9 真声明	2026-11-10
+child	VariableTypesType	typesDimensionless	lang-wins	W9 真声明	2026-11-10
+child	VariableTypesType	typesGeneric	lang-wins	W9 真声明	2026-11-10
+child	VariableTypesType	typesThermal	lang-wins	W9 真声明	2026-11-10
+attr	anon@esml-canonical-basic.xsd:18	coordinate	lang-wins	W9 真声明	2026-11-10
+attr	anon@esml-canonical-basic.xsd:18	name	lang-wins	W9 真声明	2026-11-10
+attr	anon@esml-canonical-basic.xsd:18	schema	lang-wins	W9 真声明	2026-11-10
+attr	anon@esml-canonical-basic.xsd:18	version	lang-wins	W9 真声明	2026-11-10
+attr	anon@esml-canonical-basic.xsd:19	schema	lang-wins	W9 真声明	2026-11-10
+attr	anon@esml-canonical-basic.xsd:20	name	lang-wins	W9 真声明	2026-11-10
+attr	anon@esml-canonical-basic.xsd:22	value	lang-wins	W9 真声明	2026-11-10
+attr	anon@esml-canonical-basic.xsd:23	condition	lang-wins	W9 真声明	2026-11-10
+attr	anon@esml-canonical-project.xsd:1	schema	lang-wins	W9 真声明	2026-11-10
+child	AlgorithmType	while	lang-wins	SPEC-L846 算法段 while（引擎 KNOWN_SUB_TAGS 无此名）	2026-11-10

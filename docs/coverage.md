@@ -405,6 +405,45 @@ rc=1
 canonical 声明处）＋ 至少一份演示该语法的示例，外加实现侧把参数在条件求值
 前落表。
 
+### 5.10 算法段 `<for>` 六拼法：引擎只认 `range="a:b"` 且无 `<body>` 壳
+
+`L8-function/algorithm-for.esml` 头注记录了算法段 `<for>` 的六拼法实测
+（`y` 初值 0、体 `y = y + i`）：
+
+| 拼法 | `check` | `solve` `m.y` |
+|---|---|---|
+| `range="1:3"`（canonical） | errors=0 | 6.0 ✓ |
+| `in="1..3"` | errors=0 | 0.0 ✗ |
+| `in="1:3"` | errors=0 | 0.0 ✗ |
+| `range="1..3"` | errors=0 | 0.0 ✗ |
+| `range="1:3"` + `<body>` 壳 | errors=0 | 0.0 ✗ |
+| `in="1..3"` + `<body>` 壳 | errors=0 | 0.0 ✗ |
+| 无 `range` 属性 | errors=0 | 0.0 ✗ |
+
+**关键事实**：所有错误拼写均 `check` 全绿、`solve` 得 0.0——**静默错答**，
+严重度高于普通拼写漂移（引擎债务，台账 `engine-drift.tsv` `attr algorithm-for`
+三行）。算法段 `<for>` 唯一能算对的是 `range="a:b"` 且**无** `<body>` 壳；
+`in` 是 canonical 拼写（方程级 `<for>` 读 `in`，SPEC:241/1282/1298），但
+算法段引擎只认 `range`（`components.rs:345`）。
+
+### 5.11 XSD 已声明、引擎**拒绝**的四处（登记，本仓不裁）
+
+`xsd/esml-canonical-basic.xsd` 已声明以下元素/属性，但引擎 `esml check`
+**明确拒绝**（`F7[]: unknown element`）。W9 真声明时记为 `lang-wins`
+（方向判断），此处登记**引擎当前不收**的事实本身，不隐藏于 `lang-wins` 之后。
+
+| 条目 | XSD 声明处 | 引擎实测（verbatim） |
+|---|---|---|
+| `<literal name="a"/>` 在 `<variable>` 内 | `VariableType` / `LiteralType` | `error: F7[]: unknown element <literal> at …:12:38`，`errors=1` |
+| `<vary name="m.x"/>` 在 `<methods><onLoad>` 内 | `MethodVaryType` / `MethodsType` | `error: F7[]: unknown element <vary> at …:12:24`，`errors=1` |
+| `<while condition="…">` 在 `<algorithm>` 内 | `AlgorithmType`（`WhileType`） | `error: F7[]: unknown element <while> at …:12:7` ＋ `F1[]: parser rejected…`，`errors=2`，`five_level=BAD` |
+| `<connectionTypes>` 在文档根 | 顶层元素 | `error: F7[]: unknown element <connectionTypes>`（两处）｜`errors=2` |
+
+**对照组**：`<fix name="m.x" value="2.0"/>` 在 `<methods><onLoad>` 内
+→ `check` 输出 `ok`，`errors=0`（`fix` **被引擎接受**）。
+
+探针件：`/tmp/w14-probes/w19_four.py`（引擎 `~/esml-engine-user3/target/release/esml`，2026-11-11）。
+
 ---
 
 ## 6. 本分支的提交

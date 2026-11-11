@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `<for var="i" range="1:3">` 算法段常量展开：体 `y = y + i`、`range="1:3"`
+     ⇒ i∈{1,2,3} 累加，y = 0+1+2+3 = 6。`check` errors=0；`solve` 验证 y=6。
+     规范条文：§7（算法段）/ 附录 B（续）FOR。
+     **引擎算法段 `<for>` 六拼法，只有 1 个能算对，其余全 check=errors=0 但 solve 给 0.0（静默错答）**：
+       1. 属性名必须是 `range`（`in=` 被无视，静默零次迭代）；
+       2. 分隔符必须是 `:`（`..` 被无视）；
+       3. **不能有 `<body>` 壳**（有壳整块不展开）——与方程级 `<for>` 相反，方程级有/无 `<body>` 等价（`L1-expr-equation/for-over-orderedset.esml` 两版 solve 都得 6）；
+       4. 无区间属性时**不报错**，等于零次迭代；
+       5. 以上错法 `check` 全部 errors=0——静态闸一件拦不住，只有 `solve` 能看见。
+     六拼法表（body=`y+y+i`→实为 `y+i` 累加，y 初值 0）：
+       range="1:3"        → errors=0  m.y=6   ✓（本示例）
+       in="1..3"          → errors=0  m.y=0   ✗ 静默
+       in="1:3"           → errors=0  m.y=0   ✗ 静默
+       range="1..3"       → errors=0  m.y=0   ✗ 静默
+       range="1:3"+<body> → errors=0  m.y=0   ✗ 静默
+       in="1..3"+<body>  → errors=0  m.y=0   ✗ 静默
+       无区间属性         → errors=0  m.y=0   ✗ 静默
+     这是 **engine-debt（静默错答），严重度高于普通拼写漂移**，登记在
+     `tools/engine-drift.tsv` 的 `attr algorithm-for range` 行 + `docs/coverage.md` §5.3。
+     `in` 仍是 canonical（方程级 `<for>` 确实读 `in`，model.rs:527）。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L8_AlgorithmFor">
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
+  <functions>
+    <function name="f" returns="real">
+      <inputs><input name="x" type="real"/></inputs>
+      <outputs><output name="y" type="real"/></outputs>
+      <algorithm>
+        <assign name="y" value="0"/>
+        <for var="i" range="1:3">
+          <assign name="y" value="y + i"/>
+        </for>
+      </algorithm>
+
+    </function>
+  </functions>
+  <modelTypes>
+    <modelType name="M" discipline="generic">
+      <parameters><parameter name="x" type="real" default="3.0"/></parameters>
+      <variables><variable name="y" type="real" role="algebraic"/></variables>
+      <equations><equation>y = f(x)</equation></equations>
+    </modelType>
+  </modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="M"/></instances>
+    <schedule><sequence><continueFor time="0"/></sequence></schedule>
+  </system></systems>
+</esml>
