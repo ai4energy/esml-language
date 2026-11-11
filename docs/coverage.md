@@ -571,6 +571,41 @@ except Exception as e:
     print("REJECT  ← required 机制顶不上")
 ```
 
+> **两种探针口径（W53 复核补注，2026-11-11）**——本节 3/26 走的是**替代式**：
+>
+> - **替代式**（§5.12 的口径）：legacy **替换** canonical，探针上**不写**被
+>   替代的那个 canonical 属性。例：`<continueUntil … max-time="1"/>`（**不写**
+>   `maxTime=`）。此时若 canonical 的该属性 `use="required"`，探针因**缺
+>   required** 而 REJECT——拒收原因是「替代后 required 落空」，即 XSD 对这条
+>   legacy 拼法有判别力。`max-time`/`model-type`/`component` 三条正是此口径下
+>   可拒，余 23 条因 canonical 对应属性 `use="optional"`（或本仓未声明）而
+>   缺了也过 → ACCEPT（lax 放行）。**3/26 就是这个口径。**
+> - **叠加式**：canonical 的 required 属性**保留**，另加一个 legacy 拼法。
+>   例：`<continueUntil … maxTime="1" max-time="1"/>`（`maxTime` 与 `max-time`
+>   同写）。此式下任何宿主都 ACCEPT——lax anyAttribute 对未声明的额外属性一律
+>   放行，这是 anyAttribute 的定义性行为，**与 legacy 拼法是否可替代无关**。
+>   故叠加式**不构成判别力证据**（W53 曾误把叠加式的 26/26 ACCEPT 当结论，
+>   已否）；本节不采用此口径。
+>
+> 复算替代式 3 条（W53 独立复现，逐条 REJECT）：
+>
+> ```python
+> # 替代式：只写 legacy，不写被替代的 canonical required
+> sub = [
+>   ('<system name="S"><schedule><sequence><continueUntil condition="c" max-time="1"/>'
+>    '</sequence></schedule></system>'),
+>   ('<system name="S"><instances><instance name="i" model-type="M"/></instances></system>'),
+>   ('<system name="S"><instances><instance name="i" component="M"/></instances></system>'),
+> ]
+> for f in sub:
+>     f = f.replace('<system', '<system xmlns="%s"'%NS, 1)
+>     try:
+>         x.validate(ET.fromstring(f)); print('ACCEPT')
+>     except Exception as e:
+>         print('REJECT  ←', [l for l in str(e).splitlines() if 'Reason:' in l][:1])
+> # 三条均 REJECT：missing required 'maxTime' / 'type' / 'type'
+> ```
+
 **引用链**（证据行，本单不改台账）：
 
 - `tools/attr-acceptance.tsv`：`aPart`/`bPart`（`rejected-f7`）+ `maxTime`
