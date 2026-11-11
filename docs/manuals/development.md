@@ -38,7 +38,7 @@
 | `tools/attr-coverage.tsv` | 属性「声明 ⇄ 示例」双向差集完整性对账；`covered` 行指向 attr-acceptance、不重复建 | 同上 |
 | `tools/attr-acceptance.tsv` | 零使用属性的**引擎裁决**（accepted / rejected-f7 / rejected-legacy / rejected-ie / no-example）；attr-coverage 只读它当登记来源 | 引擎侧裁决，手建清单 |
 | `tools/engine-drift.tsv` | 跨仓 XSD 分歧裁决（属性集 / 子元素集 / 全局根）；已消解行可删、不炸 | 分歧未裁决 ⇒ 红 |
-| `tools/engine-example-debt.tsv` | 引擎逐件 `esml check` 实测 `errors>0` 的非负例登记（owner 恒 `engine-debt`） | 引擎侧不收、登记跟踪；示例本身不动 |
+| `tools/engine-example-debt.tsv` | 引擎逐件实跑非绿的非负例登记（owner 恒 `engine-debt`）；`stage` 列两值域：`check` 行 = `esml check` 层不收（errors 数写实测值）；`solve` 行 = `esml check` 绿（errors=0）但 `esml solve` 失败 | 引擎侧不收、登记跟踪；示例本身不动 |
 
 ## 3. 改 schema 的顺序
 
