@@ -39,6 +39,8 @@ REPO = Path(__file__).resolve().parent.parent
 TSV = Path(__file__).resolve().parent / "engine-example-debt.tsv"
 
 OWNERS = ("engine-debt",)
+STAGES = ("check", "solve")
+SOLVE_TIMEOUT_S = 120  # esml solve 超时（防挂死）
 
 
 # --------------------------------------------------------------------------- 引擎路径
@@ -56,7 +58,8 @@ def resolve_engine():
 def load_tsv(path):
     """→ (rows, declared_count or None)。
 
-    rows: [{lineno, path, errors(int or None), owner, evidence}]
+    rows: [{lineno, path, errors(int or None), owner, stage, evidence}]
+    stage 值域 {check, solve}；不合法 ⇒ 红（不静默退出——台账格式错要当违规报，不是崩闸门）。
     """
     rows, declared = [], None
     for lineno, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
@@ -68,14 +71,16 @@ def load_tsv(path):
         if not line.strip():
             continue
         parts = line.split("\t")
-        if len(parts) != 4:
-            sys.exit(f"[check-engine-examples] {Path(path).name}:{lineno} 必须 4 列"
-                     f"（path errors owner evidence），实际 {len(parts)}")
-        p, errs, owner, evidence = parts
+        if len(parts) != 5:
+            sys.exit(f"[check-engine-examples] {Path(path).name}:{lineno} 必须 5 列"
+                     f"（path errors owner stage evidence），实际 {len(parts)}")
+        p, errs, owner, stage, evidence = parts
         rows.append({
             "lineno": lineno, "path": p,
             "errors": int(errs) if errs.lstrip("-").isdigit() else None,
-            "owner": owner, "evidence": evidence,
+            "owner": owner,
+            "stage": stage if stage in STAGES else None,  # None ⇒ 非法值，check_engine 判红
+            "evidence": evidence,
         })
     return rows, declared
 
@@ -123,6 +128,21 @@ def engine_check(engine, path):
     return int(m.group(1)) if m else None
 
 
+def engine_solve(engine, path):
+    """跑 `esml solve <path>`（ESML_PROPS=off，超时 SOLVE_TIMEOUT_S），→ returncode 或 None。
+
+    None 表示超时（挂死）。判据只用退出码：0=成功（引擎修好），非 0=仍失败。
+    """
+    env = dict(os.environ)
+    env["ESML_PROPS"] = "off"
+    try:
+        r = subprocess.run([engine, "solve", path], capture_output=True, text=True,
+                           env=env, timeout=SOLVE_TIMEOUT_S)
+        return r.returncode
+    except subprocess.TimeoutExpired:
+        return None
+
+
 # --------------------------------------------------------------------------- 检查
 def check_counts(declared, rows, tsv_name):
     """头部「共 N 行」必须等于正文行数。→ [msg]"""
@@ -135,48 +155,85 @@ def check_counts(declared, rows, tsv_name):
 
 
 def check_engine(rows, engine, repo):
-    """逐件跑引擎 + 与台账对账。→ [(where, msg)] 红项。
+    """逐件跑引擎 + 与台账对账。→ [red_msg] 红项（分 stage）。
 
-    判据：
-      errors=0        ⇒ 通过（台账里还有行 ⇒ 台账过时，红）
-      errors>0        ⇒ 台账必须有 path 精确行（无 ⇒ 红「未登记」）；
-                        有行但 errors 数字不符 ⇒ 红「台账过时」。
-      errors 解析不出 ⇒ 红「引擎输出异常」。
+    台账按 stage 拆两类行（W46b，一条台账管两层）：
+      stage=check：跑 `esml check`，实测 errors 必须等于台账 errors 数字；
+                   errors=0 但仍登记 ⇒ 红「台账过时（已修好）⇒ 删行」（既有 8 行逻辑不变，只加严不放宽）。
+      stage=solve：跑 `esml check` 必须 errors=0；再跑 `esml solve <file>` 必须**非零退出**（仍失败）；
+                   solve 成功(退出 0) ⇒ 引擎修好 ⇒ 红「台账过时 ⇒ 删行」；check 非 0 / solve 超时 ⇒ 红。
+    通用：stage 值不合法 ⇒ 红；登记行 path 文件已删/改名 ⇒ 红；check errors>0 无登记行 ⇒ 红「未登记」。
     """
     red = []
     tsv_name = TSV.name
-    reg = {r["path"]: r for r in rows}
+    # 台账行分 stage
+    check_rows = [r for r in rows if r["stage"] == "check"]
+    solve_rows = [r for r in rows if r["stage"] == "solve"]
+    other_rows = [r for r in rows if r["stage"] is None]  # 非法 stage
+    check_reg = {r["path"]: r for r in check_rows}
+    solve_reg = {r["path"]: r for r in solve_rows}
     used = set()
+
+    # —— 逐非负例：先 `esml check`（所有示例都跑，check 是共同前置层）
     for rel in enumerate_examples(repo):
         n = engine_check(engine, str(repo / rel))
         if n is None:
             red.append((rel, "引擎输出无 `summary: errors=N` ⇒ 无法判定（引擎行为异常？）"))
             continue
-        row = reg.get(rel)
+        crow = check_reg.get(rel)
+        srow = solve_reg.get(rel)
         if n == 0:
-            if row is not None:
-                red.append((f"{tsv_name}:{row['lineno']}",
-                            f"台账过时：{rel} 已修好（实测 errors=0）但仍登记 ⇒ 删行"))
+            # check 绿。check 债行不该在这（已修好）⇒ 红。solve 债行合法，继续判 solve。
+            if crow is not None:
+                red.append((f"{tsv_name}:{crow['lineno']}",
+                            f"台账过时：{rel} check 已修好（实测 errors=0）但仍登记(stage=check) ⇒ 删行"))
             continue
-        # n > 0
+        # n > 0：check 层不收
         used.add(rel)
-        if row is None:
+        if srow is not None:
+            red.append((f"{tsv_name}:{srow['lineno']}",
+                        f"stage=solve 行要求 check errors=0，但 {rel} check 实测 errors={n} ⇒ 台账过时/误登记 ⇒ 删行或改 stage"))
+            continue
+        if crow is None:
             red.append((rel,
-                        f"esml check errors={n} 但台账无登记行 ⇒ 未登记的引擎债不许当通过"))
-        elif row["errors"] != n:
-            red.append((f"{tsv_name}:{row['lineno']}",
-                        f"台账过时：{rel} 台账写 errors={row['errors']}，实测 {n} ⇒ 改数字"))
-    # 台账里登记了、但实测 errors=0 的（上面 n==0 分支已报「已修好」）之外的：
-    # 登记行 path 既非 0 也非匹配到任何示例（示例被删 / 改名）⇒ 台账过时。
-    for rel, r in reg.items():
-        if rel not in {p for p in used}:
-            # 该 path 没在「errors>0 且实测非 0」里被用到 ⇒ 要么已修好（上面报过），要么文件没了
-            # 重新跑一次以区分（已修好 vs 文件缺失）
-            f = repo / rel
-            if not f.exists():
-                red.append((f"{tsv_name}:{r['lineno']}",
-                            f"台账过时：{rel} 文件已不存在 ⇒ 删行"))
-            # 已修好(errors=0) 的情形上面已报，这里不重复
+                        f"esml check errors={n} 但台账无 stage=check 登记行 ⇒ 未登记的引擎债不许当通过"))
+        elif crow["errors"] != n:
+            red.append((f"{tsv_name}:{crow['lineno']}",
+                        f"台账过时：{rel} 台账写 errors={crow['errors']}，实测 {n} ⇒ 改数字"))
+
+    # —— 台账登记了、但文件已删/改名（既非 check 债、非 solve 债、也没在上面被匹配）⇒ 过时
+    for r in rows:
+        if r["path"] in used or r["path"] in check_reg or r["path"] in solve_reg:
+            continue
+        # 走到这：rel 没进 used（check errors=0）也没在 check/solve 登记里被消费
+        # 上面逐例循环已对所有**现存**示例跑过 check；若 rel 文件不存在（被删），这里兜底
+        f = repo / r["path"]
+        if not f.exists():
+            red.append((f"{tsv_name}:{r['lineno']}",
+                        f"台账过时：{r['path']} 文件已不存在 ⇒ 删行"))
+
+    # —— stage=solve 行：跑 `esml solve`，必须非零退出（仍失败）才闭合
+    for rel, r in solve_reg.items():
+        if rel in used:
+            continue  # 已在上面 check 层判红（check 非 0）
+        f = repo / rel
+        if not f.exists():
+            red.append((f"{tsv_name}:{r['lineno']}",
+                        f"台账过时：{rel} 文件已不存在 ⇒ 删行"))
+            continue
+        rc = engine_solve(engine, str(f))
+        if rc is None:
+            red.append((f"{tsv_name}:{r['lineno']}",
+                        f"stage=solve：esml solve {rel} 超时（>{SOLVE_TIMEOUT_S}s）⇒ 无法判定（挂死？）"))
+        elif rc == 0:
+            red.append((f"{tsv_name}:{r['lineno']}",
+                        f"台账过时：{rel} esml solve 已收敛（退出 0）⇒ 引擎修好了 ⇒ 删行"))
+        # rc != 0 ⇒ solve 仍失败 ⇒ 台账闭合，不报（这是登记行的预期状态）
+
+    # —— 非法 stage 值
+    for r in other_rows:
+        red.append((f"{tsv_name}:{r['lineno']}",
+                    f"stage 值非法：{r['path']} stage={r['stage']!r}（值域 check|solve）⇒ 改台账"))
     return red
 
 
@@ -205,14 +262,17 @@ def self_test(stream):
     POS = '<?xml version="1.0"?><esml xmlns="u" name="A"/><foo/>'
     NEG = "<?xml version='1.0'?><!-- 负例：预期失败 --><esml xmlns=\"u\" name=\"N\"/>"
 
-    def run_on(tree, forced_errors):
-        """对一棵合成树跑非引擎部分：负例识别 + 台账对账 + 计数。
-        forced_errors: {rel: int} 注入的实测 errors（替代真引擎）。"""
+    def run_on(tree, forced_errors, forced_solve_rc=None):
+        """对一棵合成树跑非引擎部分：负例识别 + 分 stage 台账对账 + 计数。
+        forced_errors: {rel: int} 注入的实测 check errors（替代真引擎 check）。
+        forced_solve_rc: {rel: int|None} 注入的 solve 退出码（替代真引擎 solve）；None=不跑 solve。
+        逻辑镜像 check_engine（stage=check/solve 两类判据）。"""
         msgs = []
         rows, declared = load_tsv(tree / "engine-example-debt.tsv")
         msgs += check_counts(declared, rows, "engine-example-debt.tsv")
-        # 台账逻辑：负例识别 + 对账（用注入值代替引擎）
-        reg = {r["path"]: r for r in rows}
+        check_reg = {r["path"]: r for r in rows if r["stage"] == "check"}
+        solve_reg = {r["path"]: r for r in rows if r["stage"] == "solve"}
+        other = [r for r in rows if r["stage"] is None]
         used = set()
         for f in sorted(glob.glob(os.path.join(str(tree), "**", "*.esml"), recursive=True)):
             p = Path(f)
@@ -221,29 +281,51 @@ def self_test(stream):
             if is_negative(p, txt):
                 continue
             n = forced_errors.get(rel, 0)
-            row = reg.get(rel)
+            crow, srow = check_reg.get(rel), solve_reg.get(rel)
             if n == 0:
-                if row is not None:
-                    msgs.append(f"{p.name}: 台账过时：{rel} 已修好但仍登记")
+                if crow is not None:
+                    msgs.append(f"台账过时：{rel} check 已修好但仍登记(stage=check)")
                 continue
+            # n > 0
             used.add(rel)
-            if row is None:
-                msgs.append(f"{p.name}: {rel} errors={n} 但台账无登记行")
-            elif row["errors"] != n:
-                msgs.append(f"{p.name}: 台账过时：{rel} 写 {row['errors']} 实测 {n}")
-        for rel, r in reg.items():
-            if rel not in used:
-                fp = tree / rel
-                if not fp.exists():
-                    msgs.append(f"台账过时：{rel} 文件已不存在")
+            if srow is not None:
+                msgs.append(f"stage=solve 行要求 check errors=0，实测 {n} ⇒ 误登记")
+                continue
+            if crow is None:
+                msgs.append(f"{rel} errors={n} 但台账无 stage=check 登记行")
+            elif crow["errors"] != n:
+                msgs.append(f"台账过时：{rel} 写 {crow['errors']} 实测 {n}")
+        # stage=solve 行：注入的 solve 退出码（0=成功⇒红；非 0=闭合）
+        for rel, r in solve_reg.items():
+            if rel in used:
+                continue
+            if not (tree / rel).exists():
+                msgs.append(f"台账过时：{rel} 文件已不存在")
+                continue
+            rc = (forced_solve_rc or {}).get(rel)
+            if rc is None:
+                msgs.append(f"stage=solve：{rel} solve 超时/无法判定")
+            elif rc == 0:
+                msgs.append(f"台账过时：{rel} solve 已收敛(退出 0) ⇒ 删行")
+            # rc != 0 ⇒ 闭合
+        # 非法 stage
+        for r in other:
+            msgs.append(f"stage 值非法：{r['path']} stage={r['stage']!r}")
+        # 文件已删的登记行（既未消费也非 solve）
+        for r in rows:
+            if r["path"] in used or (tree / r["path"]).exists():
+                continue
+            if r["path"] in check_reg or r["path"] in solve_reg:
+                continue
+            msgs.append(f"台账过时：{r['path']} 文件已不存在")
         return msgs
 
     with tempfile.TemporaryDirectory() as td:
         root = Path(td)
-        # —— 好树：a 绿、b 红(errors=2)、probe 负例跳过；台账 1 行(b, errors=2)、计数 1 ⇒ 零违规
+        # —— 好树：a 绿、b 红(errors=2)、probe 负例跳过；台账 1 行(b, errors=2, stage=check)、计数 1 ⇒ 零违规
         good = make_tree(root / "good",
                          {"a.esml": POS, "b.esml": POS, "probe.esml": NEG},
-                         "# 共 1 行\nb.esml\t2\tengine-debt\terror: F7[]: unknown element\n")
+                         "# 共 1 行\nb.esml\t2\tengine-debt\tcheck\terror: F7[]: unknown element\n")
         # —— 坏树1：红件 b 未登记（台账空）⇒ 必红
         bad1 = make_tree(root / "bad1",
                          {"a.esml": POS, "b.esml": POS, "probe.esml": NEG},
@@ -251,17 +333,28 @@ def self_test(stream):
         # —— 坏树2：台账数字错（b 写 3、实测 2）⇒ 台账过时
         bad2 = make_tree(root / "bad2",
                          {"a.esml": POS, "b.esml": POS, "probe.esml": NEG},
-                         "# 共 1 行\nb.esml\t3\tengine-debt\terror: F7[]: unknown element\n")
+                         "# 共 1 行\nb.esml\t3\tengine-debt\tcheck\terror: F7[]: unknown element\n")
         # —— 坏树3：头部计数错（写 2 行、实际 1 行）⇒ 条数对不上
         bad3 = make_tree(root / "bad3",
                          {"a.esml": POS, "b.esml": POS, "probe.esml": NEG},
-                         "# 共 2 行\nb.esml\t2\tengine-debt\terror: F7[]: unknown element\n")
+                         "# 共 2 行\nb.esml\t2\tengine-debt\tcheck\terror: F7[]: unknown element\n")
+        # —— 好树·solve：c.esml 绿(check=0)、solve 仍失败(rc=1)；台账 1 行(c, errors=0, stage=solve) ⇒ 零违规
+        good_solve = make_tree(root / "good_solve",
+                               {"c.esml": POS},
+                               "# 共 1 行\nc.esml\t0\tengine-debt\tsolve\terror: solve … structurally singular\n")
+        # —— 坏树·solve：同上但 solve 已收敛(rc=0) ⇒ 台账过时（引擎修好）⇒ 红
+        bad_solve = make_tree(root / "bad_solve",
+                              {"c.esml": POS},
+                              "# 共 1 行\nc.esml\t0\tengine-debt\tsolve\terror: solve … structurally singular\n")
 
+        # cases: (label, tree, forced_check_errors, forced_solve_rc, want_red)
         cases = [
-            ("好：绿+红+负例，台账闭合、计数对", good, {"b.esml": 2}, False),
-            ("坏：红件未登记", bad1, {"b.esml": 2}, True),
-            ("坏：台账数字过时", bad2, {"b.esml": 2}, True),
-            ("坏：头部计数错", bad3, {"b.esml": 2}, True),
+            ("好：绿+红+负例，台账闭合、计数对", good, {"b.esml": 2}, None, False),
+            ("坏：红件未登记", bad1, {"b.esml": 2}, None, True),
+            ("坏：台账数字过时", bad2, {"b.esml": 2}, None, True),
+            ("坏：头部计数错", bad3, {"b.esml": 2}, None, True),
+            ("好·solve：solve 仍失败 ⇒ 闭合", good_solve, {"c.esml": 0}, {"c.esml": 1}, False),
+            ("坏·solve：solve 已收敛 ⇒ 台账过时", bad_solve, {"c.esml": 0}, {"c.esml": 0}, True),
         ]
         # 负例识别自证：probe 必须被跳过（不在对账输入里）
         probe_txt = NEG
@@ -277,8 +370,8 @@ def self_test(stream):
             w("  [%s] %s\n" % ("PASS" if ok else "BROKEN", label))
             failures += 0 if ok else 1
 
-        for label, tree, forced, want_red in cases:
-            v = run_on(tree, forced)
+        for label, tree, forced, srcc, want_red in cases:
+            v = run_on(tree, forced, srcc)
             ok = bool(v) == want_red
             w(f"  [{'PASS' if ok else 'BROKEN'}] {label} ⇒ 期望{'判红' if want_red else '零违规'}，实际 {len(v)} 项\n")
             for m in v:
@@ -321,11 +414,16 @@ def main(argv=None):
     for msg in red:
         print(f"  RED  {msg}")
 
-    # 逐件明细（绿/红）
+    # 逐件明细（绿/红），分 stage 计数
     n_ex = len(enumerate_examples(REPO))
     n_debt = len(rows)
+    n_check = sum(1 for r in rows if r["stage"] == "check")
+    n_solve = sum(1 for r in rows if r["stage"] == "solve")
+    n_badstage = n_debt - n_check - n_solve
     print(f"[check-engine-examples] 非负例 {n_ex} 件 · 引擎实跑逐件 · "
-          f"台账 {n_debt} 行 · 违规 {len(red)}")
+          f"台账 {n_debt} 行（check {n_check} / solve {n_solve}"
+          + (f" / 非法 {n_badstage}" if n_badstage else "")
+          + f"）· 违规 {len(red)}")
     return 1 if red else 0
 
 
