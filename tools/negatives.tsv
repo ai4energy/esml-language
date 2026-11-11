@@ -6,7 +6,7 @@
 #                 XSD 拒收它 = 我们把一个语义负例误判成拼写错（红）
 # 「未判定」不合法：每件都要写清它红在哪一层，否则下次复核又要重新猜。
 #
-# 登记条数：16 件（schema 9 / semantic 7）—— 改表即改这一行；
+# 登记条数：22 件（schema 15 / semantic 7）—— 改表即改这一行；
 # tools/check-neg-debt.py 每次跑都重算并核对，对不上就红（台账写错就改台账）。
 L0-type-unit/units-contradiction.esml	semantic	单位声明与 type unit= 矛盾（§11 量纲冲突），拼写合法
 L1-expr-equation/array-index-probe.esml	semantic	数组维 "GhostSet" 既非字面量、也非已声明序集/参数名，求解期报 I25a；拼写合法
@@ -24,3 +24,9 @@ L1-expr-equation/partial-noextern-probe.esml	schema	「合法位被拒」：<par
 L1-expr-equation/zeroderivative-noextern-probe.esml	schema	「合法位被拒」：<zeroDerivative> 同上（XSD 拒收 + 引擎 F1 判据 C）
 L3-model/component-probe.esml	schema	legacy <component> 元素形态，canonical 只收 <instance>（SPEC §2 收紧词法）
 L5-instance/instance-condition-undecidable.esml	semantic	instance condition 引用模型参数，构建期不可静态判定；check 过、solve/simulate 必须报「not statically decidable」（SPEC §6.5）
+L5-instance/bind-probe.esml	schema	legacy `<bind name value>` 实例覆盖形态，`<instance>` 内容模型无 `bind` ⇒ XSD 拒收；canonical 覆盖用 `<set path value/>`（SPEC §2 收紧词法，:122/:427）
+T-tasks/computetask-probe.esml	schema	legacy `<computeTask>`（单数）外层壳，esml 根只声明复数 `<computeTasks>` ⇒ XSD 拒收；canonical 用 `<computeTasks>`（SPEC §6.8，:694）
+L3-model/connector-probe.esml	schema	legacy `<connector>` 端口协议形态，`<portTypes>` 内容模型只收 `<portType>` ⇒ XSD 拒收；canonical 用 `<portType>`（SPEC §4 端口协议表，:89）
+L3-model/model-types-probe.esml	schema	legacy `<model-types>`（kebab-case）容器，esml 根只声明 camelCase `<modelTypes>`（kebab 不是合法语法）⇒ XSD 拒收；canonical 用 `<modelTypes>`（SPEC §1 词法，:82）
+L2-discrete/initialisation-procedures-probe.esml	schema	legacy `<initialisation-procedures>`（kebab-case）容器，`<system>` 只声明 camelCase `<initialisationProcedures>` ⇒ XSD 拒收；canonical 用 `<initialisationProcedures>`（SPEC §6.7，:641）
+L5-instance/subsystem-probe.esml	schema	legacy `<subsystem>` 形态，SPEC 明言「不是独立元素」（子系统只有 `<system>` 作 `type=` 复用）；`<instances>` 内容模型只收 `<instance>` ⇒ XSD 拒收（SPEC §5 系统层，:518）

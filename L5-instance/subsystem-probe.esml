@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 负例（预期失败）：实例用 `<subsystem>` 形态。SPEC 明言 `<subsystem>`
+     不是独立元素（子系统只有 `<system>` 作 `type=` 复用这一种构造方式）；
+     XSD 拒收（`<instances>` 内容模型只收 `<instance>`）。非零退出是预期行为。
+     规范条文：§5 系统层（`<subsystem>` 不是独立元素）。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L5_SubsystemProbe">
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
+  <modelTypes><modelType name="M" discipline="generic">
+    <variables><variable name="y" type="real" role="algebraic"/></variables>
+    <equations><equation>y = 1.0</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances>
+      <subsystem name="s"/>
+    </instances>
+    <schedule><sequence><continueFor time="0"/></sequence></schedule>
+  </system></systems>
+</esml>
