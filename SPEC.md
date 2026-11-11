@@ -104,6 +104,8 @@
 | 调度 | `<schedule><sequence><continueFor time=.../>[<call method=.../>]*</sequence></schedule>` | （附录 K）；多段连续求解 |
 | 图形标注 | `<annotation>`（`<icon>`/`<placement>`/`<port>`） | 纯 UI 元数据（§4.2） |
 
+`count` 是 `PortInstanceType` 的 canonical 声明保留（旧拼写，canonical 是 `size`），**引擎当前 F1 响亮拒收，登记见 docs/coverage.md §5.11 与 tools/engine-drift.tsv**。
+
 **收紧规则（canonical 唯一，不向后兼容旧写法）**：
 解析器对旧词法直接报错（解析器）：
 - 端口协议：`<portTypes>/<portType>`；`interfaces` / `interface` / `connector` → 报错
@@ -749,9 +751,9 @@ kebab-case 拼写**不是合法语法**，报错（§2 收紧集）。
 | `sensitivity` | `<perturb>`（属性式：`name` / `fraction` / `lower` / `upper`）、`<output>`（`<var>` 列表） |
 | `estimation` | `<estimate>`（`<var initial/>` 或属性式 `initial`）、`<data>` |
 | `optimize` | `<decision>`（`<var lower upper/>` 或属性式）、`<objective>`（含 `<expr>`）、`<constraints>`（含 `<constraint>`）、`<solver>` |
-| `control` | `<mpc N dt/>`（滚动时域） |
-| `surrogate` | `<surrogate method degree/>`、`<sampling size/>`、`<data>` |
-| `validation` | `<metrics>`（含 `<metric>`）、`<data>` |
+| `control` | `<mpc N dt/>`（滚动时域）；MPC 载荷属性：`x0`（初始状态）/ `xref`（参考轨迹）/ `umax`、`umin`（控制量上下限）/ `r`（正则化权重）/ `steps`（预测步数）/ `tol`（收敛容差）/ `q`（状态代价权重） |
+| `surrogate` | `<surrogate method degree model/>`（`model`：拟合模型形态）、`<sampling size/>`、`<data>` |
+| `validation` | `<metrics>`（含 `<metric name expected tolerancePct/>`）、`<data>` |
 
 **三个辅助任务**（不占七类编号，不引入新的求解角色）：
 
@@ -781,8 +783,8 @@ kebab-case 拼写**不是合法语法**，报错（§2 收紧集）。
 | `<checks>` / `<check>` | 验收断言 | `T-tasks/checks.esml` / `T-tasks/check.esml` |
 | `<constraints>` / `<constraint>` | 约束 | `T-tasks/task-constraint.esml` |
 | `<hyperParams>` | 超参（`<param name value/>`） | `T-tasks/hyperparams.esml` |
-| `<benchmarks>` / `<benchmark>` | 基准 | `T-tasks/benchmarks.esml` / `T-tasks/task-vendor-text.esml` |
-| `<controller>`（内含 `<setpoint>` / `<gains>`） | 控制器声明 | `T-tasks/controller.esml` / `T-tasks/controller-gains.esml` / `T-tasks/gains.esml` |
+| `<benchmarks>` / `<benchmark>` | 基准（属性 `name` / `expected` / `unit` / `tol` / `source`） | `T-tasks/benchmarks.esml` / `T-tasks/task-vendor-text.esml` |
+| `<controller>`（内含 `<setpoint>` / `<gains>`） | 控制器声明（属性 `kind` / `sampleTime` / `controlHorizon` / `antiWindup` / `bumpless`；`<gains>` 属性 `Kp` / `Ki` / `Kd`） | `T-tasks/controller.esml` / `T-tasks/controller-gains.esml` / `T-tasks/gains.esml` |
 | `<setpoint>` | 设定点 | `T-tasks/setpoint.esml` |
 | `<actuator>` / `<sensor>` / `<controlled>` | 执行器 / 传感器 / 被控量 | `T-tasks/actuator.esml` / `T-tasks/sensor.esml` / `T-tasks/controlled.esml` |
 | `<controlVars>` / `<designVars>` | 控制变量 / 设计变量（`<var name/>`） | `T-tasks/control-vars.esml` / `T-tasks/design-vars.esml` / `T-tasks/controlled-control-vars.esml` |
@@ -882,14 +884,18 @@ kebab-case 拼写**不是合法语法**，报错（§2 收紧集）。
 ### 7.1 状态机与时钟（离散面）
 
 **状态机 `<stateMachine>`**：模型级 `<stateMachine name="fsm">` 内写状态与迁移——
-`<state name initialState/>` 与 `<transition from to condition reset/>`。
+`<state name initialState/>` 与 `<transition from to condition reset priority immediate synchronize/>`。
 每个状态对应一个**互斥的离散 active 旗标**，方程里用 `activeState(A)` 读它；
-`condition` 是迁移触发条件；`reset="true"` 表示该次迁移**复位**相关状态。
+`condition` 是迁移触发条件；`reset="true"` 表示该次迁移**复位**相关状态；
+`priority`（整数，多条迁移同拍竞争时取优先级最高者）；`immediate="true"` 表示触发后立即进入目标状态（不等时钟拍）；
+`synchronize` 是 canonical 声明保留，**引擎当前拒收（F7/IE8），登记见 docs/coverage.md §5.11 与 tools/engine-drift.tsv**。
 示例：`L2-discrete/state-machine.esml`（两状态 toggle）、
-`L2-discrete/reset-transition.esml`（迁移带 `reset=`）。
+`L2-discrete/reset-transition.esml`（迁移带 `reset=`）、
+`L2-discrete/transition-attrs.esml`（迁移带 `priority` / `immediate`）。
 
-**时钟 `<clock>`**：模型级可直挂 `<clock name="c" interval="0.1"/>`，也可用容器
+**时钟 `<clock>`**：模型级可直挂 `<clock name="c" interval="0.1" phase="0"/>`，也可用容器
 `<clocks><clock name="c" interval="0.1"/></clocks>`——**两种写法等价**。
+`phase` 是 canonical 声明保留，**引擎当前拒收（F7/IE8），登记见 docs/coverage.md §5.11 与 tools/engine-drift.tsv**。
 时钟面上的算子分两类：
 - **采样/保持**：`sample(x, c)` 取 x 在**当前拍**上的采样值，`previous(x)` 取上一拍的值并保持；
 - **时钟自身**：`interval(c)` 拍长、`firstTick(c)` 首拍时刻、`noClock(x)` x 无时钟时为真。
@@ -913,6 +919,7 @@ kebab-case 拼写**不是合法语法**，报错（§2 收紧集）。
    语言支持，官方库不代建。
 
 - 变量级连接（`from=a.x to=b.y`，x/y 均为实例变量）→ `b_y = a_x`（直接相等）。
+  `aPart` / `bPart` 是 canonical 声明保留，**引擎当前拒收（F7/IE8），登记见 docs/coverage.md §5.11 与 tools/engine-drift.tsv**。
 - 端口数组/虚拟节点连接 → potential 相等 + flow 求和=0。
 - 端口级自动 KVL/KCL 对标量多命名端口是目标语义；编译器路径的标准写法为
   在**展开后的扁平变量**上连接（见 §9）。
