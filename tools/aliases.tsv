@@ -40,7 +40,14 @@ element	connectport	connection	无连字符的 legacy 元素名
 element	continue-for	continueFor	kebab 拼写
 element	control-vars	controlVars	kebab 容器
 element	design-vars	designVars	kebab 容器
-element	extends	extendsFrom	ModelType 类级继承的第二种元素名
+element	bind	set	实例覆盖的 legacy 元素名（SPEC:122/427 明写「<bind name= value=> → 报错」；canonical 是 <set path= value=>）
+element	computetask	task	任务条目单数的 legacy 元素名（SPEC:694-695 明写「<computeTask> 在任何 schema 里都不存在，一律拒绝」；canonical 是 <computeTasks> 容器内的 <task>）
+element	constant	portVariable	旧元素形端口变量（与 <flow>/<potential>/<stream> 同批，SPEC:131/1210 明写「元素形已退役、解析期拒收」；canonical 是 <portVariable> 属性形）
+element	constants	constantVariables	待入：kebab 容器（SPEC:1248 明写「带 <constants>/<initialisation-procedures> 等旧容器」拒收；canonical 容器名以 §4/§5 为准，本仓 XSD 尚未声明该语法点）
+element	connectortype	connection	连接类型参数的 legacy 元素名（SPEC:1463 表行与 <portSet> 并列旧名；canonical 是 <connection> + portSet 属性）
+element	duration	tspan	段长的 legacy 元素名（SPEC:697 明写「没有 <duration> 这种元素」；段长 canonical 拼法是 <tspan from to/>）
+element	discretes	stateMachine	MathML 混合状态机旧容器（SPEC:1247/1254 明写「旧文档里的 legacy 形态」；canonical 状态机拼法见 state-machine/state-machines 行）
+element	flow	portVariable	旧元素形端口变量（SPEC:131/1190/1210 明写「元素形（<flow> 等）已随单轨裁决删除、已退役」；canonical 是 <portVariable> 属性形）
 element	extends-from	extendsFrom	kebab 元素名
 element	foreign-objects	foreignObjects	kebab 容器
 element	hyper-params	hyperParams	kebab 容器
@@ -52,6 +59,12 @@ element	jump-to	jumpTo	待入：kebab 拼写
 element	jumpto	jumpTo	待入：全小写拼写
 element	link	crosslink	跨分区边界边的 legacy 元素名
 element	model-instance	instance	实例元素的 legacy 元素名
+element	modeltype	modelType	驼峰大小写变体（SPEC:82 明写「camelCase 书写」，§2 收紧集把 <model-types> 等 kebab/大小写变体一律点名非合法语法；与 model-type/model-types 行同宿主）
+element	potential	portVariable	旧元素形端口变量（SPEC:131/1210 明写「元素形（<potential> 等）已退役、解析期响亮拒收」；canonical 是 <portVariable> 属性形）
+element	portset	connection	PortSet 参数容器的 legacy 元素名（SPEC:1463 表行与 <connectionType> 并列旧名；canonical 是 <connection> 上的 portSet= 属性）
+element	stream	portVariable	旧元素形端口变量（SPEC:131/1210 明写「元素形（<stream> 等）已退役」；canonical 是 <portVariable> 属性形 portRole="stream"）
+element	subsystem	system	子系统的 legacy 元素名（SPEC:518 明写「<subsystem> 不是独立元素」——子系统只有 <system> 作 type= 复用这一种构造方式）
+element	switch-to	stateMachine	MathML 混合状态机旧元素（SPEC:1247 与 <discretes> 并列点名；canonical 状态机拼法见 state-machine/state-machines 行）
 element	model-instances	instances	复合成员容器的 legacy 拼写
 element	model-type	modelType	类型声明的 legacy 元素名
 element	model-types	modelTypes	kebab 容器
