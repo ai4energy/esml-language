@@ -126,6 +126,28 @@
 
 改后机判：**0 处差异**（`R_canon = R_entry = R_spec = 12`）。
 
+### 4.5 本轮（`e572012` 树）：`SPEC.md:321` 的「根在 span 前」句式
+
+上一轮修完 `R7`/`R8` 之后，§4.2「图形标注 `<annotation>`」新写的 `<annotation>` 段落
+又在 `e572012` 上留下一处红：
+
+```
+[parity] 对账结果
+  [C3] SPEC 声明了 XSD 不认的文档根 —— 1 处
+      <modelType>  SPEC 把它写成文档根，canonical 层却没有这个全局元素 （证据 SPEC.md:321）
+
+[parity] 共 1 处差异。
+```
+
+`SPEC.md:321`：「三处宿主（已核对 XSD）：`<modelType>`（basic.xsd:531）、`<system>`（:667）、
+**文档根 `<esml>`**（:804）。」—— 这一句说的是「annotation 可以出现在这三处宿主里」，
+`文档根` 只修饰 `<esml>` 一个 span，它**不是**「声明文档根」。机制：`R8`（`SPAN_FOLLOWED_BY_ROOT`）
+只认「span 在根**前面**」（`<X>` 根），这一句是反过来（根在 span 前面），anchored 落空 ⇒
+回落全抓 ⇒ 并列的 `<modelType>`、`<system>` 一起被抓进 `R_spec`。`<system>` 恰好本来就是
+canonical 全局根 ⇒ 结论对、证据行错，没暴露；`<modelType>` 不是 ⇒ 暴露为 `C3`。
+**裁定：改门（加 `R9`），不动 SPEC、不动 XSD** —— §4.2 措辞本身没错，改被测对象就是作弊。
+修后 `R_spec` 里 `modelType` 消失、`system` 保留（它本就该在），`rc=0`。
+
 ## 五、by-design 登记
 
 登记口径在 `tools/spec-xsd-bydesign.tsv`（`kind<TAB>name<TAB>reason`，`kind ∈ spec-root / entry-root`）。
@@ -151,9 +173,11 @@ SPEC 是散文，没有「根清单」字段，只能从正文抽。规则写死
 | `R6` | **示例块**：```` ```xml ```` 代码块的最外层元素单列成信息表，并机验它在 XSD 里有同名声明（`C5`）——示例顶层写个 XSD 根本没声明的名字，一定是拼写漂移 |
 | `R7` | **成员级「顶层」**：「顶层」后面**紧跟行内代码 span** ⇒ 它点名的是某个**元素**（「顶层 `<solutionParameters>` 段」「顶层 `<domains>` 声明计算域」），说的是文档的一个**成员段**，不是文档根。例外：「顶层 `<X>` 根」—— 那时 `X` 就是根（`R8`） |
 | `R8` | **「`<X>` 根」句式独占**：紧跟在「根」前面的那个 span 才是被声明的根，同一子句里并列提到的别的名字不算 —— §1.1 标题「（`<esml>` 根 · `<metadata>`）」里 `<metadata>` 只是骨架的一项，不是「它是根」的声明 |
+| `R9` | **「文档根 `<X>`」句式独占（根标记在 span **前面**）**：子句里出现强根标记词（`文档根` / `文档顶层` / `根清单` / `根元素` / `独立根` / `顶层声明` / `顶层壳` / `顶层`）**紧跟**行内代码 span ⇒ 被标记点名的 span 才是被声明的根，同一子句里**并列提到的其它 span 不算**（「三处宿主：`<a>`、`<b>`、文档根 `<c>`」⇒ 只有 `c`）。`R8` 认的是「span 在根前面」（`<X>` 根），`R9` 认的是反过来 —— §4.2 的「文档根 `<esml>`」正是后者，没有 `R9` 时 anchored 落空回落全抓，把并列的 `<modelType>`/`<system>` 也抓进 `R_spec`（§4.5）。边界：① 标记词与 span 之间**只许空白**，出现标点 / 其它文字 ⇒ 标记不归属这些 span，回落全抓（保守，宁可多报不假绿）；② 只收「指向文档根的」词形，**不放宽到裸「根」** —— 「`<esml>` 根」（`R8`）与「可加库根」（`R1` 的假朋友）各有其规则；③ `R8` 优先：「`<X>` 根」先被 `R8` 命中，`R9` 只在 `R8` 落空时才看 |
 
-`R7` / `R8` 是本轮补的：它们对应 §4.1 的 3 处误判与「§1.1 标题把 `<metadata>` 算成根声明」
-的连带问题。**两条规则都有合成自证用例钉住**（见 §七：拆掉任一条，对应的好用例立刻变红）。
+`R7` / `R8` 是上一轮补的：它们对应 §4.1 的 3 处误判与「§1.1 标题把 `<metadata>` 算成根
+声明」的连带问题；`R9` 是本轮补的：对应 §4.5 的 `SPEC.md:321` 误抓。**三条规则都有合成
+自证用例钉住**（见 §七：拆掉任一条，对应的好用例立刻变红）。
 
 ### 已知的语义歧义（机器判不了的那部分）
 
@@ -178,12 +202,14 @@ python3 tools/check-spec-xsd-parity.py --self-test
 
 「一个对任何东西都说 OK 的检查器，和没有检查器等价。」所以门自带构造样例：
 
-* **合成树 5 好 4 坏**（好例必须 0 红、坏例必须红，任一翻转即自证失败）：
+* **合成树 6 好 4 坏**（好例必须 0 红、坏例必须红，任一翻转即自证失败）：
   * 好 1 / 好 2：三方一致的树；
   * 好 3：SPEC 明说某元素不是文档根 ⇒ 该名字不得进根声明集
     （把分句否定词表拆掉，这条**立刻变红**）；
   * 好 4：成员级「顶层」不算文档根（把 `R7` 拆掉，这条**立刻变红**）；
   * 好 5：「`<X>` 根」句式独占（把 `R8` 拆掉，这条**立刻变红**）；
+  * 好 6：「文档根 `<X>`」句式独占（根标记在 span 前）—— 输入「三处宿主：`<a>`、
+    `<b>`、文档根 `<c>`。」只抽 `c`，**不抽** `a`/`b`（把 `R9` 拆掉，这条**立刻变红**）；
   * 坏 1：入口层**删**一个根（漏收）；坏 2：入口层**多**一个根（多收）；
     坏 3：SPEC 把 XSD 不认的写成根；坏 4：canonical 有根而 SPEC 只字不提。
 * **反向自检**：SPEC 凭空声明 `<ghostRoot>` ⇒ `C3` 必须抓到（抓不到说明判定被架空了）。
@@ -197,7 +223,7 @@ python3 tools/check-spec-xsd-parity.py --self-test
 ```sh
 python3 tools/check-spec-xsd-parity.py                # 全量对账；退出码 0 = 三方一致
 python3 tools/check-spec-xsd-parity.py --report        # 附带 SPEC 根声明清单与证据行
-python3 tools/check-spec-xsd-parity.py --self-test     # 5 好 4 坏 + 反向 + 真实树变异
+python3 tools/check-spec-xsd-parity.py --self-test     # 6 好 4 坏 + 反向 + 真实树变异
 ```
 
 改 XSD 根清单或改 SPEC 根描述之后，**两件事都要跑**：
@@ -238,7 +264,7 @@ python3 tools/check-spec-xsd-parity.py
 [parity] 共 4 处差异。裁决见 docs/design/xsd-spec-parity.md
 ```
 
-### 改后
+### 改后（`c6333f1` 树，上一轮）
 
 ```
 [parity] 三方集合
@@ -250,15 +276,31 @@ python3 tools/check-spec-xsd-parity.py
   三方一致：入口层根清单 = canonical 层全局元素集 = SPEC 文档根声明。0 处差异。
 ```
 
+### 改后（`e572012` 树，本轮）
+
+本轮树里 `<tasks>` 已不再是 canonical 全局元素（§13 根清单随之从 12 个收成 11 个），
+`R_spec` 的 11 个名字里**没有 `modelType`**（若 `R9` 缺席，:321 会把它抓进来 ⇒ `C3` 红）。
+
+```
+[parity] 三方集合
+  R_canon  canonical 层全局元素 (11): computeTasks esml metadata modelTypes orderedSet portTypes project system systems units variableTypes
+  R_entry  入口层全局元素     (11): computeTasks esml metadata modelTypes orderedSet portTypes project system systems units variableTypes
+  R_spec   SPEC 文档根声明     (11): computeTasks esml metadata modelTypes orderedSet portTypes project system systems units variableTypes
+
+[parity] 对账结果
+  三方一致：入口层根清单 = canonical 层全局元素集 = SPEC 文档根声明。0 处差异。
+```
+
 ### 自证
 
 ```
-[self-test] 构造样例 5 好 4 坏 —— 证明本检查器真的会红
+[self-test] 构造样例 6 好 4 坏 —— 证明本检查器真的会红
   [PASS] 好 1：三方一致（2 根）                      应判绿 → 实际判绿了
   [PASS] 好 2：三方一致（4 根）                      应判绿 → 实际判绿了
   [PASS] 好 3：SPEC 明说 <innerShell> 不是文档根     应判绿 → 实际判绿了
   [PASS] 好 4：成员级「顶层」不算文档根                   应判绿 → 实际判绿了
   [PASS] 好 5：并列提及不算根声明                      应判绿 → 实际判绿了
+  [PASS] 好 6：根在 span 前时只有被点名者算根             应判绿 → 实际判绿了
   [PASS] 坏 1：入口层删了一个根（漏收）                   应判红 → 实际判红了（C2:units）
   [PASS] 坏 2：入口层多了一个根（多收）                   应判红 → 实际判红了（C1:schedule）
   [PASS] 坏 3：SPEC 把 XSD 不认的写成根              应判红 → 实际判红了（C3:bogusRoot）
@@ -280,4 +322,7 @@ python3 tools/check-spec-xsd-parity.py
 
 === 拆掉「顶层 + 代码 span ⇒ 成员级」⇒ 好 4 必须变红 ===
   [BROKEN] 好 4：成员级「顶层」不算文档根                   应判绿 → 实际判红了（C3:metaSeg）
+
+=== 拆掉「文档根 `<X>`」句式独占（R9）⇒ 好 6 必须变红 ===
+  [BROKEN] 好 6：根在 span 前时只有被点名者算根             应判绿 → 实际判红了（C3:a；C3:b）
 ```
