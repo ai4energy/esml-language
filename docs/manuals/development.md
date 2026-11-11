@@ -30,7 +30,7 @@
 | `tools/check-attr-coverage.py` | 属性覆盖双向闸：XSD 命名属性 ⇄ 非负例示例用法，台账 `tools/attr-coverage.tsv`（第 5 道；仅标准库） |
 | `tools/check-engine-examples.py` | 引擎 × 示例可运行性闸：逐件 `esml check` 非负例，台账 `tools/engine-example-debt.tsv`（第 6 道；缺引擎仓时跳过） |
 
-台账五张（与上面脚本一一对应，各管一件事、互不重叠）：
+台账六张（前五张与上面脚本一一对应，各管一件事、互不重叠；`solve-smoke.tsv` 为普查台账，无对应闸脚本，口径见行内说明）：
 
 | 台账 | 责任 | 责任人（owner）语义 |
 |---|---|---|
@@ -39,6 +39,7 @@
 | `tools/attr-acceptance.tsv` | 零使用属性的**引擎裁决**（accepted / rejected-f7 / rejected-legacy / rejected-ie / no-example）；attr-coverage 只读它当登记来源 | 引擎侧裁决，手建清单 |
 | `tools/engine-drift.tsv` | 跨仓 XSD 分歧裁决（属性集 / 子元素集 / 全局根）；已消解行可删、不炸 | 分歧未裁决 ⇒ 红 |
 | `tools/engine-example-debt.tsv` | 引擎逐件实跑非绿的非负例登记（owner 恒 `engine-debt`）；`stage` 列两值域：`check` 行 = `esml check` 层不收（errors 数写实测值）；`solve` 行 = `esml check` 绿（errors=0）但 `esml solve` 失败 | 引擎侧不收、登记跟踪；示例本身不动 |
+| `tools/solve-smoke.tsv` | **普查台账（非闸）**：逐件 solve 冒烟实测。列：`path` / `has_system`（1/0，lxml 判定）/ `solve_rc` / `simulate_rc`（N/A=未跑）/ `unknowns`（解出未知量数）/ `status` / `evidence`（错误首行，≤200 字）。`status` 值域：`ok` / `ok-simulate`（simulate 成功、solve 稳态不适用）/ `na-no-system` / `na-artifact`（需外部工件，如 `libesml_extern_testlib.so`）/ `fail` / `fail-check-debt`（F7 check 层已知债，已登记 engine-example-debt.tsv）/ `fail-engine-debt`（引擎侧求解层缺口，已登记 engine-example-debt.tsv stage=solve）/ `timeout`。口径：负例判据照 `tools/check-engine-examples.py` 的 `is_negative`；158 件非负例逐件 `ESML_PROPS=off esml solve`（X-use 库件加 `-L`），solve 面的 fail 件再逐件 `esml simulate`——**这是普查台账不是闸**，无对应闸脚本，`make check` 不跑它 | 手工实跑刷新（头部计数当场重算）；无 owner 列 |
 
 ## 3. 改 schema 的顺序
 
