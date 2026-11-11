@@ -9,6 +9,14 @@
 - **BEFORE** = 本分支的起点 `58d2c0a`（用 `git archive` 取的快照）。
 - **AFTER** = 本分支 HEAD。
 
+> **时效层（W27 2026-11-11）**：本文件有两层口径——**历史层**（§1 总量对照表与 §2、
+> §3、§4：记录 `58d2c0a` → 分支 HEAD 的 diff 对账，数字是当时的，不再随树变；§6 的
+> 提交清单已不再逐条维护，以 `git log` 为准，见 §6）与**现状层**（§5 缺口台账与 §7 复现
+> 命令：数字按**当下树**重算，2026-11-11 基线 = `union/lang-batch` `0b34503`，示例 **170**
+> 份 / 负例 **16**（schema 9 / semantic 7）/ 非负例 **154** 份）。W27 只修现状层的过时
+> 数字（§5.1/§5.3/§5.11/§7）；历史层的旧数字（136 / 141 / 164 / 153 / 37 编号等）是
+> 当时对账事实，保留原值。
+
 ---
 
 ## 0. 口径与机器判据
@@ -151,7 +159,7 @@
 | §6.3 分层归属（库 vs 案例） | 散文 | 不覆盖 |
 | §9 展平与命名（编译器） | 散文 | 不覆盖 |
 | §10 求解语义 | 散文 | 不覆盖 |
-| §11 物性插件 | 真条款 | **缺口**：`物性` / `plugin` / `mmprops` 在 141 份示例里 0 命中。补示例等于先立语义 ⇒ 另一次规范修订，见 §5.1 |
+| §11 物性插件 | 真条款 | **缺口**：`物性` / `plugin` / `mmprops` 在 170 份示例里 0 命中（W27 2026-11-11 重算）。补示例等于先立语义 ⇒ 另一次规范修订，见 §5.1 |
 | §12 标准库（Standard Library） | 散文 | 不覆盖（`X-use/` 三份归 §6.1） |
 | §13 分层验收 | 验收条款 | 不覆盖 |
 | §14.4 注册 / 发现 / 缓存 | 散文 | 不覆盖 |
@@ -159,7 +167,7 @@
 | 附录 A 术语 / 附录 C 修订史 / 附录 D 旧版边界 | 散文 | 不覆盖 |
 | 附录 B（续）· process 级全局默认参数传播（顶层 `SET`） | 真条款 | **缺口**：schema 的 `<sets>` 只许 `<scope>` 子元素，裸 `<set>` 不可机验；引擎接受但**不生效** ⇒ 不补示例，见 §5.2 |
 | 附录 B（续）· FOR 按序集迭代 | 真条款 | **已补**：`for-over-orderedset.esml`（`in="Species"` 序集迭代，`array="Species"` 变量，`S=sum(C[1:3])=6`） |
-| 附录 F9 高指标 DAE（Pantelides） | 真条款 | **缺口**：`pantelides` 在 141 份示例里 0 命中 ⇒ 见 §5.1 |
+| 附录 F9 高指标 DAE（Pantelides） | 真条款 | **缺口**：`pantelides` 在 170 份示例里 0 命中（W27 2026-11-11 重算）⇒ 见 §5.1 |
 | 附录 F10 外部 I/O 经信号口 / 端口壳 | 真条款 | **缺口**：`signal` / `外部 I/O` 在示例里 0 命中（`signal-causal.esml` 是附录 F2 的**信号 causal 连接**，不是 F10 的外部 I/O）⇒ 见 §5.1 |
 | 附录 G 能力概览 / 附录 G·序集运算（编译期） | 散文 | 不覆盖 |
 | 附录 H XML Schema 与 canonical 校验 | 散文 | 不覆盖 |
@@ -167,7 +175,7 @@
 | 附录 J · 连接参数单向传播 / 回退 | 散文 | 不覆盖 |
 | 附录 K · `<call method>` 方法体 | 已被附录 K 覆盖 | 不另立 |
 | 附录 L 术语表与命名 / L.1 / 附录 M / 附录 N | 散文 | 不覆盖 |
-| ConstSetMember 一等成员类型 | 真条款 | **缺口**：`constSetMember` 0 命中；且该成员类型在 `xsd/` 里未定义 ⇒ 记 §5.3 |
+| ConstSetMember 一等成员类型 | 真条款 | **缺口**：`constSetMember` 在 170 份示例里 0 命中（W27 2026-11-11 重算）；且该成员类型在 `xsd/` 里未定义 ⇒ 记 §5.3 |
 | `§6.9` 元数据表 · `<description>` 一行 | 表内已自注「（暂缺示例）」 | 记账 |
 
 ---
@@ -229,7 +237,7 @@ BEFORE 状态有 **54 / 136** 份示例在本仓 `SPEC.md` 里查无点名依据
 
 | 条款 | 症状 | 裁决 |
 |---|---|---|
-| 附录 F9 高指标 DAE（Pantelides） | `pantelides` 在 141 份示例里 **0 命中** | **不补**。该条讲的是**降阶算法**（`pantelides.rs` 在引擎里），示例层要它就得先有 canonical 的指标降阶写法 |
+| 附录 F9 高指标 DAE（Pantelides） | `pantelides` 在 170 份示例里 **0 命中**（W27 2026-11-11 重算，注释剥除后 grep 全树） | **不补**。该条讲的是**降阶算法**（`pantelides.rs` 在引擎里），示例层要它就得先有 canonical 的指标降阶写法 |
 | §11 物性插件 | `物性` / `plugin` / `mmprops` **0 命中** | **不补**。插件的挂载方式（`<use>`？`<plugin>`？自带库还是 extern？）在规范里还没有 canonical 拼写 |
 | 附录 F10 外部 I/O 经信号口 / 端口壳 | `signal` 相关的**外部 I/O** 形态 **0 命中**（`L4-port/signal-causal.esml` 是附录 F2 的信号 causal 连接，**不是** F10 的外部 I/O 端口壳） | **不补**。F10 讲的是「block 化单机 + 语言层闭环」的端口壳，等于一次新语法 |
 
@@ -289,9 +297,9 @@ schema**；要落地「顶层 `SET`」须先做一次规范修订（`SPEC.md` + 
 
 | 条目 | 实测 | 状态 |
 |---|---|---|
-| `ConstSetMember` 一等成员类型 | 141 份示例 0 命中；`xsd/` 里未定义该类型 | 规范有、XSD 无 → 留缺口 |
+| `ConstSetMember` 一等成员类型 | 170 份示例 0 命中（W27 2026-11-11 重算，`constSetMember` / `ConstSetMember` 注释剥除后 grep 全树均 0）；`xsd/` 里未定义该类型（重算确认） | 规范有、XSD 无 → 留缺口 |
 | 附录 F2 的 `signal_causal_guard` | 引擎**接受** input↔input、output↔output、pvar 命名不一致三种写法（`check` rc=0） | 规范有、实现无 → `L4-port/signal-causal.esml` 的头部已注明 |
-| `<param>` 元素（`compute.xsd:181` / `:387`） | 141 份示例 0 命中；`compute.xsd` 两处声明，引擎 F7 unknown element + F1 legacy spelling 双拒 | 规范有、实现无（孤儿声明）→ 台账 `param` 行记 `no-example`，不补示例 |
+| `<param>` 元素（`compute.xsd:181` / `:387`） | **已有示例** `T-tasks/hyperparams.esml`（W21 补，`<hyperParams><param name="lr" value="0.01"/>`，`:30`）；引擎实测 **F7 unknown element + F1 legacy spelling 双拒**（verbatim 见该件头注与 §5.11）；170 份示例里元素形 `<param` 命中 1（即该件，W27 2026-11-11 重算） | 规范有、XSD 有（`compute.xsd` 两处声明）、引擎拒收 ⇒ **登记于 §5.11**，不另裁 |
 | `domain` 属性（`<instance>` / `<modelType>` / `<system>` 宿主） | W17 2026-11-11 实测三宿主 `esml check` 均 `errors=0`，但 `esml solve` 取值与无 `domain` 同（`domain` 零读点，写与不写同解）；`<portType>` 宿主是 `F1 legacy spelling` 响亮拒收（台账 `PortTypeDef/domain` 行 `rejected-legacy`） | 引擎收但语义无效 → 按 §5.2 顶层 `SET` 先例**不补示例**，台账三宿主行记 `no-example` |
 | `side` 属性（`<annotation><port>` 宿主，`PortMarkType`） | W17 2026-11-11 实测 `esml check` `errors=0`，但 `side` 只属标注侧图形标记，引擎 `check` 不消费其值（写 `left`/`right` 与不写同）；模型侧 `<modelType><ports><port>` 是 `F1 unknown attribute` 响亮拒收（台账 `PortInstanceType/side` 行 `rejected-legacy`） | 引擎收但语义无效 → 按 §5.2 先例**不补示例**，台账 `PortMarkType/side` 行记 `no-example` |
 | `MetadataType` `xs:any` 兜底（`##targetNamespace` + `##other`） | SPEC:65「子结构不固定（schema 放行任意子元素）」是规范意图；XSD 1.0 UPA 禁止同一内容模型内命名元素与 `##targetNamespace` 通配并存（W23 2026-11-11 实测 sequence/choice 两种拼法均 `UPA violation`），故只能 lax | **by-design**，非缺口；strict 基线 3/3（`D-skeleton/metadata.esml` / `provenance.esml` / `doc-ref.esml`）不变 |
@@ -437,12 +445,12 @@ canonical 声明处）＋ 至少一份演示该语法的示例，外加实现侧
 **明确拒绝**（`F7[]: unknown element`）。W9 真声明时记为 `lang-wins`
 （方向判断），此处登记**引擎当前不收**的事实本身，不隐藏于 `lang-wins` 之后。
 
-| 条目 | XSD 声明处 | 引擎实测（verbatim） |
-|---|---|---|
-| `<literal name="a"/>` 在 `<variable>` 内 | `VariableType` / `LiteralType` | `error: F7[]: unknown element <literal> at …:12:38`，`errors=1` |
-| `<vary name="m.x"/>` 在 `<methods><onLoad>` 内 | `MethodVaryType` / `MethodsType` | `error: F7[]: unknown element <vary> at …:12:24`，`errors=1` |
-| `<while condition="…">` 在 `<algorithm>` 内 | `AlgorithmType`（`WhileType`） | `error: F7[]: unknown element <while> at …:12:7` ＋ `F1[]: parser rejected…`，`errors=2`，`five_level=BAD` |
-| `<connectionTypes>` 在文档根 | 顶层元素 | `error: F7[]: unknown element <connectionTypes>`（两处）｜`errors=2` |
+| 条目 | XSD 声明处 | 示例文件（W27 2026-11-11 补列） | 引擎实测（verbatim） |
+|---|---|---|---|
+| `<literal name="a"/>` 在 `<variable>` 内 | `VariableType` / `LiteralType` | `L0-type-unit/literal-enum.esml` | `error: F7[]: unknown element <literal> at L0-type-unit/literal-enum.esml:16:7`（×3，`errors=3`；W27 2026-11-11 引擎 `~/esml-engine-user3/target/release/esml` 重跑） |
+| `<vary name="m.x"/>` 在 `<methods><onLoad>` 内 | `MethodVaryType` / `MethodsType` | `L9-method-schedule/method-vary.esml` | `error: F7[]: unknown element <vary>`（该件引擎 `errors=1`；W27 2026-11-11 重跑） |
+| `<while condition="…">` 在 `<algorithm>` 内 | `AlgorithmType`（`WhileType`） | `L8-function/algorithm-while.esml` | `error: F7[]: unknown element <while> at …:12:7` ＋ `F1[]: parser rejected…`，`errors=2`，`five_level=BAD` |
+| `<connectionTypes>` 在文档根 | 顶层元素 | **仍无示例**（170 份示例里 `connectionTypes` 0 命中，W27 2026-11-11 重算）——根级元素无宿主可落，探针只能写 `/tmp`，不入库 | `error: F7[]: unknown element <connectionTypes>`（两处）｜`errors=2` |
 
 **对照组**：`<fix name="m.x" value="2.0"/>` 在 `<methods><onLoad>` 内
 → `check` 输出 `ok`，`errors=0`（`fix` **被引擎接受**）。
@@ -453,29 +461,27 @@ canonical 声明处）＋ 至少一份演示该语法的示例，外加实现侧
 
 ## 6. 本分支的提交
 
-| SHA | 主题 |
-|---|---|
-| `835fa02` | 补 §6.4 子系统 crosslink 与附录 K 段前方法体两份示例（**conformance 14 / 83**） |
-| `21ddbee` | 修 §6.8 canonical 示例的三处 schema 违规，并补 §6.9 计算任务表条文 |
-| `ca8efc7` | 补 §6.8 `<tasks>` 外壳与 §6.9 元数据族条文，修三处正文/schema 错位 |
-| `526d283` | §6.7 初始化过程改回 canonical 拼写与载荷 |
-| `fc4d05c` | 单位分组示例归位到 `L0-type-unit` |
-| `b5b3557` | 为 25 份无 SPEC 依据的示例补规范条文 |
-| `f844361` | 四份导数负例的头部把「check 应报错」改成「schema 校验应报错」 |
-| `cfb2b31` | 138 份示例的头部逐份指名其规范条文 |
-| `3a1934b` | `<partition>` 的显式属性改成 canonical 拼写 `discipline` / `timeLayer` |
-| `c438e6d` | 落盘示例 ⇄ 规范 对账机验（`docs/validate_examples.py`） |
-| `6ff438d` | 聚合器按头部指名的**全部**条文统计 |
-| `90e3770` | 五份示例的头部补上第二条规范条文（附录 F6 / F7 / F8） |
-| `17547ec` | 补附录 F2 的信号口跨 PortType 因果连接示例 |
-| `35c2bfe` | `port-roles-io` 的头部补上 §6.6（系统级方程） |
-| `1a494bd` | 补 §6.5 条件组件的正例与「条件不可静态判定」负例 |
-| `c673d57` | 修 `instance-condition` 头部指向已删文件的旧引用 |
-| `89262a5` | §6.5 补条件的操作数作用域，并把「参数形态」标为待定 |
-| `696aecd` | 落盘 SPEC 覆盖对账表，并在 README 挂上入口 |
-| `03b8b38` | §5.8 补一句闸门实测——[3] 角并不因 14/83 判红 |
-| `d63d39f` | 修本表：把上一版的「（本提交）」换成实际 SHA |
-| `35f32e8` | 入口层根清单 ⇄ canonical 全局元素：落成常驻机判（`docs/validate_roots.py`）＋ 收敛根集合 ＋ 裁决留档 |
+**提交清单以 `git log` 为准，本节不再逐条维护。**
+
+理由：v1.3.3 时代手工列了 21 行 SHA 清单，此后的每一批 lang 合并（W15/W16/W17/W19/
+W20/W21/W22/W23/W24……）都让这张表**只增不减**——它记录的只是历史，而它自己
+又成了需要维护的「现状」：W27 开工时表里最末一行 `35f32e8` 之后的提交**一行都没
+进过表**，读者若把它当现状读就会被误导。现状的权威来源本来就只有一份（`git log`），
+把同一事实抄进文档只会引入漂移；需要查这批提交时，在**当下 HEAD** 跑
+`git log --oneline -- docs/coverage.md` 即可（本节所有内容的变更史都挂在这个路径上）。
+
+锚点（2026-11-11，`union/lang-batch` `0b34503`，`git log --oneline -20` 摘录）：
+
+```
+0b34503 docs: README 跟上现状——make check 由两道闸变四道……
+6f7aa31 merge: W23 MetadataType UPA 实测记录 + coverage §5.3 by-design 登记（lang 批）
+1fa14ae merge: W24 元素覆盖双向闸 + 台账 + 接入 make check（lang 批）
+202b6c4 merge: W22 SPEC 35 个幽灵尖括号名字逐个裁决 + 别名表补 12 行（lang 批）
+f6cd473 merge: W21 四个零示例语法点补例 + replaceable 台账 + scenario tasks 实测（lang 批）
+224b9b6 W23: MetadataType UPA 实测记录 + coverage.md §5.3 by-design 登记（纯文档）
+c1c7459 merge: W20 19 处 xs:anyType 收成真声明（lang 批）
+abca616 W21: 四个「XSD 声明但全仓零示例」语法点补例 + replaceable 台账行 + data-scenario tasks 属性实测
+```
 
 ---
 
@@ -493,11 +499,13 @@ python3 docs/validate_roots.py
 # 2) 单件 XSD 校验（README「校验与运行」一节的写法）
 python3 -c "import xmlschema; xmlschema.XMLSchema('xsd/esml-canonical-basic.xsd').validate('L3-model/modeltype-basic.esml')"
 
-# 3) 引擎侧：141 份示例逐件 check（负例预期非零退出）
+# 3) 引擎侧：170 份示例逐件 check（负例预期非零退出；2026-11-11 重算，W27）
 for f in $(find . -name '*.esml' | sort); do
-  esml check "$f" -L /home/ai4e18/esml/library >/dev/null 2>&1 \
+  esml check "$f" -L "$HOME/esml-engine-user3/library" >/dev/null 2>&1 \
     && echo "ok    $f" || echo "fail  $f"
 done
+# 注：`-L` 后的标准库根随环境而变（本文档撰写时的引擎在 ~/esml-engine-user3/）；
+# 只有 `X-use/` 两件需要库，其余 168 件不带 `-L` 也能逐件 check。
 
 # 4) 引擎侧：四方闸门（[3] 角是 reference 侧对账；在引擎仓跑）
 cd ~/esml && python3 tools/four_way_gate.py
