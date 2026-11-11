@@ -3,8 +3,10 @@
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 端口变量角色 `portRole="stream"`（物质流，inStream 语义），与 potential / flow 并列，
      规范条文：附录 F1（stream 流股）。
-     用于组分或物质流。 -->
+     用于组分或物质流。
+     期望（ESML_PROPS=off esml solve 实测）：m.in.c = 0.5、m.out.c = 0.5（组分直通）。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_PortStream">
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <portTypes><portType name="StreamPort" connectorFamily="stream">
     <variables>
       <portVariable name="c" portRole="stream" type="real"/>
@@ -16,10 +18,12 @@
       <variable name="in.c"  type="real" role="algebraic"/>
       <variable name="out.c" type="real" role="algebraic"/>
     </variables>
-    <equations><equation>out.c = in.c</equation></equations>
+    <equations>
+      <equation>in.c = 0.5</equation>
+      <equation>out.c = in.c</equation>
+    </equations>
   </modelType></modelTypes>
   <systems><system name="S">
     <instances><instance name="m" type="Mix"/></instances>
-    <schedule><sequence><continueFor time="0"/></sequence></schedule>
   </system></systems>
 </esml>

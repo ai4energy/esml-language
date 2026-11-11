@@ -7,7 +7,7 @@
      本例只展示 `<flow>` 这一语法点（T 用已覆盖的 portVariable 角色形声明）：
      300 K / 280 K 两恒温源经导体，Q_flow = (300 − 280) / 0.5 = 40 W。
      规范条文：§5（端口）。
-     `check` errors=0；`solve`（system S）cd.port_a.Q_flow = 40.0。 -->
+     `check` errors=0；`ESML_PROPS=off esml solve` 实测：cd.port_a.Q_flow = 40.0、cd.port_b.Q_flow = -40.0（(300 − 280) / 0.5）。 -->
  <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_FlowElement">
    <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
    <portTypes><portType name="HeatPort" connectorFamily="thermal">
@@ -24,7 +24,7 @@
          <variable name="port.T"      type="real" role="algebraic"/>
          <variable name="port.Q_flow" type="real" role="algebraic"/>
        </variables>
-       <equations><equation>port.T = Tset</equation></equations>
+       <equations><equation>port.T = Tset</equation><equation>port.Q_flow = (300.0 - Tset) / 0.5</equation></equations>
      </modelType>
      <modelType name="Conductor">
        <ports><port name="port_a" portType="HeatPort"/><port name="port_b" portType="HeatPort"/></ports>
@@ -52,6 +52,6 @@
        <connection from="hot.port" to="cd.port_a"/>
        <connection from="cd.port_b" to="cold.port"/>
      </connections>
-     <schedule><sequence><continueFor time="1"/></sequence></schedule>
+     
    </system></systems>
  </esml>

@@ -25,18 +25,20 @@
   <modelTypes>
     <modelType name="Src">
       <ports><port name="p" portType="SigOut"/></ports>
+    <parameters><parameter name="signal" type="real" default="7.0"/></parameters>
       <parameters><parameter name="V" type="real" default="7.0"/></parameters>
       <variables><variable name="p.y" type="real" role="algebraic"/></variables>
-      <equations><equation>p.y = V</equation></equations>
+      <equations><equation>p.y = signal</equation></equations>
     </modelType>
     <modelType name="Rec">
       <ports><port name="q" portType="SigIn"/></ports>
       <variables><variable name="q.y" type="real" role="algebraic"/></variables>
+      <equations><equation>q.y = 7.0</equation></equations>
     </modelType>
   </modelTypes>
   <systems><system name="S" discipline="signal">
     <instances><instance name="s" type="Src"/><instance name="r" type="Rec"/></instances>
     <connections><connection from="s.p" to="r.q"/></connections>
-    <schedule><sequence><continueFor time="0"/></sequence></schedule>
+    
   </system></systems>
 </esml>

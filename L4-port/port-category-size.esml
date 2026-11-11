@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
-<!-- 语法点 端口实例的 category 与 size 属性：category=inlet/outlet/bi 标端口方向，size=1 标端口束规模。
-     本例 HeatPort 的两个端口分别标 inlet 与 outlet，size=1。
+<!-- 语法点 端口实例的 category 与 size 属性：category=inlet/outlet 标端口方向，
+     size="1" 标端口束规模。本例 HeatPort 的两个端口分别标 inlet 与 outlet。
      规范条文：§5（端口）。
-     check errors=0。 -->
+     期望（ESML_PROPS=off esml solve 实测）：f.port_a.T = f.port_b.T = 300.0（Tset）。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_PortCatSize">
   <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <portTypes><portType name="HeatPort" connectorFamily="thermal">
@@ -18,17 +18,19 @@
       <port name="port_a" portType="HeatPort" category="inlet" size="1"/>
       <port name="port_b" portType="HeatPort" category="outlet" size="1"/>
     </ports>
-    <parameters><parameter name="Tset" type="real" default="300.0"/></parameters>
+    <parameters>
+<parameter name="Tset" type="real" default="300.0"/>
+    </parameters>
     <variables>
-      <variable name="port_a.T" type="real" role="algebraic"/>
-      <variable name="port_a.Q_flow" type="real" role="algebraic"/>
-      <variable name="port_b.T" type="real" role="algebraic"/>
-      <variable name="port_b.Q_flow" type="real" role="algebraic"/>
-    </variables>
-    <equations><equation>port_a.T = Tset</equation></equations>
+      <variable name="port_a.T"     type="real" role="algebraic"/>
+            <variable name="port_b.T"     type="real" role="algebraic"/>
+          </variables>
+    <equations>
+      <equation>port_a.T = Tset</equation>
+      <equation>port_b.T = Tset</equation>
+    </equations>
   </modelType></modelTypes>
   <systems><system name="S">
     <instances><instance name="f" type="FixedT"/></instances>
-    <schedule><sequence><continueFor time="1"/></sequence></schedule>
   </system></systems>
 </esml>

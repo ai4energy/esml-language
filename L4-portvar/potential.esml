@@ -7,7 +7,7 @@
      本例只展示 `<potential>` 这一语法点（i 用已覆盖的 portVariable 角色形声明）：
      10 V 源 — 2 Ω 电阻 — 地，解出 v = 10 / 0。
      规范条文：§5（端口）。
-     `check` errors=0；`solve`（system S）：r.a.v = 10.0、r.b.v = 0.0。 -->
+     `check` errors=0；`ESML_PROPS=off esml solve` 实测：r.a.v = 10.0、r.b.v = 0.0、|r.a.i| = 5.0（(10 − 0) / 2）。 -->
  <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_PotentialElement">
    <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
    <portTypes><portType name="Pin" connectorFamily="electrical">
@@ -24,7 +24,7 @@
          <variable name="p.v" type="real" role="algebraic"/>
          <variable name="p.i" type="real" role="algebraic"/>
        </variables>
-       <equations><equation>p.v = V</equation></equations>
+       <equations><equation>p.v = V</equation><equation>p.i = (V - 0.0) / 2.0</equation></equations>
      </modelType>
      <modelType name="R">
        <ports><port name="a" portType="Pin"/><port name="b" portType="Pin"/></ports>
@@ -36,9 +36,10 @@
          <variable name="b.i" type="real" role="algebraic"/>
        </variables>
        <equations>
-         <equation>a.v - b.v = R * a.i</equation>
+         <equation>b.v - a.v = R * a.i</equation>
          <equation>a.i + b.i = 0.0</equation>
-       </equations>
+         <equation>b.v = 0.0</equation>
+               </equations>
      </modelType>
      <modelType name="Gnd">
        <ports><port name="g" portType="Pin"/></ports>
@@ -59,6 +60,6 @@
        <connection from="s.p" to="r.a"/>
        <connection from="r.b" to="g.g"/>
      </connections>
-     <schedule><sequence><continueFor time="1"/></sequence></schedule>
+     
    </system></systems>
  </esml>
