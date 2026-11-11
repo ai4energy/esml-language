@@ -5,8 +5,7 @@
      `title` / `summary` 可省；`summary` 亦可写作元素文本（本例即用元素文本形态）。
      三处同型：`<metadata>` 内（本例）、`<modelType>` 内、`<portType>` 内。
      纯文档元数据，不参与编译与求解。
-     规范条文：待补（本属性仅 XSD 声明，SPEC 尚未成文；XSD 锚点 `esml-canonical-basic.xsd`
-     的 DocRefType，T-DOCREF）。
+     规范条文：§1.1（文档骨架 · 就地短文档引用 `<doc>`，纯文档元数据）。
      `check` errors=0。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="D_DocRef">
   <metadata>

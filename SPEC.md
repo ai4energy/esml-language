@@ -68,6 +68,12 @@
 - 示例：`D-skeleton/metadata.esml`（author / license / description）、
   `D-skeleton/provenance.esml`（出处声明）。
 
+- **`<doc ref="…">`**：就地短文档引用，与 `<metadata>` 同类——纯文档元数据，
+  **不参与编译与求解**。属性 `ref`（**必需**，指向文档条目的唯一键）、`title` /
+  `summary` 可选；`summary` 亦可写作元素文本。三处同型：`<metadata>` 内、
+  `<modelType>` 内、`<portType>` 内。
+  - 示例：`D-skeleton/doc-ref.esml`（`<metadata>` 内 `<doc>`，summary 用元素文本形态）。
+
 ## 2. 词法（收紧集）
 
 > **唯一真相 = XSD（机验基准）**：canonical 元素/属性一律 **camelCase**（`modelTypes` /
@@ -742,7 +748,7 @@ kebab-case 拼写**不是合法语法**，报错（§2 收紧集）。
 | `estimation` | `<estimate>`（`<var initial/>` 或属性式 `initial`）、`<data>` |
 | `optimize` | `<decision>`（`<var lower upper/>` 或属性式）、`<objective>`（含 `<expr>`）、`<constraints>`（含 `<constraint>`）、`<solver>` |
 | `control` | `<mpc N dt/>`（滚动时域） |
-| `surrogate` | `<surrogate method degree/>`、`<data>` |
+| `surrogate` | `<surrogate method degree/>`、`<sampling size/>`、`<data>` |
 | `validation` | `<metrics>`（含 `<metric>`）、`<data>` |
 
 **三个辅助任务**（不占七类编号，不引入新的求解角色）：
