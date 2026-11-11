@@ -108,7 +108,7 @@ def spec_named_elements(spec_path):
     """SPEC.md 里以 `<name>` 或 `` `name` `` 形式点名的元素名集合。"""
     spec = spec_path.read_text(encoding="utf-8")
     named = set()
-    for m in re.finditer(r"<([A-Za-z_][\w.\-]*)\s*/?>", spec):
+    for m in re.finditer(r"<([A-Za-z_][\w.\-]*)(?=[\s/>])", spec):
         named.add(m.group(1))
     for m in re.finditer(r"`([A-Za-z_][\w.\-]*)`", spec):
         named.add(m.group(1))
@@ -253,6 +253,18 @@ def self_test(stream):
             for where, msg in red:
                 w(f"        {where}: {msg}\n")
             failures += 0 if ok else 1
+
+        # —— 回归用例：带属性的开标签算点名（防正则回退到只认裸标签）。
+        #    SPEC 里 <beta mode="x"/> 必须算 beta 被点名；alpha 用 `alpha` 点名。
+        SPEC_ATTR = "这是规范正文。\n\n`alpha` 和 <beta mode=\"x\"/> 都点名了。\n"
+        write_tree(root / "attr", SPEC_ATTR, TSV_EMPTY)
+        red, warn, _ = run_on(root / "attr")
+        ok = bool(red) is False
+        w(f"  [{'PASS' if ok else 'BROKEN'}] 带属性开标签算点名：<beta mode=\"x\"/> ⇒ "
+          f"期望零违规，实际 {len(red)} 红 / {len(warn)} 警告\n")
+        for where, msg in red:
+            w(f"        {where}: {msg}\n")
+        failures += 0 if ok else 1
 
         # —— 台账计数锚自证：「共 N 行」写错 ⇒ 必须红。
         badcount_tsv = write_tree(root / "badcount", SPEC_GOOD,
