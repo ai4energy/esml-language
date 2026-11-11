@@ -128,16 +128,82 @@ def declared_attributes(xsd_dir):
     return names
 
 
-def spec_named_attributes(spec_path):
-    """SPEC.md 里以词边界形式点名的属性名集合（判据同元素：`\bname\b` 出现即算）。"""
-    spec = spec_path.read_text(encoding="utf-8")
-    # 用 spec_named_elements 的两种模式收集所有已点名 token，
-    # 再与 declared_attributes 做交集；这里直接返回全 token 集合，
-    # 由 check_direction_b 负责取差。
+def _extract_format_bound_tokens(text):
+    """从文本里提取**格式绑定**的 token：
+    1. 围栏代码块（``` ... ```）内的所有 token
+    2. 行内代码（`...`）内的所有 token（支持跨行）
+    3. `<...>` 标签片段内的属性名（`attr=value` 或 `attr=` 形式）
+
+    步骤：
+    a. 逐行识别围栏块（``` 开头/结尾），收集围栏内 token，同时把围栏块
+       内容替换为等量空白（保留行结构），避免 ``` 干扰后续反引号配对。
+    b. 在去围栏文本上做全局反引号状态机扫描：遇到 ` 切换 in_code 状态，
+       in_code 期间的所有字符都收集 token。状态跨行携带（处理跨行行内代码）。
+    c. 在去围栏文本上扫 <...> 标签片段，抓属性名。
+    """
     tokens = set()
-    for m in re.finditer(r"[A-Za-z_][\w.\-]*", spec):
-        tokens.add(m.group(0))
+    lines = text.split("\n")
+
+    # --- a. 围栏块识别 + 收集 + 替换 ---
+    in_fence = False
+    no_fence_lines = []
+    for line in lines:
+        stripped = line.lstrip()
+        if stripped.startswith("```"):
+            if not in_fence:
+                in_fence = True
+                no_fence_lines.append(" " * len(line))
+            else:
+                in_fence = False
+                no_fence_lines.append(" " * len(line))
+            continue
+        if in_fence:
+            for t in re.finditer(r"[A-Za-z_][\w.\-]*", line):
+                tokens.add(t.group(0))
+            no_fence_lines.append(" " * len(line))
+        else:
+            no_fence_lines.append(line)
+    text_nofence = "\n".join(no_fence_lines)
+
+    # --- b. 全局反引号状态机（跨行）：标记 in_code 区间，再抓 token ---
+    in_code = False
+    spans = []  # (start, end) in_code intervals
+    start = None
+    for i, ch in enumerate(text_nofence):
+        if ch == "`":
+            if not in_code:
+                in_code = True
+                start = i + 1
+            else:
+                in_code = False
+                spans.append((start, i))
+    if in_code and start is not None:
+        spans.append((start, len(text_nofence)))
+    for s, e in spans:
+        for t in re.finditer(r"[A-Za-z_][\w.\-]*", text_nofence[s:e]):
+            tokens.add(t.group(0))
+
+    # --- c. <...> 标签片段：抓属性名 ---
+    for m in re.finditer(r"<[A-Za-z_][\w.\-]*((?:\s+[\w.\-]+=[\"'][^\"']*[\"'])*)\s*/?>", text_nofence):
+        attrs_str = m.group(1) or ""
+        for a in re.finditer(r"([\w.\-]+)=", attrs_str):
+            tokens.add(a.group(1))
+    # 无值属性：<tag attr1/>
+    for m in re.finditer(r"<[A-Za-z_][\w.\-]*\s+([\w.\-]+)\s*/?>", text_nofence):
+        tokens.add(m.group(1))
+
     return tokens
+
+
+def spec_named_attributes(spec_path):
+    """SPEC.md 里以**格式绑定**形式点名的属性名集合。
+
+    判据（格式绑定，比元素方向严格）：token 必须出现在
+    ① 围栏代码块内 ② 行内代码 `...` 内 ③ <...> 标签片段内
+    三者之一，才算点名。纯散文里的裸词不算。
+    """
+    spec = spec_path.read_text(encoding="utf-8")
+    return _extract_format_bound_tokens(spec)
 
 
 def _name(item):
@@ -309,7 +375,7 @@ def self_test(stream):
             '  <xs:attribute name="gamma" type="xs:string"/>'
             '/></xs:element></xs:schema>')
     SPEC_GOOD = "这是规范正文。\n\n`alpha` 和 <beta> 都点名了，`gamma` 属性也点名了。\n"
-    SPEC_BAD = "这是规范正文。\n\n`alpha` 点名了，beta 没点名，gamma 没点名。\n"
+    SPEC_BAD = "这是规范正文。\n\n`alpha` 点名了，beta 没点名。\n"
     TSV_EMPTY = "# 共 0 行\n#\n# pending：0 行\n"
     TSV_ONE = ("# 共 1 行\n#\n# pending：1 行\n"
                "<beta>\tpending\tW2\t自证：SPEC 删了 <beta> 点名，待补条文\n")
@@ -332,8 +398,10 @@ def self_test(stream):
         good_tsv = write_tree(root / "good", SPEC_GOOD, TSV_EMPTY)
         # —— 坏树：SPEC 里删了 <beta> 点名，台账也没登记 ⇒ 方向 A 红。
         bad_tsv = write_tree(root / "bad", SPEC_BAD, TSV_EMPTY)
-        # —— 台账兜树：SPEC 删了 <beta>，但台账登记了 pending owner=W2 ⇒ 警告不红。
-        pending_tsv = write_tree(root / "pending", SPEC_BAD, TSV_ONE)
+        # —— 台账兜树：SPEC 删了 <beta> 点名（但 gamma 仍用 `gamma` 点名），
+        #    台账登记了 <beta> pending owner=W2 ⇒ 警告不红。
+        SPEC_PENDING = "这是规范正文。\n\n`alpha` 和 `gamma` 点名了，beta 没点名。\n"
+        pending_tsv = write_tree(root / "pending", SPEC_PENDING, TSV_ONE)
 
         for label, tree, want_red in (
                 ("好树：声明元素都在 SPEC 里点名", root / "good", False),
@@ -369,7 +437,7 @@ def self_test(stream):
           f"实际 {len(red)} 红\n")
         failures += 0 if ok else 1
 
-        # —— 属性方向好树：gamma 在 SPEC 里以词边界形式点名（`gamma`），台账空 ⇒ 零违规。
+        # —— 属性方向好树：gamma 在 SPEC 里以行内代码形式点名（`gamma`），台账空 ⇒ 零违规。
         #    DECL 里已含 <xs:attribute name="gamma"/>，SPEC_GOOD 已含 `gamma`。
         red, warn, _ = run_on(root / "good")
         # good 树已经验证过方向 A 零违规；方向 B 也应零违规（gamma 被点名）。
@@ -380,12 +448,30 @@ def self_test(stream):
             w(f"        {where}: {msg}\n")
         failures += 0 if ok else 1
 
-        # —— 属性方向坏树：SPEC 删了 gamma 点名，台账也没登记 ⇒ 方向 B 红。
-        #    复用 bad 树（SPEC_BAD 已删 gamma 点名）。
-        red, warn, _ = run_on(root / "bad")
-        ok = bool(red) is True
-        w(f"  [{'PASS' if ok else 'BROKEN'}] 属性方向坏树：SPEC 删了 gamma 点名，台账没登记 ⇒ "
-          f"期望判红，实际 {len(red)} 红\n")
+        # —— 属性方向坏树：gamma 在 SPEC 里**彻底不出现**（不是裸词，是完全不存在），
+        #    alpha 用 `alpha` 点名、beta 用 <beta> 点名 ⇒ 方向 A 零违规，方向 B 必须红。
+        #    断言红的**必须是 direction-B 那条消息**（不是只断 bool(red)）。
+        SPEC_ATTR_BAD = "这是规范正文。\n\n`alpha` 和 <beta> 都点名了。\n"
+        write_tree(root / "attrbad", SPEC_ATTR_BAD, TSV_EMPTY)
+        red, warn, _ = run_on(root / "attrbad")
+        ok = (bool(red) is True
+             and any(where == "direction-B" and "gamma" in msg for where, msg in red))
+        w(f"  [{'PASS' if ok else 'BROKEN'}] 属性方向坏树：gamma 彻底不出现，台账没登记 ⇒ "
+          f"期望 direction-B 判红，实际 {len(red)} 红\n")
+        for where, msg in red:
+            w(f"        {where}: {msg}\n")
+        failures += 0 if ok else 1
+
+        # —— 围栏用例：gamma 只出现在 ``` 围栏代码块内（不在行内代码里），
+        #    格式绑定判据应把围栏内 token 也算点名 ⇒ 零违规。
+        #    防反引号解析回退：如果围栏没被单独处理，``` 会打乱朴素成对反引号解析。
+        SPEC_FENCE = ("这是规范正文。\n\n`alpha` 和 <beta> 都点名了。\n"
+                      "```xml\n<beta gamma=\"x\"/>\n```\n")
+        write_tree(root / "fence", SPEC_FENCE, TSV_EMPTY)
+        red, warn, _ = run_on(root / "fence")
+        ok = bool(red) is False
+        w(f"  [{'PASS' if ok else 'BROKEN'}] 围栏用例：gamma 只在 ``` 围栏内 ⇒ "
+          f"格式绑定判据应算点名，期望零违规，实际 {len(red)} 红\n")
         for where, msg in red:
             w(f"        {where}: {msg}\n")
         failures += 0 if ok else 1

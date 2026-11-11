@@ -104,6 +104,8 @@
 | 调度 | `<schedule><sequence><continueFor time=.../>[<call method=.../>]*</sequence></schedule>` | （附录 K）；多段连续求解 |
 | 图形标注 | `<annotation>`（`<icon>`/`<placement>`/`<port>`） | 纯 UI 元数据（§4.2） |
 
+`count` 是 `PortInstanceType` 的 canonical 声明保留（旧拼写，canonical 是 `size`），**引擎当前 F1 响亮拒收，登记见 docs/coverage.md §5.11 与 tools/engine-drift.tsv**。
+
 **收紧规则（canonical 唯一，不向后兼容旧写法）**：
 解析器对旧词法直接报错（解析器）：
 - 端口协议：`<portTypes>/<portType>`；`interfaces` / `interface` / `connector` → 报错
