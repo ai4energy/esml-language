@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- W21 语法点 `<algorithm><while condition=>…</while></algorithm>`（算法段循环，SPEC:858）。
+     XSD 已声明（AlgorithmType 允许 `<while>` 子元素），但引擎
+     `unknown::KNOWN_SUB_TAGS` 无 `while`，`esml check` F7 拒收（引擎债，
+     详见 docs/coverage.md §5.11）。本例保留 canonical 写法。
+     SPEC:858 说明：`condition` 只能为常量 `false`（零迭代、可静态展开）；
+     本例写 `condition="false"` 即零次执行，体 `<assign name="y" value="0"/>` 不生效。
+     `esml check` 实测（W21 2026-11-11）：
+       error: F7[]: unknown element `<while>` at L8-function/algorithm-while.esml:20:9 — use a canonical element name (see `unknown::KNOWN_SUB_TAGS`)
+     规范条文：SPEC §7（算法段）— `<while condition=>` 循环。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L8_AlgorithmWhile">
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
+  <functions>
+    <function name="f" returns="real">
+      <inputs><input name="x" type="real"/></inputs>
+      <outputs><output name="y" type="real"/></outputs>
+      <algorithm>
+        <while condition="false">
+          <assign name="y" value="0"/>
+        </while>
+        <assign name="y" value="42"/>
+      </algorithm>
+    </function>
+  </functions>
+  <modelTypes><modelType name="M" discipline="generic">
+    <parameters><parameter name="x" type="real" default="1.0"/></parameters>
+    <variables><variable name="y" type="real" role="algebraic"/></variables>
+    <equations><equation>y = f(x)</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="M"/></instances>
+    <schedule><sequence><continueFor time="0"/></sequence></schedule>
+  </system></systems>
+</esml>

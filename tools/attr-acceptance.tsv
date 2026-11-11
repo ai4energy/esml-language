@@ -9,7 +9,7 @@
 #   rejected-legacy 引擎 F1[] 响亮拒收旧拼写（count/side 报 unknown attribute 并指路；domain 报 legacy spelling）
 #   rejected-ie     引擎 IE8[] 未实现响亮拒收（synchronize）
 #   no-example      宿主元素在仓内示例零出现，无基线可注入
-# 共 46 行
+# 共 47 行
 # 待落地：5 行（accepted 且示例还没进 **/*.esml；rejected-* / no-example 不在此列。
 #   闸门对 owner=W3/W4 的 accepted 行只警告不红，对 W5/engine-debt 才红。
 #   W17 2026-11-11：domain 按宿主拆 3 行（<instance>/<modelType>/<system>，实测语义无效 ⇒ no-example，
@@ -41,6 +41,7 @@ attribute	MpcType	q	mpc	accepted	W4	注入 T-tasks/control-vars.esml 的 <mpc> �
 attribute	VariableType	quantity	variable	rejected-f7	engine-debt	error: F7[]: unknown attribute `quantity` on `<variable>` at <probe> — remove or rename; canonical attributes are in `unknown::KNOWN_ATTRS`
 attribute	MpcType	r	mpc	accepted	W4	注入 T-tasks/control-vars.esml 的 <mpc> 后 errors=0
 attribute	DocRefType	ref	doc	accepted	W4	整块注入 <doc name title ref/> 后 errors=0（宿主 <doc> 仓内零使用，待落地补示例）
+attribute	ParameterType	replaceable	parameter	rejected-f7	engine-debt	W21 2026-11-11 实测注 <parameter replaceable="true"> 于 L3-model/extendsfrom.esml:11 复现：error: F7[]: unknown attribute `replaceable` on `<parameter>` — remove or rename; canonical attributes are in `unknown::KNOWN_ATTRS` + error: F1[]: parser rejected the document: unknown attribute `replaceable` on <parameter 'k'> — canonical attributes are ["name", "type", "role", "array", "distribution", "initial", "default", "description", "values", "redeclare"]（canonical XSD does not accept the legacy spelling `replaceable`）。SPEC:273-276 声明为 canonical metadata（redeclare 伴生），引擎 parser 无读点 ⇒ 引擎债
 attribute	MethodType	samples	method	accepted	W4	注入 L8-function/foreign-object.esml 的 <method> 后 errors=0
 attribute	PortInstanceType	side	port	rejected-legacy	W5	error: F1[]: parser rejected the document: unknown attribute `side` on <port 'p'> at L4-port/porttype-electrical.esml:16 — canonical attributes are ["name", "portType", "category", "connectClass", "size", "portSet", "description"]（W17 2026-11-11 实测注 <modelType><ports><port side="left"> 复现；PortInstanceType 无 side，PortMarkType 才有 ⇒ 同名 <port> 不同宿主属性集不同，本行 verdict 只对 <modelType><ports><port> 成立，<annotation><port> 侧见新增 PortMarkType 行）
 attribute	PortInstanceType	size	port	accepted	W4	注入 D-skeleton/skeleton-full.esml 的 <port> 后 errors=0

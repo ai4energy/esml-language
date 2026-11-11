@@ -6,11 +6,16 @@
      每份 `<scenario>` 内嵌 `<data t="…" y="…">` 与其中的 `<point>` 数据点。
      本例**不写 `<systemRef src="…">`**：`src` 是相对 project 文件的路径，
      文件不存在会 F21 报错。
-     `check` errors=0（附录 · project 骨架）。
-     规范条文：§1.1（文档骨架）。 -->
+     `<scenario tasks="…">` 属性：ScenarioType（project.xsd:59）声明 `tasks` 为可选
+     string，本例写 `tasks="sim"` 演示。引擎 F7 拒收（`unknown::KNOWN_ATTRS` 无 `tasks`，
+     引擎债，详见 docs/coverage.md §5.11）；本例保留 canonical 写法。
+     `esml check` 实测（W21 2026-11-11）：
+       error: F7[]: unknown attribute `tasks` on `<scenario>` at D-skeleton/data-scenario.esml:13:5 — remove or rename; canonical attributes are in `unknown::KNOWN_ATTRS`
+       warning: F21[]: <scenarioChain> is accepted and skipped: the engine does not consume scenarios …
+     规范条文：§1.1（文档骨架）+ SPEC ScenarioType（`tasks` 可选 string）。 -->
 <project xmlns="https://www.ai4energy.cn/esml/v1" name="P" version="1.0">
   <scenarioChain>
-    <scenario name="base">
+    <scenario name="base" tasks="sim">
       <data t="0.0" y="1.0"><point t="1.0" y="2.0"/></data>
     </scenario>
   </scenarioChain>

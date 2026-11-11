@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- W21 语法点 `<literal name=>` in `<type>` (SPEC:158 — 枚举类型显式列出字面量)。
+     XSD 已声明 (basic.xsd VariableType allows `<literal>` as child)，但引擎
+     `unknown::KNOWN_SUB_TAGS` 无 `literal`，`esml check` F7 拒收（引擎债，
+     详见 docs/coverage.md §5.11）。本例保留 canonical 写法。
+     `esml check` 实测（W21 2026-11-11）：
+       error: F7[]: unknown element `<literal>` at L0-type-unit/literal-enum.esml:16:7 — use a canonical element name (see `unknown::KNOWN_SUB_TAGS`)
+     三处 `<literal>` 各报一条 F7。
+     规范条文：SPEC §3 (类型系统) — 枚举类型可选 `<literal>` 子元素显式列名。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L0_LiteralEnum">
+  <variableTypes>
+    <type name="real" unit="1" default="0.0"/>
+    <type name="Mode" kind="enumeration" values="off,on,boost" default="off">
+      <literal name="off"/>
+      <literal name="on"/>
+      <literal name="boost"/>
+    </type>
+  </variableTypes>
+  <modelTypes>
+    <modelType name="M" discipline="generic">
+      <parameters><parameter name="mode" type="Mode" default="off"/></parameters>
+      <variables><variable name="y" type="real" role="state" initial="0.0"/></variables>
+      <equations><equation>Der(y) = 0</equation></equations>
+    </modelType>
+  </modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="M"/></instances>
+    <schedule><sequence><continueFor time="1"/></sequence></schedule>
+  </system></systems>
+</esml>
