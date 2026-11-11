@@ -2,14 +2,19 @@
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 `ifelse(c, t, f)`：分段表达式（光滑分段，不是事件）。
+     独立变量用 t（规范 O-15：独立变量是 t，不是 time）。
+     本件是瞬态 DAE：Der(x) = ifelse(t < 0.5, 2.0, 0.0)，x(0)=0.0 ⇒
+       t ∈ [0, 0.5): x(t) = 2t；t ∈ [0.5, 1]: x = 1.0（常数）。
+     期望值（simulate，W66 实测命令：ESML_PROPS=off esml simulate L1-expr-equation/ifelse.esml）：
+       t=0.5 时 m.x = 1.0；t=1.0 时 m.x = 1.0（solve 会正确报 no steady state）。
      规范条文：§7（分段表达式）。
-     c ≠ 0 取 t，否则取 f；分支切换精度由积分器容差决定。 -->
+     c ≠ 0 取 t 分支，否则取 f；分支切换精度由积分器容差决定。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_IfElse">
   <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="M">
     <variables><variable name="x" type="real" role="state" initial="0.0"/></variables>
     <equations>
-      <equation>Der(x) = ifelse(time &lt; 0.5, 2.0, 0.0)</equation>
+      <equation>Der(x) = ifelse(t &lt; 0.5, 2.0, 0.0)</equation>
     </equations>
   </modelType></modelTypes>
   <systems><system name="S">

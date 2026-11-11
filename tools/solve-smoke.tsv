@@ -2,7 +2,7 @@
 # 列：path  has_system(1/0,lxml 判定)  solve_rc  simulate_rc(N/A=未跑)  unknowns(解出未知量数)  status  evidence(错误首行,≤200 字)
 # 普查口径：负例判据照 tools/check-engine-examples.py（is_negative，W47b 收紧版）；158 件非负例逐件 `ESML_PROPS=off esml solve <file>`（X-use/ 库件加 -L ~/esml-engine-user3/library），120 s/件超时；solve 面的 fail 件 W52 续件逐件再跑 `ESML_PROPS=off esml simulate <file>`（X-use/ 加 -L，120 s），simulate 成功者记 ok-simulate（solve 稳态不适用），fail 只留 solve 与 simulate 双红件
 # status 值域：ok / ok-simulate（simulate 成功、solve 稳态不适用）/ na-no-system / na-artifact（需外部工件，如 libesml_extern_testlib.so，缺失时 solve 走 SolveError）/ fail / fail-check-debt（F7 check 层已知债，已登记 engine-example-debt.tsv）/ fail-engine-debt（引擎侧求解层缺口，已登记 engine-example-debt.tsv stage=solve）/ fail（未归因或示例侧待修）/ timeout
-# 共 158 行 / ok 135 / ok-simulate 6 / na 6 / fail 11（fail 内分：fail-check-debt 5 / fail-engine-debt 6）
+# 共 158 行 / ok 136 / ok-simulate 7 / na 6 / fail 9（fail 内分：fail-check-debt 5 / fail-engine-debt 3 / fail 1）
 D-skeleton/data-scenario.esml	0	N/A	N/A	N/A	na-no-system	 
 D-skeleton/doc-ref.esml	1	0	N/A	1	ok	 
 D-skeleton/esml-coordinate.esml	1	0	N/A	1	ok	 
@@ -28,17 +28,17 @@ L0-type-unit/units-derived.esml	1	0	N/A	1	ok
 L0-type-unit/units-group.esml	1	0	N/A	1	ok	 
 L0-type-unit/variable-roles.esml	1	0	N/A	3	ok	 
 L1-expr-equation/array-index.esml	1	0	N/A	3	ok	 
-L1-expr-equation/axis-reduce.esml	1	1	1	0	fail-engine-debt	[stage=solve 已登记] error: undeclared symbol(s) referenced during flatten: m__x — these names do not resolve in the bound scope. Common causes: (a) typo / wrong case in the path; (b) the model that declares them was not  ｜ simulate rc=1 双红：error: und
+L1-expr-equation/axis-reduce.esml	1	1	1	0	fail	[spec-backlog F8] SPEC 附录 F8 明文「不支持：多维数组归约」；本件演示 check 层 axis 范围校验（I25b），errors=0，不宣称可 solve。solve rc=1（flatten 层 undeclared symbol m__x，属预期）｜ simulate rc=1（同因）
 L1-expr-equation/builtins-complex.esml	1	0	N/A	8	ok	 
 L1-expr-equation/builtins-delay.esml	1	0	N/A	2	ok	 
 L1-expr-equation/builtins-expr.esml	1	0	N/A	28	ok	 
-L1-expr-equation/builtins-math.esml	1	1	1	0	fail-engine-debt	[stage=solve 已登记] error: undeclared symbol(s) referenced during flatten: time — these names do not resolve in the bound scope. Common causes: (a) typo / wrong case in the path; (b) the model that declares them was not  ｜ simulate rc=1 双红：error: und
+L1-expr-equation/builtins-math.esml	1	0	N/A	4	ok	W66 修复（O-15：time→t）；solve rc=0，m.s1=1.0 m.s2=6.7320508076 m.s3=7.0 m.s4=1.0
 L1-expr-equation/derivative-analytic.esml	1	1	1	0	na-artifact	需 libesml_extern_testlib.so（extern 测试库）；该 .so 非仓内工件，缺失时 solve 走 SolveError。示例侧 canonical 不动，留待引擎仓补库或 CI 注入 .so。
 L1-expr-equation/equation-basic.esml	1	0	N/A	2	ok	 
 L1-expr-equation/expr.esml	1	0	N/A	1	ok	 
 L1-expr-equation/for-in.esml	1	0	N/A	6	ok	 
 L1-expr-equation/for-over-orderedset.esml	1	0	N/A	4	ok	 
-L1-expr-equation/ifelse.esml	1	1	1	0	fail-engine-debt	[stage=solve 已登记] error: undeclared symbol(s) referenced during flatten: time — these names do not resolve in the bound scope. Common causes: (a) typo / wrong case in the path; (b) the model that declares them was not  ｜ simulate rc=1 双红：error: und
+L1-expr-equation/ifelse.esml	1	1	0	0	ok-simulate	W66 修复（O-15：time→t）；瞬态 DAE（Der(x)=ifelse(t<0.5,2,0)，x(0)=0）⇒ t∈[0,0.5): x=2t，t∈[0.5,1]: x=1.0。simulate rc=0（末行 x=0.99≈1.0）；solve 正确报 no steady state（残差恒 2.0，与 x 无关）
 L1-expr-equation/reference.esml	1	0	N/A	1	ok	 
 L2-discrete/case-branch.esml	1	0	N/A	1	ok	 
 L2-discrete/clock-functions.esml	1	1	0	0	ok-simulate	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm ｜ simulate rc=0（solve 不适用）

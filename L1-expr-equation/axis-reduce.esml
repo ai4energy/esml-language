@@ -6,8 +6,10 @@
        · sum(x, 0)  1D → 标量
        · sum(M, 1) / prod(M, 0) / min(M, 0) / max(M, 1)  2D → 1D
        · scalar × array 是唯一合法广播 ⇒ 结果同形
-     规范条文：§7（向量归约内建）＋ 附录 F8（vector 归约内建）。
-     `check` 只验类型层（axis 范围、形状一致、索引范围），errors=0。 -->
+     本件仅演示 check 层 axis 范围校验（I25b），errors=0；
+     SPEC 附录 F8 明文「不支持：多维数组归约」⇒ 多维归约是 spec backlog，
+     不宣称可 solve（solve 会因 flatten 层 undeclared symbol 失败，属预期行为）。
+     规范条文：§7（向量归约内建）＋ 附录 F8（vector 归约内建；多维归约 backlog）。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_AxisReduce">
   <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes>
