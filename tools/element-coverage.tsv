@@ -1,0 +1,43 @@
+# 元素覆盖台账 —— XSD 命名元素 ↔ 示例用法 双向差集（W24，2026-11-11 当场重算登记）。
+# 列：kind  item(<元素名>)  verdict  owner  evidence(一行可复核)
+# kind  值域：element（方向 A：声明了、非负例示例没用）/ example（方向 B：示例用了、未命名声明）
+# verdict 值域：has-example（已落地，只作记录）/ pending（待落地）/ by-design（刻意如此，依据写清）
+# owner  值域：W1 / W3 / W4 / engine-debt
+# 方向 A：pending 且 owner∈{W1,W3,W4} ⇒ 警告不红；owner=engine-debt ⇒ 红。
+# 方向 B：只有 by-design 行能豁免；pending 不算（用了就是用了）。
+# 台账行必须与当天重算差集闭合：补了示例/声明 ⇒ 删行或改 verdict；闸门机判闭合，过时即红。
+# 共 26 行
+# pending：23 行（方向 A 7 + 方向 B 16；by-design 3 不计入。W21/W20 落地后相应行改 has-example/删行，计数随之重算）
+#
+# —— 方向 A：声明了、非负例示例零使用（7 个）。
+# 4 个 = W21 在办补示例；3 个导数符号只活在 schema 级负例里（L1-expr-equation/*）。
+element	<literal>	pending	W1	W21 在办：literal/param/vary/while 四示例正在补；落地后本行改 has-example 或删
+element	<param>	pending	W1	W21 在办：literal/param/vary/while 四示例正在补；落地后本行改 has-example 或删
+element	<vary>	pending	W1	W21 在办：literal/param/vary/while 四示例正在补；落地后本行改 has-example 或删
+element	<while>	pending	W1	W21 在办：literal/param/vary/while 四示例正在补；落地后本行改 has-example 或删
+element	<derivativeSymbol>	pending	W1	只在 schema 级负例出现（L1-expr-equation/derivativesymbol.esml 等）；非负例示例零使用，暂无补例工单
+element	<noDerivative>	pending	W1	只在 schema 级负例出现（L1-expr-equation/noderivative.esml）；非负例示例零使用，暂无补例工单
+element	<zeroDerivative>	pending	W1	只在 schema 级负例出现（L1-expr-equation/zeroderivative.esml）；非负例示例零使用，暂无补例工单
+#
+# —— 方向 B：非负例示例在用、XSD 未命名声明（19 个）。
+# component 因 schema 负例（L3-model/component-probe.esml）跳过而**不在**差集 —— 符合预期，故无行。
+# 3 个 = <metadata> 宽松子结构 by-design；16 个 = W20 在办把 anyType 收成真声明。
+example	<advance>	pending	W3	W20 在办：anyType 收成真声明；现见于 L2-discrete/initialisationprocedure-advance.esml:20
+example	<branch>	pending	W3	W20 在办：anyType 收成真声明；现见于 L2-discrete/case-branch.esml:12
+example	<complete>	pending	W3	W20 在办：anyType 收成真声明；现见于 L2-discrete/initialisationprocedures.esml:19
+example	<condition>	pending	W3	W20 在办：anyType 收成真声明；现见于 L3-model/if.esml:12（真元素用法，非属性假阳性）
+example	<default>	pending	W3	W20 在办：anyType 收成真声明；现见于 L3-model/selector-values.esml:10（真元素用法，非属性假阳性）
+example	<initialSelector>	pending	W3	W20 在办：anyType 收成真声明；现见于 L3-model/selector-values.esml:17
+example	<initialisationProcedure>	pending	W3	W20 在办：anyType 收成真声明；现见于 L2-discrete/initialisationprocedure-advance.esml:15
+example	<jumpTo>	pending	W3	W20 在办：anyType 收成真声明；现见于 L2-discrete/initialisationprocedures.esml:18
+example	<moveTo>	pending	W3	W20 在办：anyType 收成真声明；现见于 L2-discrete/initialisationprocedure-advance.esml:19
+example	<next>	pending	W3	W20 在办：anyType 收成真声明；现见于 L2-discrete/initialisationprocedure-advance.esml:18
+example	<preset>	pending	W3	W20 在办：anyType 收成真声明；现见于 L9-method-schedule/fixed-preset.esml:15
+example	<rule>	pending	W3	W20 在办：anyType 收成真声明；现见于 L6-connect/connect-rules.esml:30
+example	<selector>	pending	W3	W20 在办：anyType 收成真声明；现见于 L3-model/selector-values.esml:8
+example	<start>	pending	W3	W20 在办：anyType 收成真声明；现见于 L2-discrete/initialisationprocedure-advance.esml:17
+example	<value>	pending	W3	W20 在办：anyType 收成真声明；现见于 L3-model/selector-values.esml:9（真元素用法，非属性假阳性）
+example	<values>	pending	W3	W20 在办：anyType 收成真声明；现见于 L3-model/selector-values.esml:9（真元素用法，非属性假阳性）
+example	<author>	by-design	W3	<metadata> 子结构不固定、schema 放行任意子元素（SPEC.md:65）；现见于 D-skeleton/metadata.esml:7
+example	<license>	by-design	W3	<metadata> 子结构不固定、schema 放行任意子元素（SPEC.md:65）；现见于 D-skeleton/metadata.esml:8
+example	<provenance>	by-design	W3	<metadata> 子结构不固定、schema 放行任意子元素（SPEC.md:65）；现见于 D-skeleton/provenance.esml:8
