@@ -47,15 +47,15 @@
 
 自证（`--self-test`）
 --------------------
-一个「检查器」如果对任何东西都说 OK，它和没有检查器等价。所以本脚本自带 7 个构造样例
-（3 好 4 坏，另加 1 条反向自检）证明它**真的会红**：好件必须判过、坏件必须判红，
+一个「检查器」如果对任何东西都说 OK，它和没有检查器等价。所以本脚本自带 9 个构造样例
+（3 好 4 坏 + 1 条反向自检 + 2 条台账计数）证明它**真的会红**：好件必须判过、坏件必须判红，
 任一翻转都算自证失败。
 
 用法
 ----
     tools/check-examples.py              # 全仓；退出码 0 = 全绿
     tools/check-examples.py --vocab      # 附带逐元素对账表
-    tools/check-examples.py --self-test  # 3 好 4 坏 + 反向自检自证
+    tools/check-examples.py --self-test  # 3 好 4 坏 + 反向自检 + 台账计数自证
 
 依赖：lxml（XSD 校验器）。装法见 README 或 `python3 -m venv .venv && .venv/bin/pip install lxml`。
 xmllint 若可用，`--xmllint` 会改用它并保持同样的判据口径。
@@ -83,6 +83,9 @@ PROJECT_SCHEMA = XSD_DIR / "esml-canonical-project.xsd"
 NEGATIVES_TSV = Path(__file__).resolve().parent / "negatives.tsv"
 ALIASES_TSV = Path(__file__).resolve().parent / "aliases.tsv"
 ESML_GLOB = "*.esml"
+
+# negatives.tsv 头部写着条数的那一行：「# 登记条数：31 件（schema 24 / semantic 7）」
+COUNT_NEG = re.compile(r"^#\s*登记条数：(\d+)\s*件（schema\s*(\d+)\s*/\s*semantic\s*(\d+)）")
 
 # 校验顺序：`<esml>` 文档走 canonical-basic（它 include 了 common + compute）；
 # 其它根各自走对应 schema。判据是「根元素属于哪个 schema 的全局元素集」，
@@ -188,25 +191,47 @@ def schema_for_root(root):
     return None
 
 
-def load_negatives():
-    """→ (path -> (level, reason))。清单里每行都必须有三列且 level 合法。"""
+def parse_negatives(text):
+    """→ path -> (level, reason)。纯函数：行格式、level、reason 与头部
+    「登记条数」全部当场核对，任一条对不上就 ValueError（条数不是注释里的摆设）。"""
     table = {}
-    for lineno, line in enumerate(NEGATIVES_TSV.read_text(encoding="utf-8").splitlines(), 1):
-        if not line.strip() or line.lstrip().startswith("#"):
+    declared = None
+    for lineno, line in enumerate(text.splitlines(), 1):
+        if not line.strip():
+            continue
+        if line.lstrip().startswith("#"):
+            m = COUNT_NEG.match(line)
+            if m:
+                declared = tuple(int(g) for g in m.groups())
             continue
         parts = line.split("\t")
         if len(parts) != 3:
-            sys.exit(f"[check-examples] {NEGATIVES_TSV.name}:{lineno} 必须 3 列（path/level/reason）")
+            raise ValueError(f"{lineno} 必须 3 列（path/level/reason）")
         path, level, reason = parts
         if level not in ("schema", "semantic"):
-            sys.exit(
-                f"[check-examples] {NEGATIVES_TSV.name}:{lineno} level={level!r} 非法："
-                "只许 schema / semantic（「未判定」不是合法状态）"
+            raise ValueError(
+                f"{lineno} level={level!r} 非法：只许 schema / semantic（「未判定」不是合法状态）"
             )
         if not reason.strip():
-            sys.exit(f"[check-examples] {NEGATIVES_TSV.name}:{lineno} reason 为空 —— 没写清它红在哪一层")
+            raise ValueError(f"{lineno} reason 为空 —— 没写清它红在哪一层")
         table[path] = (level, reason)
+    if declared is None:
+        raise ValueError("缺「# 登记条数：N 件（schema X / semantic Y）」头部 —— 条数不许只活在注释里")
+    n_schema = sum(1 for v in table.values() if v[0] == "schema")
+    n_semantic = len(table) - n_schema
+    if declared != (len(table), n_schema, n_semantic):
+        raise ValueError(
+            f"头部登记 {declared[0]} 件（schema {declared[1]} / semantic {declared[2]}），"
+            f"实测 {len(table)} 件（schema {n_schema} / semantic {n_semantic}）—— 改表即改头部"
+        )
     return table
+
+
+def load_negatives():
+    try:
+        return parse_negatives(NEGATIVES_TSV.read_text(encoding="utf-8"))
+    except ValueError as e:
+        sys.exit(f"[check-examples] {NEGATIVES_TSV.name}:{e}")
 
 
 # --------------------------------------------------------------------------- 逐元素对账
@@ -471,7 +496,7 @@ def self_test(validate, stream):
             ok, err = validate(p, CANONICAL_SCHEMA)
             results.append((name, False, ok, err))
 
-    w("[self-test] 构造样例 3 好 4 坏 + 1 反向自检 —— 证明本检查器真的会红\n")
+    w("[self-test] 构造样例 3 好 4 坏 + 1 反向自检 + 2 台账计数 —— 证明本检查器真的会红\n")
     failures = 0
     for name, should_pass, ok, err in results:
         verdict = "PASS" if ok == should_pass else "BROKEN"
@@ -494,6 +519,24 @@ def self_test(validate, stream):
           "反向自检样例失效，请检查 XSD 是否被改成了严格模式\n")
         failures += 1
 
+    # 台账头部计数自证：条数对得上必须过，对不上必须红（计数不许只活在注释里）。
+    rows = "a.esml\tschema\tr\nb.esml\tschema\tr\nc.esml\tsemantic\tr\n"
+    for name, head, should_pass in (
+        ("negatives-tsv-count-ok", "# 登记条数：3 件（schema 2 / semantic 1）\n", True),
+        ("negatives-tsv-count-wrong", "# 登记条数：4 件（schema 3 / semantic 1）\n", False),
+    ):
+        try:
+            parse_negatives(head + rows)
+            ok = True
+        except ValueError:
+            ok = False
+        verdict = "PASS" if ok == should_pass else "BROKEN"
+        if ok != should_pass:
+            failures += 1
+        want = "应收下" if should_pass else "应判红"
+        got = "收下了" if ok else "判红了"
+        w(f"  [{verdict}] {name:32} {want} → 实际{got}\n")
+
     return failures
 
 
@@ -501,7 +544,7 @@ def self_test(validate, stream):
 def main(argv=None):
     ap = argparse.ArgumentParser(description="ESML 示例 × XSD 一致性门")
     ap.add_argument("--vocab", action="store_true", help="附带逐元素对账表")
-    ap.add_argument("--self-test", action="store_true", help="只跑 2 好 2 坏自证")
+    ap.add_argument("--self-test", action="store_true", help="只跑构造样例自证（不查全仓）")
     ap.add_argument("--xmllint", action="store_true", help="优先用 xmllint（缺 lxml 时）")
     ap.add_argument("--quiet", action="store_true", help="只报红项")
     args = ap.parse_args(argv)

@@ -7,7 +7,7 @@
 # 「未判定」不合法：每件都要写清它红在哪一层，否则下次复核又要重新猜。
 #
 # 登记条数：31 件（schema 24 / semantic 7）—— 改表即改这一行；
-# tools/check-neg-debt.py 每次跑都重算并核对，对不上就红（台账写错就改台账）。
+# tools/check-examples.py 每次跑都重算并核对，对不上就红（台账写错就改台账）。
 L0-type-unit/units-contradiction.esml	semantic	单位声明与 type unit= 矛盾（§11 量纲冲突），拼写合法
 L1-expr-equation/array-index-probe.esml	semantic	数组维 "GhostSet" 既非字面量、也非已声明序集/参数名，求解期报 I25a；拼写合法
 L1-expr-equation/axis-reduce-probe.esml	semantic	rank-1 数组上 sum(x, 1) 的 axis 1 越界（合法 0..0），求解期报 I25b；拼写合法

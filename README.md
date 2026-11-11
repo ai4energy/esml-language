@@ -11,7 +11,7 @@ ESML 是一种声明式、基于方程的物理系统建模语言，文档即 XM
 | [`SPEC.md`](SPEC.md) | 语言规范：词法、类型系统、组件、端口、系统、方程、展开与求解约定 |
 | [`xsd/`](xsd/) | XML Schema：入口 schema 一份，canonical 子集四份（共享 primitive / 模型体系 / 计算体系 / 项目容器） |
 | [`docs/`](docs/) | 机验对账：[`validate_roots.py`](docs/validate_roots.py)（入口层根清单 ⇄ canonical 全局元素）与 [`validate_examples.py`](docs/validate_examples.py)（规范 ⇄ 示例，五道检查）、[`coverage.md`](docs/coverage.md)（对账表与逐条裁决）、[`design/`](docs/design/)（裁决记录）、[`audit/`](docs/audit/)（strict 基线等审计件） |
-| [`tools/`](tools/) | 台账闸：[`element-coverage.tsv`](tools/element-coverage.tsv)（元素覆盖双向台账）、[`attr-acceptance.tsv`](tools/attr-acceptance.tsv)（属性验收台账：引擎裁决）、[`attr-coverage.tsv`](tools/attr-coverage.tsv)（属性覆盖双向台账：完整性）、[`engine-example-debt.tsv`](tools/engine-example-debt.tsv)（引擎 × 示例可运行性台账）、[`engine-drift.tsv`](tools/engine-drift.tsv)（跨仓 schema 漂移裁决）、[`aliases.tsv`](tools/aliases.tsv)（legacy 拼法清单）、[`negatives.tsv`](tools/negatives.tsv) / [`neg-debt.tsv`](tools/neg-debt.tsv)（负例清单与债务处置） |
+| [`tools/`](tools/) | 台账闸：[`element-coverage.tsv`](tools/element-coverage.tsv)（元素覆盖双向台账）、[`attr-acceptance.tsv`](tools/attr-acceptance.tsv)（属性验收台账：引擎裁决）、[`attr-coverage.tsv`](tools/attr-coverage.tsv)（属性覆盖双向台账：完整性）、[`engine-example-debt.tsv`](tools/engine-example-debt.tsv)（引擎 × 示例可运行性台账）、[`engine-drift.tsv`](tools/engine-drift.tsv)（跨仓 schema 漂移裁决）、[`aliases.tsv`](tools/aliases.tsv)（legacy 拼法清单）、[`negatives.tsv`](tools/negatives.tsv)（负例清单：红在哪一层） |
 | `D-skeleton/` … `X-use/` | 每个语法点一份可运行文档，按语言层次分目录（见下表） |
 
 canonical XML 是正统语法；XML Schema 描述 canonical XML，是可机验的基准。
@@ -135,20 +135,12 @@ python3 -m venv .venv && .venv/bin/pip install lxml   # 只需一次
 **红在哪一层**：`schema` 表示 XSD 必须拒收它，`semantic` 表示拼写合法、红在求解层。
 标成 `schema` 的负例哪天被 XSD 收下了，门就红——那说明判据漏了，不是件变好了。
 
-引擎 G16 语料门白名单里落在本仓示例目录的 10 行，逐行处置在
-[`tools/neg-debt.tsv`](tools/neg-debt.tsv)（改件 / 转 negative / 删孤儿，各带一行证据）。
-[`tools/check-neg-debt.py`](tools/check-neg-debt.py) 把关：
-
-```sh
-.venv/bin/python tools/check-neg-debt.py                        # 台账 + XSD 复核
-.venv/bin/python tools/check-neg-debt.py --engine <esml 二进制>  # 附引擎实测错误码复核
-.venv/bin/python tools/check-neg-debt.py --self-test             # 2 好 2 坏 + 反向自证
-```
-
-它当场重算两本台账的登记条数（对不上就红），核对每行的件、登记层与证据行，
-并盯住导数 token 的**位置**判据：新增的负例必须把 token 放在合法位
-（`<derivative>` 之内、canonical 拼写）且整件不写 `<body>`——这样引擎的同一个
-失败码 F1 才归因于**位置**（缺 `<extern>`），而不是 body 形态。
+`negatives.tsv` 头部的「登记条数」（schema / semantic 各几件）由
+`tools/check-examples.py` 每次跑**当场重算并核对**，对不上就红——条数不是注释里的摆设。
+早期的 G16 语料门白名单处置台账（`neg-debt.tsv` 14 行）与它的对账门
+`check-neg-debt.py` 已于 2026-11-11 退役，原件归档在
+[`ai4ecom/esml-adr-archive`](https://github.com/ai4ecom/esml-adr-archive)
+的 `language/tools-archive/`（一次性结算已完毕，不再有新行）。
 
 「哪些写法算 legacy」这条知识落在 [`tools/aliases.tsv`](tools/aliases.tsv)，
 门据此逐条机验：legacy 元素名/属性名不得被任何 `xsd/*.xsd` 声明、不得出现在示例里；
