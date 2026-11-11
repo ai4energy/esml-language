@@ -11,7 +11,7 @@
 #   stage=solve 行：跑 `esml check` 必须 errors=0，再跑 `esml solve <file>` 必须**非零退出**（仍失败）；
 #                   solve 成功(退出 0) ⇒ 引擎修好了 ⇒「台账过时，删行」。
 # 台账行必须与当天重算闭合：示例修好了 ⇒ 删行；errors 计数变了 ⇒ 改数字。
-# 共 11 行（check 8 / solve 3）
+# 共 10 行（check 8 / solve 2）
 #
 # —— 8 件 check 层引擎债 + 3 件 solve 层引擎债（2026-11-11，ESML_PROPS=off，逐个非负例实跑 `esml check`/`esml solve`；port-carrier 为 W56b 补登记 stage=solve）。
 D-skeleton/data-scenario.esml	1	engine-debt	check	error: F7[]: unknown attribute `tasks` on `<scenario>` at D-skeleton/data-scenario.esml:18:5 — remove or rename; canonical attributes are in `unknown::KNOWN_ATTRS`（tasks 属性 W21 登记）
@@ -22,6 +22,5 @@ L9-method-schedule/method-vary.esml	1	engine-debt	check	error: F7[]: unknown ele
 T-tasks/hyperparams.esml	2	engine-debt	check	error: F7[]: unknown element `<param>` at T-tasks/hyperparams.esml:30:22 — use a canonical element name (see `unknown::KNOWN_SUB_TAGS`) + error: F1[]: parser rejected the document: legacy spelling `<param>` at 2093:2124 — use `<parameter>`（F7+F1 双拒，W21 登记）
 X-use/use-library.esml	4	engine-debt	check	error: F10[]: `<instance>` references undeclared model `FixedTemperature` at X-use/use-library.esml:17:7 — declare `<modelType name="…">` first（×3 未声明模型 F10 + 1 F16 HIR）；不带 -L 时库模型不可解析；带 -L 见文件头注（设计行为非缺陷）
 X-use/use-multi-library.esml	4	engine-debt	check	error: F10[]: `<instance>` references undeclared model `FixedTemperature` at X-use/use-multi-library.esml:28:7 — declare `<modelType name="…">` first（×3 未声明模型 F10 + 1 F16 HIR）；不带 -L 时库模型不可解析；带 -L 见文件头注（设计行为非缺陷）
-L6-connect/port-array.esml	0	engine-debt	solve	error: solve … pantelides: structurally singular: 4 unmatched unknown(s)（s.p.v_1/v_2、d.p.v_1/v_2）；残差 f[2]=s.p.v_1-d.p.v_1、f[3]=s.p.v_2-d.p.v_2 证明逐元素连接等式已建，机制=Pantelides DOF 少计+unmatched 误判（W46 实测）
 L6-connect/connect-rules.esml	0	engine-debt	solve	[diag] solve failed: pantelides: structurally singular: 2 unmatched unknown(s), 0 redundant equation(s)（W56a 登记；coverage §5.3 已登记 `<connectRules>` 默认 CLI 路径不消费——`F-CONNECT-RULES-*` 只数 `rule` 条目不联 `connectClass`、HIR/flat 层无 `connect_rules` 消费点 ⇒ 求解层无连接约束建出 ⇒ 2 个 unmatched；check 层 errors=0）
 L4-port/port-carrier.esml	0	engine-debt	solve	pantelides: structurally singular — 4 unmatched unknown(s) i.a.h/i.b.h/j.a.h/j.b.h（+ redundant i.a.q）。引擎侧两 flow 端口闭合缺口，示例侧不可修（W55 探针 14 变体证实：两 flow 变量端口连接时引擎对第二个 flow 变量 q 不发守恒残差）。W56b 登记 stage=solve；check 层 errors=0。

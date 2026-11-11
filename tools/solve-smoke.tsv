@@ -2,7 +2,7 @@
 # 列：path  has_system(1/0,lxml 判定)  solve_rc  simulate_rc(N/A=未跑)  unknowns(解出未知量数)  status  evidence(错误首行,≤200 字)
 # 普查口径：负例判据照 tools/check-engine-examples.py（is_negative，W47b 收紧版）；158 件非负例逐件 `ESML_PROPS=off esml solve <file>`（X-use/ 库件加 -L ~/esml-engine-user3/library），120 s/件超时；solve 面的 fail 件 W52 续件逐件再跑 `ESML_PROPS=off esml simulate <file>`（X-use/ 加 -L，120 s），simulate 成功者记 ok-simulate（solve 稳态不适用），fail 只留 solve 与 simulate 双红件
 # status 值域：ok / ok-simulate（simulate 成功、solve 稳态不适用）/ na-no-system / na-artifact（需外部工件，如 libesml_extern_testlib.so，缺失时 solve 走 SolveError）/ fail / fail-check-debt（F7 check 层已知债，已登记 engine-example-debt.tsv）/ fail-engine-debt（引擎侧求解层缺口，已登记 engine-example-debt.tsv stage=solve）/ fail（未归因或示例侧待修）/ timeout
-# 共 158 行 / ok 136 / ok-simulate 7 / na 6 / fail 9（fail 内分：fail-check-debt 5 / fail-engine-debt 3 / fail 1）
+# 共 158 行 / ok 137 / ok-simulate 7 / na 6 / fail 8（fail 内分：fail-check-debt 5 / fail-engine-debt 2 / 示例侧待修 1）
 D-skeleton/data-scenario.esml	0	N/A	N/A	N/A	na-no-system	 
 D-skeleton/doc-ref.esml	1	0	N/A	1	ok	 
 D-skeleton/esml-coordinate.esml	1	0	N/A	1	ok	 
@@ -88,7 +88,7 @@ L6-connect/composite-internal.esml	1	0	N/A	6	ok
 L6-connect/connect-basic.esml	1	0	N/A	4	ok	 
 L6-connect/connect-canonical.esml	1	0	N/A	4	ok	 
 L6-connect/connect-rules.esml	1	1	1	0	fail-engine-debt	[stage=solve 已登记] error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm ｜ simulate rc=1 双红：error: sim
-L6-connect/port-array.esml	1	1	1	0	fail-engine-debt	[stage=solve 已登记] error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm ｜ simulate rc=1 双红：error: sim
+L6-connect/port-array.esml	1	0	0	4	ok	J2 修复：flatten 数组臂 pvar 守卫（W71 销账）；solve rc=0，d.p.v_1=1.0 d.p.v_2=2.0（与 s.p.v 逐元素相等）
 L6-connect/variable-level.esml	1	0	N/A	2	ok	 
 L7-partition/domain.esml	1	0	N/A	1	ok	 
 L7-partition/orderedsets.esml	1	0	N/A	1	ok	 

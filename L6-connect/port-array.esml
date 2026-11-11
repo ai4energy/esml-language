@@ -4,18 +4,11 @@
 <!-- 语法点 端口数组连接：portVariable 标 array="2"，<connection> 对数组端口逐元素建相等约束（§6.4:409、§8）。
      规范条文：§6.4:409「<connection> 对数组端口逐元素建相等约束」、§8 显式域 connect 逐 pvar 相等。
      本例：Src 钉 s.p.v[1]=1.0、s.p.v[2]=2.0；Dst 纯读出口、无自身方程；连接 from="s.p" to="d.p"。
-     【实测事实 · 引擎与 SPEC 不符（求解层）】check errors=0（拼写合法、XSD 过），但 esml solve 失败：
-       [diag] solve failed: pantelides: structurally singular: 4 unmatched unknown(s), 0 redundant equation(s)
-       且 verify_struct[I17] 报「8 unknowns vs 4 equations (under-determined)」。
-       残差表是反证——逐元素等式【确实生成】且引用了全部 4 个未知量：
-       f[2] = s.p.v_1 - d.p.v_1、f[3] = s.p.v_2 - d.p.v_2（连接语义已实现，§6.4:409 的逐元素相等约束建了），
-       外加 f[0]=s.p.v_1-1、f[1]=s.p.v_2-2 把 Src 两端各自钉满 ⇒ 实际 4 方程 4 未知、应恰定。
-       但 Pantelides 结构分析【少计方程】：它把 4 条连接/钉值等式漏出 DOF 计数（报 4 equations），
-       又把 4 个元素未知量全部标「unmatched / no residual mentions it」（与 f[2]/f[3] 明显矛盾）。
-       ⇒ 非欠定、非拼写错，是求解器 Pantelides 结构判据对数组端口连接的缺陷：DOF 少计 + unmatched 误判。
-       故「逐元素相等」在**引擎求解层未闭合**，本例作为引擎债留档。
-     期望（SPEC §8 语义，若引擎修好）：d.p.v_1=1.0、d.p.v_2=2.0（逐元素 = s.p.v）。
-     登记：`tools/engine-example-debt.tsv` 的 `stage=solve` 行（W46b：台账加 stage 列，一条管两层）。 -->
+     实测（2026-11-11，ESML v1.9.3）：
+       esml check → errors=0；esml solve → 4 unknowns：
+         s.p.v_1=1.0  s.p.v_2=2.0  d.p.v_1=1.0  d.p.v_2=2.0（逐元素相等）
+     历史：J2 前 flatten 数组臂缺 pvar 守卫（同一路径物化两次：2 段 vs 3 段 SymId），
+       Pantelides 报 4 unmatched（与残差表自相矛盾）；J2 补守卫后 4 未知量恰定。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L6_PortArray">
 
   <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
