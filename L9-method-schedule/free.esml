@@ -5,15 +5,27 @@
      放 sequence 里 F1 拒收「`<free>` is not a canonical step」）。
      `<free><scope instance="m"><set path="k"/></scope></free>`：把该自由度置为
      自由（FREE），求解时不再作为固定值参与。
-     check errors=0。
+     闭合（W63）：`<free>` 把 k 置为自由 ⇒ k 成为第二个未知量，模型须补一条
+     观测方程 `y_obs = k`（y_obs 为参数 =2.0）使 k 可定值；DOF 2（x, k）⇄
+     方程 2（Der(x) = -k*x；y_obs = k），solve 闭合。
+     期望值与实测命令（头注钉死）：
+       ESML_PROPS=off esml check L9-method-schedule/free.esml  ⇒ errors=0
+       ESML_PROPS=off esml solve L9-method-schedule/free.esml   ⇒ 退出 0；
+         m.k = 2.0（free 参数取观测方程钉住的值）；x(0)=1.0，
+         t=1 时 x = exp(-k) = exp(-2) = 0.135335（simulate 末行核对）。
      规范条文：附录 F7（自由度 FREE）。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L9_Free">
   <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="M" discipline="generic">
     <parameters>
-    <parameter name="k" type="real" default="0.0"/></parameters>
-    <variables><variable name="x" type="real" role="state" initial="1.0"/></variables>
-    <equations><equation>Der(x) = -k * x</equation></equations>
+    <parameter name="k" type="real" default="0.0"/>
+    <parameter name="y_obs" type="real" default="2.0"/>
+    </parameters>
+    <variables>
+    <variable name="x" type="real" role="state" initial="1.0"/>
+    </variables>
+    <equations><equation>Der(x) = -k * x</equation>
+    <equation>y_obs = k</equation></equations>
   </modelType></modelTypes>
   <systems><system name="S">
     <instances><instance name="m" type="M"/></instances>
