@@ -20,6 +20,7 @@ check:
 	$(PY) docs/validate_examples.py || rc=1; \
 	$(PY) tools/check-engine-xsd-parity.py || rc=1; \
 	$(PY) tools/check-element-coverage.py || rc=1; \
+	$(PY) tools/check-engine-examples.py || rc=1; \
 	if [ $$rc -ne 0 ]; then echo; echo "make check: 判红（见上）"; exit 1; fi; \
 	echo; echo "make check: 全绿"
 

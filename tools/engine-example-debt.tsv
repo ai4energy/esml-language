@@ -1,0 +1,15 @@
+# 引擎 × 示例可运行性台账 —— 每个非负例示例要么 `esml check` 绿，要么在此登记（W31，2026-11-11 当场重算登记）。
+# 列：path  errors(实测值，`ESML_PROPS=off esml check <file>` 的 summary errors=N)  owner  evidence(错误码 + 引擎首行原文，一行可复核)
+# owner 值域：engine-debt（引擎侧不收，登记后跟踪，示例本身 canonical 不动）
+# 台账行必须与当天重算闭合：示例修好了 ⇒ 删行；errors 计数变了 ⇒ 改数字。闸门机判闭合，过时即红。
+# 共 8 行
+#
+# —— 8 件引擎债（2026-11-11，union 05d59bf，ESML_PROPS=off，逐个非负例实跑 `esml check`）。
+D-skeleton/data-scenario.esml	1	engine-debt	error: F7[]: unknown attribute `tasks` on `<scenario>` at D-skeleton/data-scenario.esml:18:5 — remove or rename; canonical attributes are in `unknown::KNOWN_ATTRS`（tasks 属性 W21 登记）
+L0-type-unit/literal-enum.esml	3	engine-debt	error: F7[]: unknown element `<literal>` at L0-type-unit/literal-enum.esml:16:7 — use a canonical element name (see `unknown::KNOWN_SUB_TAGS`)（×3，行 16/17/18 各一；W21 登记 §5.11）
+L8-function/algorithm-while.esml	1	engine-debt	error: F7[]: unknown element `<while>` at L8-function/algorithm-while.esml:20:9 — use a canonical element name (see `unknown::KNOWN_SUB_TAGS`)（W19 登记 §5.11）
+L9-method-schedule/continue-until.esml	1	engine-debt	error: F7[]: unknown attribute `maxTime` on `<continueUntil>` at L9-method-schedule/continue-until.esml:20:7 — remove or rename; canonical attributes are in `unknown::KNOWN_ATTRS`（更早登记）
+L9-method-schedule/method-vary.esml	1	engine-debt	error: F7[]: unknown element `<vary>` at L9-method-schedule/method-vary.esml:23:9 — use a canonical element name (see `unknown::KNOWN_SUB_TAGS`)（W21 登记 §5.11）
+T-tasks/hyperparams.esml	2	engine-debt	error: F7[]: unknown element `<param>` at T-tasks/hyperparams.esml:30:22 — use a canonical element name (see `unknown::KNOWN_SUB_TAGS`) + error: F1[]: parser rejected the document: legacy spelling `<param>` at 2093:2124 — use `<parameter>`（F7+F1 双拒，W21 登记）
+X-use/use-library.esml	4	engine-debt	error: F10[]: `<instance>` references undeclared model `FixedTemperature` at X-use/use-library.esml:17:7 — declare `<modelType name="…">` first（×3 未声明模型 F10 + 1 F16 HIR）；不带 -L 时库模型不可解析；带 -L 见文件头注（设计行为非缺陷）
+X-use/use-multi-library.esml	4	engine-debt	error: F10[]: `<instance>` references undeclared model `FixedTemperature` at X-use/use-multi-library.esml:28:7 — declare `<modelType name="…">` first（×3 未声明模型 F10 + 1 F16 HIR）；不带 -L 时库模型不可解析；带 -L 见文件头注（设计行为非缺陷）
