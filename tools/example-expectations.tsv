@@ -1,0 +1,34 @@
+# 示例「期望值」台账 —— 头部注释块里写的「期望值」从今往后有机器判（W70，根治「头注期望值没人机判」）。
+# 列(7 列)：path  mode  steps  var  value  tol  source
+#   mode    solve | simulate（台账行内不允许混；`esml simulate` 必须带 --steps 才可判数值）。
+#   steps   simulate 行 = 步数（`--steps N`）；solve 行 = `-`。
+#   var     引擎输出里的变量路径（solve 输出行首列 / simulate 表头第二列起的列名）。
+#   value   期望值；source=实测 ⇒ 以引擎实跑为准（台账钉死实测数）；source=头注 ⇒ 头注原值。
+#   tol     绝对容差（台账写死，不随步数漂移）。
+#   source  头注 | 实测（W68 ifelse 头注已改实测，本列与头注一致处记「头注」，引擎实跑仍逐行机判）。
+# 闭合判据（闸门机判，过时即红；只加严不放宽）：
+#   跑 `ESML_PROPS=off esml <mode> [--steps N] <file>`，从输出解析 var 的值，与 value 按 tol 比对；
+#   台账行对应的引擎跑不出 ⇒ 红（引擎行为变了）；值出 tol ⇒ 红（台账/引擎不一致，改台账或改头注，不许双标）；
+#   **引擎跑不出（非零退出）的示例不在本台账登记期望值行**——那是 engine-example-debt.tsv 的 stage=solve
+#   引擎债（如 L6-connect/port-array.esml，W70 盘点确认仍 fail，Pantelides 数组端口 DOF 少计），
+#   两本台账分工：本台账管「跑得通的值对不对」，debt 台账管「跑不跑的通」。
+# 头部计数当场重算（与 check-engine-examples.py 同口径）：
+# 共 15 行（8 件示例：L1 两件、L4 四件、L6 一件、L9 一件；port-array solve 仍 fail 不登记，见 debt 台账）
+#
+# 值口径：8 件中 7 件为 `esml solve` 稳态实跑（2026-11-11，引擎 release 构建，ESML_PROPS=off）；
+# ifelse 为 `esml simulate --steps 200` 瞬态实测（头注 W68 已改实测，本行钉 t=0.5 与 t=1.0 两点）。
+L1-expr-equation/builtins-math.esml	solve	-	m.s1	1.0	1e-9	头注
+L1-expr-equation/builtins-math.esml	solve	-	m.s2	6.7320508076	1e-6	头注
+L1-expr-equation/builtins-math.esml	solve	-	m.s3	7.0	1e-9	头注
+L1-expr-equation/builtins-math.esml	solve	-	m.s4	1.0	1e-9	头注
+L1-expr-equation/ifelse.esml	simulate	200	m.x	0.9933333	2e-2	实测
+L1-expr-equation/ifelse.esml	simulate	200	m.x	0.995	2e-2	实测
+L4-port/port-category-size.esml	solve	-	f.port_a.T	300.0	1e-6	头注
+L4-port/port-category-size.esml	solve	-	f.port_b.T	300.0	1e-6	头注
+L4-port/port-stream.esml	solve	-	m.in.c	0.5	1e-9	头注
+L4-port/port-stream.esml	solve	-	m.out.c	0.5	1e-9	头注
+L4-port/stream.esml	solve	-	m.in.c	0.25	1e-9	头注
+L4-port/stream.esml	solve	-	m.out.c	0.25	1e-9	头注
+L4-port/flow-potential.esml	solve	-	m.q	1.0	1e-9	头注
+L6-connect/composite-internal.esml	solve	-	chain.b.port.v	5.0	1e-6	头注
+L9-method-schedule/free.esml	solve	-	m.k	2.0	1e-9	头注

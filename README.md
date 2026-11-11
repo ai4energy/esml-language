@@ -16,7 +16,7 @@ canonical XML 是正统语法；XML Schema 描述 canonical XML，是可机验�
 文字与 schema 出现分歧时，以 schema 为准。
 
 ```sh
-python3 -m venv .venv && .venv/bin/pip install xmlschema lxml   # 一次装齐七道闸的依赖
+python3 -m venv .venv && .venv/bin/pip install xmlschema lxml   # 一次装齐八道闸的依赖
 PY=.venv/bin/python make check                                  # 全绿 = 可以提交
 ```
 
@@ -52,7 +52,7 @@ PY=.venv/bin/python make check                                  # 全绿 = 可�
 
 ## 校验与运行
 
-仓内七道**常驻机判**，`make check` 一起跑（任一失败即非零退出）：
+仓内八道**常驻机判**，`make check` 一起跑（任一失败即非零退出）：
 
 | 脚本 | 查什么 | 依赖 |
 |---|---|---|
@@ -63,9 +63,10 @@ PY=.venv/bin/python make check                                  # 全绿 = 可�
 | [`tools/check-attr-coverage.py`](tools/check-attr-coverage.py) | **属性覆盖双向闸**：声明→示例（每个 XSD 声明的属性必须有非负例示例或在台账登记）与示例→声明（示例用到的每个属性必须已声明或登记 by-design）；台账 [`tools/attr-coverage.tsv`](tools/attr-coverage.tsv)，头部计数当场重算。与 `attr-acceptance.tsv` 分工：后者记**引擎裁决**（收 / 拒 / 零效果），本闸查**完整性**（声明 ⇄ 示例闭合） | 仅标准库 |
 | [`tools/check-engine-examples.py`](tools/check-engine-examples.py) | **示例 × 引擎可运行性闸**：每个非负例示例（负例识别照抄 `validate_examples.py`）要么 `esml check` 绿（`errors=0`）、要么在 [`tools/engine-example-debt.tsv`](tools/engine-example-debt.tsv) 登记引擎债；台账数字与实测不符即「台账过时」判红；缺引擎跳过（同跨仓漂移闸）。台账 `stage` 列分两值域：`check` 行 = `esml check` 层不收（`errors>0`，闭合判据：`ESML_PROPS=off esml check <file>` 的 errors 数与台账一致）；`solve` 行 = `esml check` 绿但 `esml solve` 失败（闭合判据：`errors=0` 且求解层失败，evidence 记求解层首行错误） | `lxml` 无；逐件实跑引擎，缺引擎仓跳过 rc=0 |
 | [`tools/check-spec-element-coverage.py`](tools/check-spec-element-coverage.py) | **XSD 声明 ⇄ SPEC 点名闸**：每个 XSD 命名元素都必须在 `SPEC.md` 正文点名（判据 `name=` 声明去重、正则以属性/闭合为界）；未点名须在 [`tools/spec-element-coverage.tsv`](tools/spec-element-coverage.tsv) 登记 pending / by-design（依据必填）；台账头部计数当场重算 | 仅标准库 |
+| [`tools/check-example-expectations.py`](tools/check-example-expectations.py) | **示例「期望值」台账闸**：逐台账行实跑引擎（`ESML_PROPS=off esml <mode> <file> [--steps N]`），从输出解析变量值，与台账 `value` 按 `tol` 绝对差比对；值超 tol ⇒ 红（台账过时或头注双标）；引擎跑不出 ⇒ 红；缺引擎仓跳过 rc=0。台账 [`tools/example-expectations.tsv`](tools/example-expectations.tsv)，头部计数当场重算 | 引擎二进制；缺引擎仓跳过 rc=0 |
 
 ```sh
-make check                                   # 七道都跑
+make check                                   # 八道都跑
 make roots                                   # 只跑根矩阵
 make strict                                  # 只跑撤通配判别力闸
 python3 docs/validate_roots.py selftest      # 根矩阵的自证（好例 / 坏例）
