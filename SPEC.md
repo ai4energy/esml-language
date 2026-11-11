@@ -838,13 +838,13 @@ kebab-case 拼写**不是合法语法**，报错（§2 收紧集）。
 - 分段方程用 **`ifelse(cond, A, B)` 残差 + clamp/min/max**表达
   （稳态/准稳态分段），不引入硬 if 方程。
 - **`integral(e)` 是糖**：在出现处**所在实例**上引入一个状态
-  `integral__<key>`（`role=state`，`init=0`，可用 `<set>` 覆盖），并追加一条
-  `Der(integral__<key>) = e`；该处替换为这个状态。key 取实参裸引用的末段
+  `integral__⟨key⟩`（`role=state`，`init=0`，可用 `<set>` 覆盖），并追加一条
+  `Der(integral__⟨key⟩) = e`；该处替换为这个状态。key 取实参裸引用的末段
   （`integral(sp)` → `integral__sp`），否则取实参渲染的净化串；同一实参在同一实例
   内**复用同一个状态**。
   **声明形式**（与上式等价、供作者显式命名）：作者自己写
-  `Der(integral_<x>) = <x>` 时，`integral_<x>` 即为该状态（`init=0`），
-  `integral(<x>)` 指的是它——此时**不新建状态、不追加方程**。
+  `Der(integral_⟨x⟩) = ⟨x⟩` 时，`integral_⟨x⟩` 即为该状态（`init=0`），
+  `integral(⟨x⟩)` 指的是它——此时**不新建状态、不追加方程**。
   仅此一处用 `__` 生成内部名；`integral` **不是内建函数**：真漏到求值期会
   `unknown function 'integral'` 响亮报错，不做静默兜底。
 - 模型级条件/分支：`<equations><if><condition>c</condition>
@@ -1046,7 +1046,7 @@ kebab-case 拼写**不是合法语法**，报错（§2 收紧集）。
 `tools/check-spec-xsd-parity.py`（三方对账 + 自证；退出码 0 = 一致）；
 `docs/validate_roots.py`（根矩阵块 + 本节表逐行对账）。
 
-校验命令：`python3 -c "import xmlschema; xmlschema.XMLSchema('xsd/esml-canonical-basic.xsd').validate('<fixture>')"`（compute 同理）。
+校验命令：`python3 -c "import xmlschema; xmlschema.XMLSchema('xsd/esml-canonical-basic.xsd').validate(⟨fixture⟩)"`（compute 同理）。
 
 **说明**：`esml-v1.xsd` 只校验顶层结构与根元素合法性；`esml-canonical-basic.xsd` 提供更强的
 内容校验，覆盖模型体系的主要元素（units、use、variableTypes、portTypes、
@@ -1119,7 +1119,7 @@ modelType、systems、sets、initial、connections、fixed/free、schedule）。
 
 **调用约定（v1，写死）**：每个 extern 符号的 C 原型是
 ```c
-int32_t <symbol>(<arg0_c_type>, <arg1_c_type>, …, double *out);
+int32_t ⟨symbol⟩(⟨arg0_c_type⟩, ⟨arg1_c_type⟩, …, double *out);
 ```
 标量输入按**声明顺序传值**（`real→double` / `integer→int64_t` / `boolean→int32_t`），
 最后一个参数是调用方分配的**结果 out 指针**（`double`）；返回 `0=ok`。
@@ -1129,7 +1129,7 @@ int32_t <symbol>(<arg0_c_type>, <arg1_c_type>, …, double *out);
 
 ### 14.4 注册 / 发现 / 缓存
 
-- 以**包**为单位：registry 项形如 `group:artifact:version<TAB>path`；`<extern library>` 相对声明文件
+- 以**包**为单位：registry 项形如 `group:artifact:version⟨TAB⟩path`；`<extern library>` 相对声明文件
   所在包目录优先，再 `-L` 根取并集；失败响亮。
 - **缓存/AOT 键**：`extern 声明 hash` ＋ `库文件内容 hash` ＋ `ABI 版本` ＋ `目标三元组` ＋ `flags`
   ＋ 既有键；任一变即失效。
@@ -1269,7 +1269,7 @@ canonical 语法对旧词法直接报错（§2）。
 - `<portType>` 变量：物性 `portRole="potential|flow|stream"`、信号 `causality="input|output"`，或省略。
   省略 = 显式域变量束（thermal/water/gas/process），连接=逐位置相等，无守恒 role。
 - Connection-Type 参数：`<portType><parameters><parameter …/></parameters>` → 组件自动带
-  `<leaf>__<p>`；构建期按连接/portSet 值统一 + 冲突检测。
+  `⟨leaf⟩__⟨p⟩`；构建期按连接/portSet 值统一 + 冲突检测。
 - 边界组件：`Source`(固定头, bi-directional) / `Sink`(定流量, inlet) ≙ 电接地/电流源。
 
 ### SELECTOR / CASE·STN
@@ -1373,7 +1373,7 @@ CASE/多区/滞回：配 SELECTOR + `<events><when>`(STN)，方程用 `ifelse(se
 - PortType 变量全为 `input|output` role → 该口是信号连接器（可跨 PortType：SigOut↔SigIn）。
   连接只许 **output↔input**：input↔input（无驱动源）与 output↔output（双驱动）在编译期报错
   （`signal_causal_guard`）。逐 pvar 命名须一致。
-- 组件侧同样须显式声明 `<leaf>__<pvar>` 变量（非 autovivify）。
+- 组件侧同样须显式声明 `⟨leaf⟩__⟨pvar⟩` 变量（非 autovivify）。
 - 示例：信号口跨 PortType 的因果连接 —— `L4-port/signal-causal.esml`
   （`SigOut.y`(output) ↔ `SigIn.y`(input)，两份 portType 的 pvar 同名 `y`；
   组件侧显式声明 `p.y` / `q.y`）。
@@ -1490,7 +1490,7 @@ CASE/多区/滞回：配 SELECTOR + `<events><when>`(STN)，方程用 `ifelse(se
   不影响既有文档。
 - **校验**：
   ```
-  xmllint --schema xsd/esml-canonical-basic.xsd <file>.esml
+  xmllint --schema xsd/esml-canonical-basic.xsd ⟨file⟩.esml
   ```
   扩展段（case / methods / discrete / orderedSet / fixed / PORTSET /
   connectRules / functions / …）由 `##other` 宽容跳过。
