@@ -6,7 +6,7 @@
 #                 XSD 拒收它 = 我们把一个语义负例误判成拼写错（红）
 # 「未判定」不合法：每件都要写清它红在哪一层，否则下次复核又要重新猜。
 #
-# 登记条数：29 件（schema 22 / semantic 7）—— 改表即改这一行；
+# 登记条数：31 件（schema 24 / semantic 7）—— 改表即改这一行；
 # tools/check-neg-debt.py 每次跑都重算并核对，对不上就红（台账写错就改台账）。
 L0-type-unit/units-contradiction.esml	semantic	单位声明与 type unit= 矛盾（§11 量纲冲突），拼写合法
 L1-expr-equation/array-index-probe.esml	semantic	数组维 "GhostSet" 既非字面量、也非已声明序集/参数名，求解期报 I25a；拼写合法
@@ -37,3 +37,5 @@ L3-model/constant-probe.esml	schema	legacy 端口变量元素形 `<constant>`；
 L5-instance/reassign-probe.esml	schema	legacy 调度序列别名 `<reassign>`；`<sequence>` 内容模型 choice 只声明 call/continueFor/continueUntil/reset/stop ⇒ XSD 拒收；canonical 用 `<reset>`（SPEC:1173 删同义元素）
 L3-model/interface-probe.esml	schema	legacy `<interface>` 端口协议拼写；`<portTypes>` 内容模型只收 `<portType>` ⇒ XSD 拒收；canonical 用 `<portType name connectorFamily conservation>`（SPEC:89 端口协议表旧拼写报错）
 L9-method-schedule/max-time-probe.esml	schema	legacy kebab 属性 `max-time=`；`ScheduleContinueUntilType` 上 canonical `maxTime` 为 required，kebab 顶不上必填位 ⇒ XSD 拒收（`missing required attribute 'maxTime'`）；canonical 用 `maxTime=`（SPEC 附录 K + 附录 C：v1.3.3 kebab 属性名退位）
+L3-model/extends-probe.esml	schema	legacy 元素 `<extends>`；`ModelType` 子元素 choice 只声明 canonical `<extendsFrom>`，`<extends>` 未声明 ⇒ XSD 拒收（`Unexpected child '…extends'`）。**引擎收 `errors=0`=引擎债**（见 engine-drift.tsv `child ModelType extends`，方向 lang-wins）；canonical 用 `<extendsFrom>`（SPEC §4.0 + 附录 C：`<extends>` 已删）
+L3-model/extends-from-probe.esml	schema	kebab 元素 `<extends-from>`；`ModelType` 子元素 choice 只声明 camelCase `<extendsFrom>`，kebab 未声明 ⇒ XSD 拒收（`Unexpected child '…extends-from'`）+ 引擎 F1（legacy 拼法）/F7（unknown 元素）双拒；canonical 用 `<extendsFrom>`（SPEC §4.0 + 附录 C：`extends-from` 退位）

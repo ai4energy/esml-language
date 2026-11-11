@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 负例（预期 XSD + 引擎双拒）：`<modelType><extends-from>Base</extends-from>` 用 kebab 拼法。
+     XSD 拒收：`ModelType` 子元素 choice 只声明 camelCase `<extendsFrom>`，kebab `extends-from`
+     未声明 ⇒ `Unexpected child with tag '…extends-from'`。引擎 check 双拒：F1（legacy 拼法）
+     + F7（unknown 元素）。canonical 拼法是 `<extendsFrom>`（§4.0 类级继承），kebab 是附录 C
+     已删旧拼法。canonical 用 `<extendsFrom>`，见 `L3-model/extends.esml` 正例。
+     规范条文：§4.0（`<extendsFrom>` 是唯一 canonical 拼写）＋ 附录 C（`extends-from` 退位）。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L3_ExtendsFromProbe">
+<variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
+<modelTypes>
+<modelType name="Base" discipline="generic"><parameters><parameter name="k" type="real" default="1.0"/></parameters><variables><variable name="x" type="real" role="state" initial="1.0"/></variables><equations><equation>Der(x) = -k * x</equation></equations></modelType>
+<modelType name="Derived" discipline="generic">
+<extends-from>Base</extends-from>
+</modelType>
+</modelTypes>
+<systems><system name="S"><instances><instance name="d" type="Derived"/></instances></system></systems>
+</esml>
