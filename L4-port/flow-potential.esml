@@ -3,7 +3,8 @@
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 portType 内端口变量的统一写法：`<portVariable portRole="…">`；
      元素形态 `<flow>` / `<potential>` 已退役（解析期拒收）。`check` errors=0。
-     规范条文：§5（端口）。 -->
+     规范条文：§5（端口）。
+     期望（ESML_PROPS=off esml solve 实测）：m.q = 1.0（参数 q 钉方程，无自由未知量）。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_FlowPotential">
   <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <portTypes><portType name="FP">
@@ -14,11 +15,10 @@
     <portVariable name="v" type="real" portRole="potential"/>
   </portType></portTypes>
   <modelTypes><modelType name="M" discipline="generic">
-    <parameters><parameter name="q" type="real"/></parameters>
+    <variables><variable name="q" type="real" role="algebraic"/></variables>
     <equations><equation>q = 1.0</equation></equations>
   </modelType></modelTypes>
   <systems><system name="S">
     <instances><instance name="m" type="M"/></instances>
-    <schedule><sequence><continueFor time="1"/></sequence></schedule>
   </system></systems>
 </esml>

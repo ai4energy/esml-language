@@ -2,7 +2,7 @@
 # 列：path  has_system(1/0,lxml 判定)  solve_rc  simulate_rc(N/A=未跑)  unknowns(解出未知量数)  status  evidence(错误首行,≤200 字)
 # 普查口径：负例判据照 tools/check-engine-examples.py（is_negative，W47b 收紧版）；158 件非负例逐件 `ESML_PROPS=off esml solve <file>`（X-use/ 库件加 -L ~/esml-engine-user3/library），120 s/件超时；solve 面的 fail 件 W52 续件逐件再跑 `ESML_PROPS=off esml simulate <file>`（X-use/ 加 -L，120 s），simulate 成功者记 ok-simulate（solve 稳态不适用），fail 只留 solve 与 simulate 双红件
 # status 值域：ok / ok-simulate（simulate 成功、solve 稳态不适用）/ na-no-system / fail / timeout
-# 共 158 行 / ok 127 / ok-simulate 6 / na 4 / fail 21
+# 共 158 行 / ok 134 / ok-simulate 6 / na 4 / fail 14
 D-skeleton/data-scenario.esml	0	N/A	N/A	N/A	na-no-system	 
 D-skeleton/doc-ref.esml	1	0	N/A	1	ok	 
 D-skeleton/esml-coordinate.esml	1	0	N/A	1	ok	 
@@ -63,19 +63,19 @@ L3-model/modeltype-basic.esml	1	0	N/A	1	ok
 L3-model/partials.esml	1	0	N/A	1	ok	 
 L3-model/selector-values.esml	1	0	N/A	2	ok	 
 L4-port/conservation.esml	1	0	N/A	6	ok	 
-L4-port/flow-potential.esml	1	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm ｜ simulate rc=1 双红：error: sim
+L4-port/flow-potential.esml	1	0	0	1	ok	solve 通过：m.q = 1.0（flow-potential 端口闭合）。｜ W55 复测（ESML_PROPS=off esml solve rc=0）
 L4-port/flow.esml	1	0	N/A	8	ok	 
-L4-port/port-carrier.esml	1	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm ｜ simulate rc=1 双红：error: sim
-L4-port/port-category-size.esml	1	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm ｜ simulate rc=1 双红：error: sim
+L4-port/port-carrier.esml	1	1	1	0	fail	error: solve (during L7 steady solve) — pantelides: structurally singular (unmatched i.a.h/i.b.h/j.a.h/j.b.h + redundant i.a.q)。W55 探针（14 变体）证实：两 flow 变量端口连接时引擎对第二个 flow 变量（q）不发守恒残差，模型侧无法闭合。｜ 引擎侧两 flow 端口闭合缺口，示例侧不可修，留引擎侧处置。
+L4-port/port-category-size.esml	1	0	0	4	ok	solve 通过：f.port_a.T = f.port_b.T = 3.0e2（Tset）、Q_flow = 0.0。｜ W55 复测（rc=0）
 L4-port/port-roles-io.esml	1	0	N/A	2	ok	 
-L4-port/port-stream.esml	1	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm ｜ simulate rc=1 双红：error: sim
+L4-port/port-stream.esml	1	0	0	2	ok	solve 通过：m.in.c = m.out.c = 5.0e-1（组分直通）。｜ W55 复测（rc=0）
 L4-port/porttype-electrical.esml	1	0	N/A	2	ok	 
 L4-port/porttype-thermal.esml	1	0	N/A	2	ok	 
 L4-port/potential.esml	1	0	N/A	8	ok	 
-L4-port/signal-causal.esml	1	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm ｜ simulate rc=1 双红：error: sim
-L4-port/stream.esml	1	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm ｜ simulate rc=1 双红：error: sim
-L4-portvar/flow.esml	1	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm ｜ simulate rc=1 双红：error: sim
-L4-portvar/potential.esml	1	1	1	0	fail	error: solve (during L7 steady solve) — `solve_steady` returns its own typed error (`SolveError` — see `crates/esml-solve/src/solve/types.rs:46`) which already carries the per-variant diagnostic. Comm ｜ simulate rc=1 双红：error: sim
+L4-port/signal-causal.esml	1	0	0	2	ok	solve 通过：s.p.y = r.q.y = 7.0（信号因果链）。｜ W55 复测（rc=0）
+L4-port/stream.esml	1	0	0	2	ok	solve 通过：m.in.c = m.out.c = 2.5e-1（stream 直通）。｜ W55 复测（rc=0）
+L4-portvar/flow.esml	1	0	0	8	ok	solve 通过：cd.port_a.Q_flow = 4.0e1、cd.port_b.Q_flow = -4.0e1（(300−280)/0.5）。｜ W55 复测（rc=0）
+L4-portvar/potential.esml	1	0	0	8	ok	solve 通过：r.a.v = 1.0e1、r.b.v = 0.0、|r.a.i| = 5.0（(10−0)/2）。｜ W55 复测（rc=0）
 L5-instance/component-alias.esml	1	0	N/A	2	ok	 
 L5-instance/instance-basic.esml	1	0	N/A	1	ok	 
 L5-instance/instance-condition.esml	1	0	N/A	2	ok	 

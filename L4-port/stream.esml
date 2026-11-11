@@ -8,10 +8,13 @@
      同模型同 portSet 参数等值；本例 in/out 两个 StreamPort 实例同属 `flow` 集，
      即该 Mix 上沿 stream 流股传播的参数在这对端口间等值。
      规范条文：① 附录 F1（stream 流股）；② 附录 B（续）PORTSET，§2.7。
-     `check` errors=0（单实例 stream 对无回路，方程欠定，故本例只验声明与角色映射）。 -->
+     期望（ESML_PROPS=off esml solve 实测）：m.in.c = 0.25、m.out.c = 0.25（组分直通）。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_PortVarStream">
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <portTypes><portType name="StreamPort" connectorFamily="stream">
-    <portVariable name="c" type="real" portRole="stream"/>
+    <variables>
+      <portVariable name="c" type="real" portRole="stream"/>
+    </variables>
   </portType></portTypes>
   <modelTypes><modelType name="Mix">
     <ports>
@@ -22,10 +25,12 @@
       <variable name="in.c"  type="real" role="algebraic"/>
       <variable name="out.c" type="real" role="algebraic"/>
     </variables>
-    <equations><equation>out.c = in.c</equation></equations>
+    <equations>
+      <equation>in.c = 0.25</equation>
+      <equation>out.c = in.c</equation>
+    </equations>
   </modelType></modelTypes>
   <systems><system name="S">
     <instances><instance name="m" type="Mix"/></instances>
-    <schedule><sequence><continueFor time="0"/></sequence></schedule>
   </system></systems>
 </esml>
