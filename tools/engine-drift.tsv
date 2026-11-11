@@ -32,7 +32,7 @@ root	—	schedule	lang-wins	SPEC-L1001	2026-11-10
 root	—	solutionParameters	lang-wins	SPEC-L1001	2026-11-10
 root	—	variables	lang-wins	SPEC-L1001	2026-11-10
 child	InitialStateType	var	engine-wins	estimation 初值块，SPEC 未点名；引擎侧新增，语言仓待评	2026-11-10
-child	ModelType	extends	engine-wins	SPEC-L1133 附录 C 已删 <extends>（留 <extendsFrom>）；引擎侧残留旧拼写，lang-wins 语义已裁定	2026-11-10
+child	ModelType	extends	lang-wins	SPEC-L1133/§16 附录 C 已删 <extends>（留 <extendsFrom>），单轨语义=lang-wins；2026-11-11 复测：引擎仍收 `<extends>Base</extends>`（check errors=0，属引擎残留旧拼写=引擎债），本仓 canonical XSD 拒收（实测 FAIL）	2026-11-11
 child	PortTypeDef	variable	lang-wins	legacy 同义元素；canonical 仅 <portVariable>（W1 三条轴 portRole=/causality=/carrier=）	2026-11-10
 child	PortTypeDef	var	lang-wins	legacy 同义元素；canonical 仅 <portVariable>	2026-11-10
 child	PortTypeDef	flow	lang-wins	legacy 同义元素；canonical 仅 <portVariable>（effort 并入 potential，§16）	2026-11-10
