@@ -13,10 +13,9 @@
        但 Pantelides 结构分析【少计方程】：它把 4 条连接/钉值等式漏出 DOF 计数（报 4 equations），
        又把 4 个元素未知量全部标「unmatched / no residual mentions it」（与 f[2]/f[3] 明显矛盾）。
        ⇒ 非欠定、非拼写错，是求解器 Pantelides 结构判据对数组端口连接的缺陷：DOF 少计 + unmatched 误判。
-       故「逐元素相等」在**引擎求解层未闭合**，本例作为引擎债留档（台账 L6-connect/port-array.esml，0(solve)）。
+       故「逐元素相等」在**引擎求解层未闭合**，本例作为引擎债留档。
      期望（SPEC §8 语义，若引擎修好）：d.p.v_1=1.0、d.p.v_2=2.0（逐元素 = s.p.v）。
-     注：求解层差异 check=0，engine-example-debt.tsv 以 esml check 的 errors 为键，故在本头注留档 +
-       台账按单登记一行（见交付）。 -->
+     登记：`tools/engine-example-debt.tsv` 的 `stage=solve` 行（W46b：台账加 stage 列，一条管两层）。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L6_PortArray">
 
   <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
