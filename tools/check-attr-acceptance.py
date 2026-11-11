@@ -222,6 +222,7 @@ INJECT = {
     "quantity": ("D-skeleton/esml-coordinate.esml", "attr", "Pressure"),
     "side": ("D-skeleton/skeleton-full.esml", "attr", "left"),
     "synchronize": ("L2-discrete/reset-transition.esml", "attr", "true"),
+    "replaceable": ("L3-model/extendsfrom.esml", "attr", "true"),
     # —— no-example（宿主元素在仓内零出现，插一整块元素 XML）——
     "ref": ("D-skeleton/skeleton-full.esml", "element",
             '  <doc name="d" title="x" ref="GB-1234"/>'),
