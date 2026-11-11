@@ -6,10 +6,10 @@
      语法点 ② `<continueFor>` 的段内求解器覆盖 `solver=`：本例调度为单段
      `time="0"` 稳态求解，该段覆盖求解器为 `fbdf`（显式欧拉，SPEC 列举值域之一：
      tsit5 / rodas5p / fbdf / ida / dfbdf / qndf / nonlinear）；time="0" 段实际
-     不产生求解工作量，`solver` 只声明该段若求解时用什么方法——语法展示用。
-     规范条文：① §1.1（文档骨架）；② 附录 K（schedule）：每段 solver 切换
+     不产生求解工作量，`solver` 只声明该段若求解时用什么方法——语法展示用
      （`<continueFor time="1" solver="rodas5p"/>` 为 SPEC 条文原例，本例取
      fbdf 以示段内覆盖）。
+     规范条文：§1.1（文档骨架）＋ 附录 K（schedule：每段 solver 切换）。
      `check` 通过，结果不受 `coordinate` 影响。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="D_Coordinate"
       coordinate="cn.ai4energy.esml.syntax:coordinate-demo:0.1" version="1.0">

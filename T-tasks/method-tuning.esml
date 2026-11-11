@@ -2,7 +2,9 @@
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
 <!-- optimize 任务的 method 调参属性（samples / timestep / generations / population）。 -->
-<!-- 规范条文：待补（本属性仅 XSD 声明，SPEC 尚未成文；XSD 锚点 esml-canonical-compute.xsd 的 method 元素）。 -->
+<!-- 规范条文：§6.9（计算任务表 · 任务级元数据元素 `<method>`，属性 name / samples / timestep / generations / population / horizon 均自由文本、声明性、不参与求解）。 -->
+<!-- 本例只演示声明面：写了这四个调参属性，求解路径仍走默认 Nelder–Mead
+     （`<method>` 不进任何求解分支，故结果与不写 `<method>` 完全一致）。 -->
 <!-- check errors=0。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="T_MethodTuning">
   <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>

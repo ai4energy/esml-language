@@ -785,7 +785,13 @@ kebab-case 拼写**不是合法语法**，报错（§2 收紧集）。
 | `<actuator>` / `<sensor>` / `<controlled>` | 执行器 / 传感器 / 被控量 | `T-tasks/actuator.esml` / `T-tasks/sensor.esml` / `T-tasks/controlled.esml` |
 | `<controlVars>` / `<designVars>` | 控制变量 / 设计变量（`<var name/>`） | `T-tasks/control-vars.esml` / `T-tasks/design-vars.esml` / `T-tasks/controlled-control-vars.esml` |
 | `<outputList>` | 输出列表（`<var name/>`） | `T-tasks/outputlist.esml` |
+| `<method>` | 方法选择与调参（属性 `name` / `samples` / `timestep` / `generations` / `population` / `horizon`，均自由文本） | `T-tasks/method-tuning.esml` |
 | `<description>` | 自由文本 | （暂缺示例） |
+
+⚠ `<method>` 是**声明性**的：它记录「这个任务打算用哪个方法、按什么超参」，
+**不参与求解** —— 当前的求解路径只认 `<solver name>`（见上表 `optimize` 载荷）
+与 `<surrogate method>`，`<method>` 及其六个属性由 schema 声明、被解析器接受，
+但不进入任何求解分支。这与本表「只承载声明性信息、不参与求解语义」的总口径一致。
 
 ⚠ **拼写**：这批元素在 schema 里是 camelCase（`hyperParams`、`testData`、
 `outputList`、`controlVars`、`designVars`），不是 kebab-case；
