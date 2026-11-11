@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 端口变量**属性** `category=`（W47 落地件）：
+     attr-acceptance.tsv 行 `PortVariableType category portVariable accepted W4`
+     （W5 于 2026-11-10 实跑引擎记 accepted）。本例让 (portVariable, category)
+     这一 (host, attr) 对**真落地**为非负例示例，供 check-attr-coverage.py
+     方向 C 机核（方向 A 只问属性名出现过没有——port 上的 category= 不能替
+     portVariable 上的落地）。
+     规范条文：§5（端口）＋ 附录 F4。——§5 的 portVariable 允许属性清单内**无**
+     category（category 是 port 级语法，见 §5.3 / 附录 F4：inlet|outlet|bi-directional
+     或自定义值）；XSD：PortVariableType（xsd/esml-canonical-basic.xsd:473）未声明
+     category，仅 anyAttribute(lax)——XML 校验层放行。
+     引擎实测（2026-11-11，ESML v1.9.3，同形探针 /tmp/w47-probes/probe-category.esml）：
+       `check` errors=1 —— F1：parser rejected the document: unknown attribute
+       `category` on <portVariable 'T'> … canonical attributes are ["name",
+       "portRole", "causality", "carrier", "type", "array", "initial", "default",
+       "description"]。即 W5 的 accepted 裁决**对本仓现版本引擎已过时**，本属性实际
+       归属 engine-debt（待 owner 重新裁决；W47 红线不许改 attr-acceptance 行
+       verdict）。故本例当前 `check` errors=1（F1，引擎欠账现场，非书写错误）、
+       `solve` 不可解（check 不过，引擎不进 solve）。
+     本例同时是方向 C 的「落地件」与引擎欠账的「现场件」。 -->
+ <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_PortVarCategory">
+   <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
+   <portTypes><portType name="HeatPort" connectorFamily="thermal">
+     <variables>
+       <portVariable name="T" portRole="potential" type="real" category="inlet"/>
+     </variables>
+   </portType></portTypes>
+   <modelTypes>
+     <modelType name="FixedT">
+       <ports><port name="port" portType="HeatPort"/></ports>
+       <variables><variable name="port.T" type="real" role="algebraic"/></variables>
+       <equations><equation>port.T = 300.0</equation></equations>
+     </modelType>
+   </modelTypes>
+   <systems><system name="S" discipline="thermal">
+     <instances><instance name="hot" type="FixedT"/></instances>
+     <schedule><sequence><continueFor time="1"/></sequence></schedule>
+   </system></systems>
+ </esml>

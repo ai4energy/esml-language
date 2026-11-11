@@ -10,11 +10,15 @@
 #   rejected-ie     引擎 IE8[] 未实现响亮拒收（synchronize）
 #   no-example      宿主元素在仓内示例零出现，无基线可注入
 # 共 47 行
-# 待落地：5 行（accepted 且示例还没进 **/*.esml；rejected-* / no-example 不在此列。
+# 待落地：0 行（accepted 且示例还没进 **/*.esml；rejected-* / no-example 不在此列。
 #   闸门对 owner=W3/W4 的 accepted 行只警告不红，对 W5/engine-debt 才红。
 #   W17 2026-11-11：domain 按宿主拆 3 行（<instance>/<modelType>/<system>，实测语义无效 ⇒ no-example，
 #   docs/coverage.md §5.3 记账）+ side 拆 PortMarkType 行（<annotation><port>，语义无效 ⇒ no-example）；
-#   4 条 no-example 不计待落地，待落地 0→5 系 union 线既有 accepted 无示例行，本单只新增 no-example。）
+#   4 条 no-example 不计待落地，待落地 0→5 系 union 线既有 accepted 无示例行，本单只新增 no-example。
+#   W47 2026-11-11：29 行 accepted 里 28 行早已落地（W21–W31 诸单），仅剩 category on portVariable；
+#   本单补 L4-portvar/portvar-category.esml 落地 ⇒ 待落地 5→0（5 为 W17 旧计数，其间已陆续落地）。
+#   注：该行 W5 verdict=accepted 系 2026-11-10 实测；现版引擎 v1.9.3 对该属性 F1 拒收
+#   （见 L4-portvar/portvar-category.esml 头注 2026-11-11 实测），verdict 过时尚待 owner 重裁。）
 attribute	MpcType	a	mpc	accepted	W4	注入 T-tasks/control-vars.esml 的 <mpc> 后 errors=0
 attribute	ConnectType	aPart	connection	rejected-f7	engine-debt	error: F7[]: unknown attribute `aPart` on `<connection>` at <probe> — remove or rename; canonical attributes are in `unknown::KNOWN_ATTRS`
 attribute	MpcType	b	mpc	accepted	W4	注入 T-tasks/control-vars.esml 的 <mpc> 后 errors=0
