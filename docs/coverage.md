@@ -291,6 +291,8 @@ schema**；要落地「顶层 `SET`」须先做一次规范修订（`SPEC.md` + 
 |---|---|---|
 | `ConstSetMember` 一等成员类型 | 141 份示例 0 命中；`xsd/` 里未定义该类型 | 规范有、XSD 无 → 留缺口 |
 | 附录 F2 的 `signal_causal_guard` | 引擎**接受** input↔input、output↔output、pvar 命名不一致三种写法（`check` rc=0） | 规范有、实现无 → `L4-port/signal-causal.esml` 的头部已注明 |
+| `domain` 属性（`<instance>` / `<modelType>` / `<system>` 宿主） | W17 2026-11-11 实测三宿主 `esml check` 均 `errors=0`，但 `esml solve` 取值与无 `domain` 同（`domain` 零读点，写与不写同解）；`<portType>` 宿主是 `F1 legacy spelling` 响亮拒收（台账 `PortTypeDef/domain` 行 `rejected-legacy`） | 引擎收但语义无效 → 按 §5.2 顶层 `SET` 先例**不补示例**，台账三宿主行记 `no-example` |
+| `side` 属性（`<annotation><port>` 宿主，`PortMarkType`） | W17 2026-11-11 实测 `esml check` `errors=0`，但 `side` 只属标注侧图形标记，引擎 `check` 不消费其值（写 `left`/`right` 与不写同）；模型侧 `<modelType><ports><port>` 是 `F1 unknown attribute` 响亮拒收（台账 `PortInstanceType/side` 行 `rejected-legacy`） | 引擎收但语义无效 → 按 §5.2 先例**不补示例**，台账 `PortMarkType/side` 行记 `no-example` |
 
 ### 5.4 章节编号 `§6.2` 缺失
 
