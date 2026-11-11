@@ -1,0 +1,29 @@
+# 共 21 行
+#
+# pending：21 行
+#
+# W37 首版台账（2026-11-11，union d19309e 基础上 SPEC 已补 noDerivative/unitsBase 条文后重算）。
+# 判据：xsd/*.xsd 命名 xs:element 必须在 SPEC.md 以 <name> 或 `name` 出现 ≥1 次。
+# 以下 21 个元素 XSD 已声明但 SPEC 正文未以判据形式点名，均登记 pending owner=W2（待补条文）。
+# 列：element  verdict  owner  evidence
+<branch>	pending	W2	XSD 声明但 SPEC 正文无 <branch> 或 `branch` 点名；待补条文
+<continueUntil>	pending	W2	XSD 声明但 SPEC 正文无 <continueUntil> 或 `continueUntil` 点名；待补条文
+<derivativeSymbol>	pending	W2	XSD 声明但 SPEC 正文无 <derivativeSymbol> 或 `derivativeSymbol` 点名；待补条文
+<discretization>	pending	W2	XSD 声明但 SPEC 正文无 <discretization> 或 `discretization` 点名；待补条文
+<field>	pending	W2	XSD 声明但 SPEC 正文无 <field> 或 `field` 点名；待补条文
+<foreignObject>	pending	W2	XSD 声明但 SPEC 正文无 <foreignObject> 或 `foreignObject` 点名；待补条文
+<group>	pending	W2	XSD 声明但 SPEC 正文无 <group> 或 `group` 点名；待补条文
+<initialSelector>	pending	W2	XSD 声明但 SPEC 正文无 <initialSelector> 或 `initialSelector` 点名；待补条文
+<literal>	pending	W2	XSD 声明但 SPEC 正文无 <literal> 或 `literal` 点名；待补条文
+<local>	pending	W2	XSD 声明但 SPEC 正文无 <local> 或 `local` 点名；待补条文
+<mpc>	pending	W2	XSD 声明但 SPEC 正文无 <mpc> 或 `mpc` 点名；待补条文
+<param>	pending	W2	XSD 声明但 SPEC 正文无 <param> 或 `param` 点名；待补条文
+<partial>	pending	W2	XSD 声明但 SPEC 正文无 <partial> 或 `partial` 点名；待补条文
+<partition>	pending	W2	XSD 声明但 SPEC 正文无 <partition> 或 `partition` 点名；待补条文
+<recordType>	pending	W2	XSD 声明但 SPEC 正文无 <recordType> 或 `recordType` 点名；待补条文
+<rule>	pending	W2	XSD 声明但 SPEC 正文无 <rule> 或 `rule` 点名；待补条文
+<sampling>	pending	W2	XSD 声明但 SPEC 正文无 <sampling> 或 `sampling` 点名；待补条文
+<scope>	pending	W2	XSD 声明但 SPEC 正文无 <scope> 或 `scope` 点名；待补条文
+<state>	pending	W2	XSD 声明但 SPEC 正文无 <state> 或 `state` 点名；待补条文
+<stop>	pending	W2	XSD 声明但 SPEC 正文无 <stop> 或 `stop` 点名；待补条文
+<transition>	pending	W2	XSD 声明但 SPEC 正文无 <transition> 或 `transition` 点名；待补条文
