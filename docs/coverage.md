@@ -291,6 +291,7 @@ schema**；要落地「顶层 `SET`」须先做一次规范修订（`SPEC.md` + 
 |---|---|---|
 | `ConstSetMember` 一等成员类型 | 141 份示例 0 命中；`xsd/` 里未定义该类型 | 规范有、XSD 无 → 留缺口 |
 | 附录 F2 的 `signal_causal_guard` | 引擎**接受** input↔input、output↔output、pvar 命名不一致三种写法（`check` rc=0） | 规范有、实现无 → `L4-port/signal-causal.esml` 的头部已注明 |
+| `<param>` 元素（`compute.xsd:181` / `:387`） | 141 份示例 0 命中；`compute.xsd` 两处声明，引擎 F7 unknown element + F1 legacy spelling 双拒 | 规范有、实现无（孤儿声明）→ 台账 `param` 行记 `no-example`，不补示例 |
 
 ### 5.4 章节编号 `§6.2` 缺失
 

@@ -43,7 +43,7 @@ REPO = Path(__file__).resolve().parent.parent
 TSV = Path(__file__).resolve().parent / "attr-acceptance.tsv"
 
 VERDICTS = ("accepted", "rejected-f7", "rejected-legacy", "rejected-ie", "no-example")
-OWNERS = ("W3", "W4", "W5", "engine-debt")
+OWNERS = ("W1", "W3", "W4", "W5", "engine-debt")
 NS = 'xmlns="https://www.ai4energy.cn/esml/v1"'
 
 # --------------------------------------------------------------------------- 引擎路径
@@ -140,14 +140,26 @@ def verdict_from_engine(n, codes):
 
 
 def inject_attr(txt, host, attr, value):
-    """把 `attr="value"` 注进第一处**非注释**的 `<host…>` 标签。无宿主返回 None。"""
+    """把 `attr="value"` 注进第一处**非注释**的 `<host…>` 标签。无宿主返回 None。
+
+    属性区 = 标签名之后的全部文本，只在**这一段**上做替换/判定——天然不碰注释
+    与「别的标签」的同名属性（绝不全局 `str.replace`）。同名属性判定与替换用同一
+    个正则 `(?<=\\s)ATTR="[^"]*"`：前导环视的空格保证命中的是**真属性**（属性永远
+    空格分隔），`count=1` 只换第一个同名；该属性恰好是首属性（紧贴标签名、前无
+    空格）时环视不命中 ⇒ 走追加路径。没有才追加 `attrs.rstrip() + ' ATTR="V"'`。
+    """
     m = first_host(txt, host)
     if m is None:
         return None
     tag = m.group(0)
     sc = tag.endswith("/>")
-    body = tag[:-2] if sc else tag[:-1]
-    newtag = body.rstrip() + ' %s="%s"' % (attr, value) + ("/>" if sc else ">")
+    body, tail = (tag[:-2], "/>") if sc else (tag[:-1], ">")
+    name_end = re.match(r"<%s" % re.escape(host), tag).end()
+    head, attrs = body[:name_end], body[name_end:]
+    pat = re.compile(r'(?<=\s)%s="[^"]*"' % re.escape(attr))
+    attrs = pat.sub('%s="%s"' % (attr, value), attrs, count=1) if pat.search(attrs) \
+        else attrs.rstrip() + ' %s="%s"' % (attr, value)
+    newtag = head + attrs + tail
     return txt[: m.start()] + newtag + txt[m.end():]
 
 
@@ -175,7 +187,6 @@ INJECT = {
     "immediate": ("L2-discrete/reset-transition.esml", "attr", "true"),
     "libroot": ("D-skeleton/project.esml", "attr", "/r"),
     "model": ("T-tasks/task-surrogate.esml", "attr", "poly"),
-    "param": ("L2-discrete/initialisationprocedure-advance.esml", "attr", "p"),
     "population": ("L8-function/foreign-object.esml", "attr", "20"),
     "portSet": ("D-skeleton/skeleton-full.esml", "attr", "main"),
     "priority": ("L2-discrete/reset-transition.esml", "attr", "2"),
@@ -245,7 +256,7 @@ def check_rows(rows, used, stream):
             red.append((where, "evidence 为空 —— 每行都要写清它凭什么这么判"))
             continue
         if r["verdict"] == "accepted":
-            if not example_exists_for(r["attr"], used):
+            if r["attr"] not in used:
                 if r["owner"] in ("W3", "W4"):
                     warn.append((where, f"accepted 但没有示例（{r['attr']}，owner={r['owner']}）⇒ 追债中，警告不红"))
                 else:
@@ -254,11 +265,18 @@ def check_rows(rows, used, stream):
 
 
 def check_engine(rows, engine, stream):
-    """--engine-check：逐行实跑引擎复算，与台账 verdict 对账。"""
+    """--engine-check：逐行实跑引擎复算，与台账 verdict 对账。
+
+    `no-example` 行是**记账裁决**（「宿主在仓内零出现 / check 过但语义无效 ⇒ 不补示例」），
+    不是引擎判定 ⇒ 引擎无法、也无需复算它，跳过（不计违规）。
+    """
     out = []
     for r in rows:
         attr, host, verdict = r["attr"], r["host"], r["verdict"]
         where = f"{TSV.name}:{r['lineno']}"
+        if verdict == "no-example":
+            # 记账裁决，引擎复算无意义 ⇒ 跳过
+            continue
         if attr in NO_EXAMPLE_NO_ANCHOR:
             # 宿主在仓内零出现且无干净 anchor ⇒ 引擎无法复算，跳过
             if verdict != "no-example":
@@ -320,6 +338,21 @@ def self_test(stream):
         red, _warn = check_rows(rows, used, stream)
         v += red
         return v
+
+    # —— 闸自证：宿主标签已带同名属性 → 注入后仍只有**一份**（替换、不追加），
+    #    否则双同名属性会触发 F1「xml is not well-formed」假红。
+    host_with = '<host attr="old" z="1"/>'
+    after = inject_attr(host_with, "host", "attr", "new")
+    dup_ok = (after is not None and after.count('attr="') == 1) \
+        and 'attr="new"' in after and 'attr="old"' not in after
+    # 追加路径（原行为）：宿主**没有**该属性时才追加，行为不变。
+    after_app = inject_attr('<host z="1"/>', "host", "attr", "new")
+    app_ok = (after_app is not None and after_app.count('attr="') == 1) \
+        and 'attr="new"' in after_app
+    for label, ok in (("闸自证：宿主已有同名属性 → 注入后单份（替换不追加）", dup_ok),
+                      ("闸自证：宿主无该属性 → 追加单份", app_ok)):
+        w("  [%s] %s\n" % ("PASS" if ok else "BROKEN", label))
+        failures += 0 if ok else 1
 
     with tempfile.TemporaryDirectory() as td:
         root = Path(td)
@@ -390,7 +423,7 @@ def main(argv=None):
         print(f"  RED  {where} {msg}")
 
     n_acc = sum(1 for r in rows if r["verdict"] == "accepted")
-    pend = sum(1 for r in rows if r["verdict"] == "accepted" and not example_exists_for(r["attr"], used))
+    pend = sum(1 for r in rows if r["verdict"] == "accepted" and r["attr"] not in used)
     eng = "跳过（引擎仓不在）" if (args.engine_check and resolve_engine() is None) else (
         "未给 --engine-check（引擎复算跳过）" if not args.engine_check else "引擎实跑复算")
     print(f"[check-attr-acceptance] 台账 {len(rows)} 行（accepted {n_acc}）· "
