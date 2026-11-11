@@ -9,9 +9,12 @@
 #   rejected-legacy 引擎 F1[] 响亮拒收旧拼写（count/side 报 unknown attribute 并指路；domain 报 legacy spelling）
 #   rejected-ie     引擎 IE8[] 未实现响亮拒收（synchronize）
 #   no-example      宿主元素在仓内示例零出现，无基线可注入
-# 共 42 行
-# 待落地：0 行（accepted 且示例还没进 **/*.esml；rejected-* / no-example 不在此列。
-#   闸门对 owner=W3/W4 的 accepted 行只警告不红，对 W5/engine-debt 才红。）
+# 共 46 行
+# 待落地：5 行（accepted 且示例还没进 **/*.esml；rejected-* / no-example 不在此列。
+#   闸门对 owner=W3/W4 的 accepted 行只警告不红，对 W5/engine-debt 才红。
+#   W17 2026-11-11：domain 按宿主拆 3 行（<instance>/<modelType>/<system>，实测语义无效 ⇒ no-example，
+#   docs/coverage.md §5.3 记账）+ side 拆 PortMarkType 行（<annotation><port>，语义无效 ⇒ no-example）；
+#   4 条 no-example 不计待落地，待落地 0→5 系 union 线既有 accepted 无示例行，本单只新增 no-example。）
 attribute	MpcType	a	mpc	accepted	W4	注入 T-tasks/control-vars.esml 的 <mpc> 后 errors=0
 attribute	ConnectType	aPart	connection	rejected-f7	engine-debt	error: F7[]: unknown attribute `aPart` on `<connection>` at <probe> — remove or rename; canonical attributes are in `unknown::KNOWN_ATTRS`
 attribute	MpcType	b	mpc	accepted	W4	注入 T-tasks/control-vars.esml 的 <mpc> 后 errors=0
@@ -20,7 +23,7 @@ attribute	MpcType	c	mpc	accepted	W4	注入 T-tasks/control-vars.esml 的 <mpc> �
 attribute	PortVariableType	category	portVariable	accepted	W4	注入 D-skeleton/skeleton-full.esml 的 <portVariable> 后 errors=0
 attribute	PortInstanceType	count	port	rejected-legacy	W5	error: F1[]: parser rejected the document: unknown attribute `count` on <port 'p'> at <col>:<row> — canonical attributes are ["name", "portType", "category", "connectClass", "size", "portSet", "description"] (c
 attribute	PerturbType	distribution	perturb	accepted	W4	注入 T-tasks/task-sensitivity.esml 的 <perturb> 后 errors=0
-attribute	PortTypeDef	domain	portType	rejected-legacy	W5	error: F1[]: parser rejected the document: legacy spelling `<domain=>` at <col>:<row> — use `<connectorFamily=>` (compatibility expressions are no longer accepted) at <probe>
+attribute	PortTypeDef	domain	portType	rejected-legacy	W5	error: F1[]: parser rejected the document: legacy spelling `<domain=>` at L4-port/porttype-electrical.esml:9 — use `<connectorFamily=>` (compatibility expressions are no longer accepted)（W17 2026-11-11 实测注 `<portType domain="thermal">` 复现；domain 在 <instance>/<modelType>/<system> 三宿主 errors=0 ⇒ 见新增 InstRefType/ModelType/SystemType 三行 no-example，本行 verdict 只对 <portType> 宿主成立）
 attribute	ConstraintType	expr	constraint	accepted	W4	注入 T-tasks/task-constraint.esml 的 <constraint> 后 errors=0
 attribute	InstRefType	extendsFrom	instance	rejected-f7	W5	error: F7[]: unknown attribute `extendsFrom` on `<instance>` at <probe> — remove or rename; canonical attributes are in `unknown::KNOWN_ATTRS`
 attribute	MethodType	generations	method	accepted	W4	注入 L8-function/foreign-object.esml 的 <method> 后 errors=0
@@ -30,7 +33,7 @@ attribute	ContinueUntilType	maxTime	continueUntil	rejected-f7	W3	error: F7[]: un
 attribute	SurrogateType	model	surrogate	accepted	W4	注入 T-tasks/task-surrogate.esml 的 <surrogate> 后 errors=0
 attribute	VariableType	nominal	variable	rejected-f7	engine-debt	error: F7[]: unknown attribute `nominal` on `<variable>` at <probe> — remove or rename; canonical attributes are in `unknown::KNOWN_ATTRS`
 attribute	SetType	param	set	no-example	engine-debt	check 过但语义无效：A) <set path="k" param="p" value="10"/> errors=0 但 m.x=10 取自 path（引擎读 path 不读 param）；B) <scope><set param="p" value="5"/></scope> errors=0（宽分支无 path 不报错）；C) scope+path 亦 errors=0 且不改变解；D) 全链 param 零读点。<param> 元素 compute.xsd:181/:387 为孤儿声明，引擎 F7 unknown element + F1 legacy spelling 双拒（见 docs/coverage.md §5.3）⇒ 不补示例
-attribute	ClockType	phase	clock	rejected-f7	engine-debt	error: F7[]: unknown attribute `phase` on `<clock>` at <probe> — remove or rename; canonical attributes are in `unknown::KNOWN_ATTRS`
+attribute	ClockType	phase	clock	rejected-f7	engine-debt	error: F7[]: unknown attribute `phase` on `<clock>` at L2-discrete/clock-sample.esml:12 — remove or rename; canonical attributes are in `unknown::KNOWN_ATTRS`（引擎 schema/esml-canonical-basic.xsd:527 ClockType **声明了** phase，但 parser unknown::KNOWN_ATTRS 无之 ⇒ 引擎 XSD 与引擎 parser 自相矛盾；W17 2026-11-11 实测注 `<clock name="c" interval="0.1" phase="0.5"/>` 于 :12 复现）
 attribute	MethodType	population	method	accepted	W4	注入 L8-function/foreign-object.esml 的 <method> 后 errors=0
 attribute	PortInstanceType	portSet	port	accepted	engine-debt	注入 D-skeleton/skeleton-full.esml 的 <port> 后 errors=0
 attribute	TransitionType	priority	transition	accepted	W4	注入 L2-discrete/reset-transition.esml 的 <transition> 后 errors=0
@@ -39,12 +42,12 @@ attribute	VariableType	quantity	variable	rejected-f7	engine-debt	error: F7[]: un
 attribute	MpcType	r	mpc	accepted	W4	注入 T-tasks/control-vars.esml 的 <mpc> 后 errors=0
 attribute	DocRefType	ref	doc	accepted	W4	整块注入 <doc name title ref/> 后 errors=0（宿主 <doc> 仓内零使用，待落地补示例）
 attribute	MethodType	samples	method	accepted	W4	注入 L8-function/foreign-object.esml 的 <method> 后 errors=0
-attribute	PortInstanceType	side	port	rejected-legacy	W5	error: F1[]: parser rejected the document: unknown attribute `side` on <port 'p'> at <col>:<row> — canonical attributes are ["name", "portType", "category", "connectClass", "size", "portSet", "description"] (ca
+attribute	PortInstanceType	side	port	rejected-legacy	W5	error: F1[]: parser rejected the document: unknown attribute `side` on <port 'p'> at L4-port/porttype-electrical.esml:16 — canonical attributes are ["name", "portType", "category", "connectClass", "size", "portSet", "description"]（W17 2026-11-11 实测注 <modelType><ports><port side="left"> 复现；PortInstanceType 无 side，PortMarkType 才有 ⇒ 同名 <port> 不同宿主属性集不同，本行 verdict 只对 <modelType><ports><port> 成立，<annotation><port> 侧见新增 PortMarkType 行）
 attribute	PortInstanceType	size	port	accepted	W4	注入 D-skeleton/skeleton-full.esml 的 <port> 后 errors=0
 attribute	ContinueForType	solver	continueFor	accepted	engine-debt	注入 D-skeleton/esml-coordinate.esml 的 <continueFor>（替换既有 solver="fbdf"）后 errors=0
 attribute	MpcType	steps	mpc	accepted	W4	注入 T-tasks/control-vars.esml 的 <mpc> 后 errors=0
 attribute	DocRefType	summary	doc	accepted	W1	D-skeleton/doc-ref.esml <modelType> 内属性形态 <doc ref title summary="…"/> errors=0（与 <metadata> 内元素文本形态并存）；<doc name="d" title="t" summary="sum"/> 独立件亦 errors=0
-attribute	TransitionType	synchronize	transition	rejected-ie	engine-debt	error: IE8[]: SynchronizeUnsupported: transition 'A' -> 'B' uses synchronize="true", which is not implemented at <stateMachine 'fsm'> — remove synchronize="true", or implement synchronize; silently dropping it 
+attribute	TransitionType	synchronize	transition	rejected-ie	engine-debt	取值决定收拒（W17 2026-11-11 两值都跑）：="true" → error: IE8[]: SynchronizeUnsupported: transition uses synchronize="true", which is not implemented at <stateMachine>；="false" → errors=0（收下但未实现，写 false 与不写同解）。单行表达理由：属性是同一个，取值只是触发条件，拆两行会制造「同宿同键两行」的假异属性；故不拆行，evidence 写清两值实测
 attribute	DataType	t	data	accepted	W3	注入 T-tasks/tasks-seven.esml 的 <data> 后 errors=0
 attribute	ScenarioType	tasks	scenario	no-example	W3	宿主 <scenario> 在仓内示例零出现（无基线 errors=0 可注入件）
 attribute	MethodType	timestep	method	accepted	W4	注入 L8-function/foreign-object.esml 的 <method> 后 errors=0
@@ -54,3 +57,7 @@ attribute	MpcType	umax	mpc	accepted	W4	注入 T-tasks/control-vars.esml 的 <mpc
 attribute	MpcType	umin	mpc	accepted	W4	注入 T-tasks/control-vars.esml 的 <mpc> 后 errors=0
 attribute	MpcType	x0	mpc	accepted	W4	注入 T-tasks/control-vars.esml 的 <mpc> 后 errors=0
 attribute	MpcType	xref	mpc	accepted	W4	注入 T-tasks/control-vars.esml 的 <mpc> 后 errors=0
+attribute	InstRefType	domain	instance	no-example	W5	引擎 errors=0 但语义无效（W17 2026-11-11 注 <instance domain="thermal"> 于 L5-instance/instance-basic.esml 复现）：esml solve 取值与无 domain 同（domain 零读点，写与不写同解）⇒ 按 §5.2 顶层 SET 先例不补示例，docs/coverage.md §5.3 记账；domain 在 <portType> 宿主是响亮拒收（见 PortTypeDef 行），本行 verdict 只对 <instance> 成立
+attribute	ModelType	domain	modelType	no-example	W5	引擎 errors=0 但语义无效（W17 2026-11-11 注 <modelType domain="thermal"> 于 L5-instance/instance-basic.esml 复现）：esml solve 取值与无 domain 同 ⇒ 不补示例，docs/coverage.md §5.3 记账；本行 verdict 只对 <modelType> 成立
+attribute	SystemType	domain	system	no-example	W5	引擎 errors=0 但语义无效（W17 2026-11-11 注 <system domain="thermal"> 于 L5-instance/instance-basic.esml 复现）：esml solve 取值与无 domain 同 ⇒ 不补示例，docs/coverage.md §5.3 记账；本行 verdict 只对 <system> 成立
+attribute	PortMarkType	side	port	no-example	W5	引擎 errors=0（W17 2026-11-11 注 <annotation><port name="p" side="left"> 于 L3-model/annotation.esml 复现）但语义无效（side 只属标注侧图形标记，引擎 check 不消费其值，写 left/right 与不写同）⇒ 不补示例，docs/coverage.md §5.3 记账；与 PortInstanceType 行（<modelType><ports><port> 侧 F1 响亮拒收）宿主不同，verdict 各对各宿主

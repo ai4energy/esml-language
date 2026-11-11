@@ -100,9 +100,17 @@ def repo_used_attrs(repo):
     return used
 
 
-def example_exists_for(attr, repo):
-    """仓内任一 .esml（跳过注释）里是否真的写了 `attr="…"`。"""
-    return attr in repo_used_attrs(repo)
+def example_exists_for(attr, used):
+    """仓内任一 .esml（跳过注释）里是否真的写了 `attr="…"`。
+
+    入参是 `repo_used_attrs()` 已经算好的**属性名集合**，不是仓库路径 —— 逐行判断
+    都要问同一个问题，重复 glob 一遍全仓既慢又容易把入参传错（早期版本这里写成
+    `repo` 路径，两个调用点却都传集合 ⇒ `glob(os.path.join(str(set), …))` 恒空
+    ⇒ 每一行 accepted 都被误判「没有示例」，真加了示例也看不见）。
+    """
+    if isinstance(used, (str, Path)):
+        used = repo_used_attrs(used)
+    return attr in used
 
 
 # --------------------------------------------------------------------------- 引擎
@@ -283,6 +291,17 @@ def check_engine(rows, engine, stream):
                 out.append((where, f"台账写 {verdict}，但 {attr} 无 anchor 可注入（宿主零出现）⇒ 无法引擎复算"))
             continue
         recipe = INJECT.get(attr)
+        # 同属性多宿主拆行（W17 2026-11-11）：domain 在 <instance>/<modelType>/<system>
+        # 各拆一行，单一 INJECT 配方无法区分宿主 ⇒ 按 (attr, host) 补宿主感知配方。
+        # 不改判定，只让 --engine-check 对拆行后的各宿主找对锚件。
+        if isinstance(recipe, tuple) and attr == "domain":
+            _dhost = {
+                "instance": "L5-instance/instance-basic.esml",
+                "modelType": "L5-instance/instance-basic.esml",
+                "system": "L5-instance/instance-basic.esml",
+            }
+            if host in _dhost:
+                recipe = (_dhost[host], "attr", val)
         if recipe is None:
             out.append((where, f"台账行 {attr} 没有注入配方（INJECT 缺项）⇒ 无法引擎复算"))
             continue

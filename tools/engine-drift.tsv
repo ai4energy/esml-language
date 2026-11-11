@@ -16,10 +16,10 @@ attr	InstRefType	extends-from	lang-wins	aliases.tsv:94 camelCase	2026-11-10
 attr	ModelType	desc	lang-wins	aliases.tsv:91 desc 是 legacy 缩写	2026-11-10
 attr	SystemType	desc	lang-wins	aliases.tsv:91	2026-11-10
 attr	ScheduleContinueUntilType	max-time	lang-wins	SPEC-L1512 maxTime	2026-11-10
-attr	ConnectType	a-part	lang-wins	aliases.tsv:87	2026-11-10
-attr	ConnectType	b-part	lang-wins	aliases.tsv:88	2026-11-10
-attr	ConnectType	interface	lang-wins	aliases.tsv:96	2026-11-10
-attr	ConnectType	portType	engine-wins	引擎侧已单轨	2026-11-10
+attr	ConnectType	a-part	lang-wins	aliases.tsv:87；引擎实测 esml check <connection a-part="1">：error: F7[]: unknown attribute `a-part` on `<connection>` —— 引擎两种拼法（aPart/a-part）都拒收，本仓 kebab 拼法亦引擎不收 ⇒ lang-wins 仅记本仓保留拼法，引擎侧实收的是 none	2026-11-11
+attr	ConnectType	b-part	lang-wins	aliases.tsv:88；引擎实测 esml check <connection b-part="1">：error: F7[]: unknown attribute `b-part` on `<connection>` —— 同 a-part，两拼法引擎均拒收	2026-11-11
+attr	ConnectType	interface	lang-wins	aliases.tsv:96；引擎实测 esml check <connection interface="x">：error: F1[]: parser rejected the document: legacy spelling `<interface>` — use `<portType>`（ALIAS 表拒收，**非 F7**；对照 ifaceA=/myInterface=/zzz= 同宿主均 F7，证明是名字本身触发 ALIAS）	2026-11-11
+attr	ConnectType	portType	engine-wins	引擎侧已单轨；引擎实测 esml check <connection portType="SigOut">：errors=0（引擎收 portType 不收 interface，与本行 engine-wins 一致）	2026-11-11
 attr	DecisionRefType	rate	engine-wins	引擎侧新增，语言仓待评	2026-11-10
 attr	VendorControllerType	antiWindup	lang-wins	W1 补入	2026-11-10
 attr	VendorControllerType	bumpless	lang-wins	W1 补入	2026-11-10
