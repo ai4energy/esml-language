@@ -667,7 +667,7 @@ Process/Case 也有 flowsheet 级 `EQUATION`。ESML canonical 对应地允许 `<
 > 三份 XSD 的声明（compute 全局元素 / basic `<esml>` 子元素表引用 / 入口同名根）
 > 已同步移除，根清单减为 11（§13）。canonical 任务段唯一写法是 `<computeTasks>`
 > （并列写法见 `T-tasks/tasks.esml`）。此前的壳裁决见
-> `docs/design/tasks-shell-adjudication.md`（2026-10-21，现被取代）。
+> `esml-adr-archive`（ai4ecom）`language/design/tasks-shell-adjudication.md`（2026-10-21，现被取代）。
 
 **canonical 形态**（`xsd/esml-canonical-project.xsd`）：
 ```xml
@@ -709,7 +709,7 @@ Process/Case 也有 flowsheet 级 `EQUATION`。ESML canonical 对应地允许 `<
 kebab-case 拼写**不是合法语法**，报错（§2 收紧集）。
 
 **`<tasks>` 外层壳**：已废弃（canonical-strict，2026-11）——本节开头的废弃说明
-为唯一说法，不再重复；壳的旧裁决记录在 `docs/design/tasks-shell-adjudication.md`。
+为唯一说法，不再重复；壳的旧裁决记录在 `esml-adr-archive`（ai4ecom）`language/design/tasks-shell-adjudication.md`。
 
 ### 6.9 计算任务表（`<computeTasks>` / `<task>`）
 

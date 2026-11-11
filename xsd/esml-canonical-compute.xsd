@@ -609,6 +609,6 @@
 
   <!-- 旧 `<tasks>` 外层壳（§6.8 旧形态）已废弃：canonical-strict（2026-11）
        起 parser F1 响亮拒收（点名 canonical 写法 `<computeTasks>`），
-       全局元素随之移除。此前的壳裁决见 docs/design/tasks-shell-adjudication.md
+       全局元素随之移除。此前的壳裁决见 esml-adr-archive（ai4ecom）language/design/tasks-shell-adjudication.md
        （2026-10-21，现被 canonical-strict 取代）。 -->
 </xs:schema>

@@ -143,4 +143,4 @@ python3 docs/validate_roots.py selftest   # 自证：好例 / 坏例
 make check                                 # 根矩阵 + 示例对账，一起跑
 ```
 
-相关裁决：`<tasks>` 壳的单独裁定见 [`tasks-shell-adjudication.md`](tasks-shell-adjudication.md)。
+相关裁决：`<tasks>` 壳的单独裁定已迁 `esml-adr-archive`（ai4ecom）`language/design/tasks-shell-adjudication.md`。
