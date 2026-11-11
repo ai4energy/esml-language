@@ -137,3 +137,44 @@ attr	anon@esml-canonical-project.xsd:1	schema	lang-wins	同上——project 根�
 child	AlgorithmType	while	lang-wins	SPEC-L846 算法段 while（引擎 KNOWN_SUB_TAGS 无此名）	2026-11-10
 attr	anon@esml-canonical-basic.xsd:19	coordinate	lang-wins	同上——esml 根匿名内联宿主同键，引擎 anon basic:19 仅 name/schema	2026-11-10
 attr	anon@esml-canonical-basic.xsd:19	version	lang-wins	同上	2026-11-10
+attr	EquationCaseType	on	lang-wins	W20 真声明：SPEC §6.6 方程级 <case on>；L2-discrete/case-branch.esml	2026-11-11
+child	EquationCaseType	branch	lang-wins	W20 真声明：SPEC §6.6 <branch value>；L2-discrete/case-branch.esml	2026-11-11
+child	EquationForType	body	lang-wins	W20 真声明：方程级 for <body> 壳（for-in.esml 头注：有/无 body 等价）	2026-11-11
+child	EquationForType	connection	lang-wins	W20 真声明：连接级 <for> 宿主（W20 单 #6/#9）	2026-11-11
+child	EquationForType	equation	lang-wins	W20 真声明：for 内直接 <equation>（L1-expr-equation/for-in.esml）	2026-11-11
+attr	EquationForType	in	lang-wins	W20 真声明：L1-expr-equation/for-in.esml in="1..3"	2026-11-11
+attr	EquationForType	range	lang-wins	W20 真声明：SPEC 附录B(续) 六拼法之 range 形（W19 口径）	2026-11-11
+attr	EquationForType	var	lang-wins	W20 真声明：L1-expr-equation/for-in.esml var="i"	2026-11-11
+child	EquationIfType	condition	lang-wins	W20 真声明：SPEC §6.9 方程级 <if>；L3-model/if.esml	2026-11-11
+child	EquationIfType	else	lang-wins	W20 真声明：L3-model/if.esml <else>	2026-11-11
+child	EquationIfType	then	lang-wins	W20 真声明：L3-model/if.esml <then>	2026-11-11
+attr	EquationType	description	lang-wins	W20 真声明：原 anyType 占位收为 EquationType，属性同 L1 方程示例	2026-11-11
+attr	EquationType	name	lang-wins	W20 真声明：原 anyType 占位收为 EquationType，属性同 L1 方程示例	2026-11-11
+child	DiscreteSegmentType	variable	lang-wins	W20 真声明：L2-discrete/elsewhen.esml <discrete><variable name type default/>	2026-11-11
+child	MethodOnLoadType	fix	lang-wins	W20 真声明：SPEC:1526 <onLoad> 内 <fix>（修前 XSD FAIL/引擎 errors=0 实测）	2026-11-11
+child	MethodOnLoadType	vary	lang-wins	W20 真声明：SPEC:1526 <onLoad> 内 <vary>（引擎 F7 未认，引擎欠账）	2026-11-11
+attr	anon@esml-canonical-basic.xsd:13	value	lang-wins	W20 真声明：<case><branch value>（L2-discrete/case-branch.esml）	2026-11-11
+attr	anon@esml-canonical-basic.xsd:15	path	lang-wins	W20 真声明：initialSelectors <initialSelector path value>（SPEC:1279，L3-model/selector-values.esml 系统级段）	2026-11-11
+attr	anon@esml-canonical-basic.xsd:15	value	lang-wins	W20 真声明：同上	2026-11-11
+attr	anon@esml-canonical-basic.xsd:19	name	lang-wins	引擎 nth 键碰撞伪分歧：引擎侧 basic:19 单例恰为 esml 根（name/schema），lang 侧 :19 为 <sets>（无属性）；本仓真声明为 <sets>，按 lang-wins 记	2026-11-11
+attr	anon@esml-canonical-basic.xsd:24	name	lang-wins	W20 真声明：initialisationProcedure name（SPEC §6.7 表，L2-discrete initproc 示例）	2026-11-11
+attr	anon@esml-canonical-basic.xsd:26	path	lang-wins	W20 真声明：start 内 set/replace <path value>（SPEC §6.7 表）	2026-11-11
+attr	anon@esml-canonical-basic.xsd:26	value	lang-wins	W20 真声明：同上	2026-11-11
+attr	anon@esml-canonical-basic.xsd:30	unit	lang-wins	W20 真声明：next/advance <unit>（SPEC §6.7 表）	2026-11-11
+attr	anon@esml-canonical-basic.xsd:31	unit	lang-wins	W20 真声明：next/complete <unit>（SPEC §6.7 表）	2026-11-11
+attr	anon@esml-canonical-basic.xsd:33	from	lang-wins	W20 真声明：connectRules <rule from to>（SPEC:1366 附录F4，L6-connect/connect-rules.esml，SPEC 明写必填）	2026-11-11
+attr	anon@esml-canonical-basic.xsd:33	to	lang-wins	W20 真声明：同上	2026-11-11
+attr	anon@esml-canonical-basic.xsd:34	name	lang-wins	W20 真声明：observe name（SPEC §6.10，L0-type-unit/observe-list.esml）	2026-11-11
+attr	anon@esml-canonical-basic.xsd:35	name	lang-wins	W20 真声明：observe <var path name>（SPEC §6.10）	2026-11-11
+attr	anon@esml-canonical-basic.xsd:35	path	lang-wins	W20 真声明：同上	2026-11-11
+attr	anon@esml-canonical-basic.xsd:37	lower	lang-wins	W20 真声明：presets <preset path value lower upper>（SPEC §6.10，L9-method-schedule/fixed-preset.esml）	2026-11-11
+attr	anon@esml-canonical-basic.xsd:37	path	lang-wins	W20 真声明：同上	2026-11-11
+attr	anon@esml-canonical-basic.xsd:37	upper	lang-wins	W20 真声明：同上	2026-11-11
+attr	anon@esml-canonical-basic.xsd:37	value	lang-wins	W20 真声明：同上	2026-11-11
+attr	anon@esml-canonical-basic.xsd:38	coordinate	lang-wins	W20 真声明：esml 根属性（原 :18 键随文档序移位至 :38；引擎侧无此属性）	2026-11-11
+attr	anon@esml-canonical-basic.xsd:38	name	lang-wins	W20 真声明：esml 根属性（原 :18 键随文档序移位至 :38；引擎侧无此属性）	2026-11-11
+attr	anon@esml-canonical-basic.xsd:38	schema	lang-wins	W20 真声明：esml 根属性（原 :18 键随文档序移位至 :38）	2026-11-11
+attr	anon@esml-canonical-basic.xsd:38	version	lang-wins	W20 真声明：esml 根属性（原 :18 键随文档序移位至 :38）	2026-11-11
+attr	anon@esml-canonical-basic.xsd:39	name	lang-wins	W20 真声明：recordTypes 段 <recordType name>（原 :25 键随文档序移位至 :39）	2026-11-11
+attr	anon@esml-canonical-basic.xsd:40	value	lang-wins	W20 真声明：算法段 <return value>（原 :20 键随文档序移位至 :40）	2026-11-11
+attr	anon@esml-canonical-basic.xsd:41	condition	lang-wins	W20 真声明：算法段 <while condition>（原 :23 键随文档序移位至 :41）	2026-11-11
