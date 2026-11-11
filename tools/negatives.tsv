@@ -6,7 +6,7 @@
 #                 XSD 拒收它 = 我们把一个语义负例误判成拼写错（红）
 # 「未判定」不合法：每件都要写清它红在哪一层，否则下次复核又要重新猜。
 #
-# 登记条数：22 件（schema 15 / semantic 7）—— 改表即改这一行；
+# 登记条数：28 件（schema 21 / semantic 7）—— 改表即改这一行；
 # tools/check-neg-debt.py 每次跑都重算并核对，对不上就红（台账写错就改台账）。
 L0-type-unit/units-contradiction.esml	semantic	单位声明与 type unit= 矛盾（§11 量纲冲突），拼写合法
 L1-expr-equation/array-index-probe.esml	semantic	数组维 "GhostSet" 既非字面量、也非已声明序集/参数名，求解期报 I25a；拼写合法
@@ -30,3 +30,9 @@ L3-model/connector-probe.esml	schema	legacy `<connector>` 端口协议形态，`
 L3-model/model-types-probe.esml	schema	legacy `<model-types>`（kebab-case）容器，esml 根只声明 camelCase `<modelTypes>`（kebab 不是合法语法）⇒ XSD 拒收；canonical 用 `<modelTypes>`（SPEC §1 词法，:82）
 L2-discrete/initialisation-procedures-probe.esml	schema	legacy `<initialisation-procedures>`（kebab-case）容器，`<system>` 只声明 camelCase `<initialisationProcedures>` ⇒ XSD 拒收；canonical 用 `<initialisationProcedures>`（SPEC §6.7，:641）
 L5-instance/subsystem-probe.esml	schema	legacy `<subsystem>` 形态，SPEC 明言「不是独立元素」（子系统只有 `<system>` 作 `type=` 复用）；`<instances>` 内容模型只收 `<instance>` ⇒ XSD 拒收（SPEC §5 系统层，:518）
+L5-instance/duration-probe.esml	schema	legacy 调度段时长拼法：`<duration>` 元素形 / `<continueFor duration="…"/>` 属性形；`<sequence>` 内容模型 choice 无 `duration`、`ScheduleContinueForType` 只声明 `time=`/`solver=` ⇒ XSD 拒收；canonical 用 `<continueFor time="…"/>`（SPEC:697「没有 `<duration>` 这种元素」）
+L2-discrete/jump-to-probe.esml	schema	legacy kebab 拼法 `<jump-to>`（同 `<move-to>`），`<next>` 内容模型 choice 只声明 camelCase `moveTo`/`jumpTo`/`advance`/`complete` ⇒ XSD 拒收；canonical 用 `<jumpTo>`/`<moveTo>`（SPEC:641 一律拒收）
+L3-model/switch-to-probe.esml	schema	legacy 状态机旧容器 `<switch-to>`/`<discretes>`；`<state>` 内容模型无 `switch-to`（`StateMachineType` 只收 `<state>` 等已声明元素）⇒ XSD 拒收；canonical 状态迁移用 `<next>` 内 `<jumpTo>`/`<moveTo>`（SPEC:1247-1254 旧文档特性，v1.3.4 删）
+L3-model/constant-probe.esml	schema	legacy 端口变量元素形 `<constant>`；`<portType>` 内容模型 choice 只收 `<doc>`/`<variables>`/`<portVariable>`（元素名给角色的 7 种拼法已删）⇒ XSD 拒收；canonical 用 `<portVariable portRole=…/>`（SPEC:131 / :1210）
+L5-instance/reassign-probe.esml	schema	legacy 调度序列别名 `<reassign>`；`<sequence>` 内容模型 choice 只声明 call/continueFor/continueUntil/reset/stop ⇒ XSD 拒收；canonical 用 `<reset>`（SPEC:1173 删同义元素）
+L3-model/interface-probe.esml	schema	legacy `<interface>` 端口协议拼写；`<portTypes>` 内容模型只收 `<portType>` ⇒ XSD 拒收；canonical 用 `<portType name connectorFamily conservation>`（SPEC:89 端口协议表旧拼写报错）

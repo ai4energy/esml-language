@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- jump-to-probe: `<initialisationProcedure>` 的 `<next>` 内用 kebab 拼法 `<jump-to>`。
+     它是 legacy 拼法，XSD 拒收（`<next>` 内容模型 choice 只声明 camelCase
+     `moveTo`/`jumpTo`/`advance`/`complete`，kebab 不是合法语法）。canonical 用
+     `<jumpTo>`/`<moveTo>`，见 `L2-discrete/initialisationprocedure-*.esml` 正例。
+     非零退出是预期行为。
+     规范条文：§6.7 系统初始化过程（`<initialisation-procedures>` / `<move-to>` / `<jump-to>` 一律拒收；canonical 只收 `<jumpTo>`/`<moveTo>`）。 -->
+ -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L2_JumpToProbe">
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
+  <modelTypes><modelType name="M" discipline="generic">
+    <variables><variable name="y" type="real" role="algebraic"/></variables>
+    <equations><equation>y = 1.0</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="a" type="M"/></instances>
+        <initialisationProcedures><initialisationProcedure name="init">
+      <next><jump-to><set path="a.y" value="1.0"/></jump-to></next>
+    </initialisationProcedure></initialisationProcedures>
+  </system></systems>
+</esml>
