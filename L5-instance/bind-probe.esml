@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 负例（预期失败）：实例覆盖用 `<bind name value>` 元素形态。它是 legacy
+     拼法，XSD 拒收（`<instance>` 内容模型无 `bind`）；canonical 覆盖用
+     `<set path value/>`，见 `L5-instance/instance-basic.esml` 等正例。
+     非零退出是预期行为。
+     规范条文：§2 收紧词法（实例覆盖 `<set path= value=>`，`<bind name= value=>` 非法→报错）。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L5_BindProbe">
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
+  <modelTypes><modelType name="M" discipline="generic">
+    <variables><variable name="y" type="real" role="algebraic"/></variables>
+    <equations><equation>y = 1.0</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances>
+      <instance name="a" type="M">
+        <bind name="a.y" value="1.0"/>
+      </instance>
+    </instances>
+    <schedule><sequence><continueFor time="0"/></sequence></schedule>
+  </system></systems>
+</esml>

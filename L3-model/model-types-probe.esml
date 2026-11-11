@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 负例（预期失败）：容器用 `<model-types>`（kebab-case）形态。legacy 拼法，
+     XSD 拒收（esml 根只声明 camelCase `<modelTypes>`，kebab 不是合法语法）；
+     canonical 用 `<modelTypes>`。非零退出是预期行为。
+     规范条文：§1 词法（kebab-case 不是合法语法；下表与 §4/§5/§6 均按 camelCase）。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L3_ModelTypesProbe">
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
+  <model-types><modelType name="M" discipline="generic">
+    <variables><variable name="y" type="real" role="algebraic"/></variables>
+    <equations><equation>y = 1.0</equation></equations>
+  </modelType></model-types>
+  <systems><system name="S">
+    <instances><instance name="a" type="M"/></instances>
+    <schedule><sequence><continueFor time="0"/></sequence></schedule>
+  </system></systems>
+</esml>
