@@ -2,11 +2,20 @@
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 `<initialisationProcedures>` + `<initialisationProcedure>` 的 process 子元素族：
-     `<start><assign path value/></start>` 与
+     `<start><assign path value/><replace path value/></start>` 与
      `<next><jumpTo><set path value/></jumpTo><complete unit=/></next>`。
+     `<start>` 的四个子元素 `<set>`/`<assign>`/`<selector>`/`<replace>`（SPEC:636，
+     子元素表）本例用其中两个：既有 `<assign>` 之外 W25 补 `<replace path="m.x"
+     value="2.0"/>`。`<replace>` canonical 声明（basic.xsd start choice 内），
+     **引擎收下但不消费（silent no-op，引擎债）**：
+     `esml check` 实测（W25 2026-11-11）：errors=0 warnings=0 models=2 systems=1
+     types=1 portTypes=0 units=0 functions=0 five_level=ok —— 无 F7（引擎 KNOWN_SUB_TAGS
+     含 `replace`，不拒收）；`esml solve` 实测 `<replace>` 零效果：同件 `<start>` 内
+     只留 `<replace path="m.x" value="2.0"/>`（删 assign）solve 后 `m.x = 0.0`，
+     与不写 `<replace>` 同 ⇒ 引擎收而不消费（与 `<assign>` 同解）。
      命名均为 camelCase，kebab 拼法会被拒绝。
      `check` errors=0（声明例，当前只解析、不参与求解）。
-     规范条文：§6.7（系统初始化过程）。
+     规范条文：§6.7（系统初始化过程，SPEC:636 子元素表）。
      另一支过程子元素见 `initialisationprocedure-advance.esml`。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L2_InitProcCamel">
   <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
@@ -19,7 +28,7 @@
     <instances><instance name="m" type="Mass"/></instances>
     <initialisationProcedures>
       <initialisationProcedure name="cooling">
-        <start><assign path="m.x" value="0.5"/></start>
+        <start><assign path="m.x" value="0.5"/><replace path="m.x" value="2.0"/></start>
         <next>
           <jumpTo><set path="m.x" value="1.5"/></jumpTo>
           <complete unit="s"/>
