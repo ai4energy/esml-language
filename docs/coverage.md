@@ -293,7 +293,7 @@ system: S (2 unknowns)
 schema**；要落地「顶层 `SET`」须先做一次规范修订（`SPEC.md` + XSD + 示例），
 且实现侧要先真正生效。
 
-### 5.3 两处规范有、实现无
+### 5.3 引擎收但语义无效 / 实现无的行
 
 | 条目 | 实测 | 状态 |
 |---|---|---|
@@ -303,6 +303,10 @@ schema**；要落地「顶层 `SET`」须先做一次规范修订（`SPEC.md` + 
 | `domain` 属性（`<instance>` / `<modelType>` / `<system>` 宿主） | W17 2026-11-11 实测三宿主 `esml check` 均 `errors=0`，但 `esml solve` 取值与无 `domain` 同（`domain` 零读点，写与不写同解）；`<portType>` 宿主是 `F1 legacy spelling` 响亮拒收（台账 `PortTypeDef/domain` 行 `rejected-legacy`） | 引擎收但语义无效 → 按 §5.2 顶层 `SET` 先例**不补示例**，台账三宿主行记 `no-example` |
 | `side` 属性（`<annotation><port>` 宿主，`PortMarkType`） | W17 2026-11-11 实测 `esml check` `errors=0`，但 `side` 只属标注侧图形标记，引擎 `check` 不消费其值（写 `left`/`right` 与不写同）；模型侧 `<modelType><ports><port>` 是 `F1 unknown attribute` 响亮拒收（台账 `PortInstanceType/side` 行 `rejected-legacy`） | 引擎收但语义无效 → 按 §5.2 先例**不补示例**，台账 `PortMarkType/side` 行记 `no-example` |
 | `MetadataType` `xs:any` 兜底（`##targetNamespace` + `##other`） | SPEC:65「子结构不固定（schema 放行任意子元素）」是规范意图；XSD 1.0 UPA 禁止同一内容模型内命名元素与 `##targetNamespace` 通配并存（W23 2026-11-11 实测 sequence/choice 两种拼法均 `UPA violation`），故只能 lax | **by-design**，非缺口；strict 基线 3/3（`D-skeleton/metadata.esml` / `provenance.esml` / `doc-ref.esml`）不变 |
+| `<replace path value/>`（`initialisationProcedure/start` 宿主，W20 新声明） | W28 2026-11-11 实测 `esml check` `errors=0`；`esml simulate` 下与不带 `<replace>` 的对照文档同值（state `x` initial=0 配 `<replace path="m.x" value="1.0"/>`，两文档 `simulate` 末行均 `m.x=0.0`） | 引擎收但零效果（CLI 默认 solve/simulate 路径不跑初始化过程，`esml-solve` 的 `solve_initialisation_procedure` 只有库级调用点）→ 按 §5.2 先例**不补示例** |
+| `<next><moveTo>` / `<next><jumpTo>`（W20 新声明） | 同法实测：`check` `errors=0`，且整条初始isationProcedures 管线默认 `esml solve`/`simulate` 均不消费（库级 ADR-97/98 求解器存在但 CLI 无调用点） | 引擎收但零效果（同 `<replace>` 行，管线级）→ 不补示例 |
+| `<observe name><var path name/></observe>`（W20 新声明） | W28 2026-11-11 实测：HIR 收（`observes`）、flat 层 `resolve_observes` 消费（`esml-flat/src/flat/observe.rs`）；但 `esml solve` 输出列与不带 `<observe>` 的对照文档逐字同（`m.x=1.0` 单行）；`<observe>` 只接 `esml simulate --observe`（`esml-cli/src/main.rs:2132` `resolve_observe_paths` 只消费命令行参数） | 引擎收但默认路径零效果（需 `simulate --observe` 才可见）→ 现有示例 `L0-type-unit/observe-list.esml` 头部已注明，不另补 |
+| `<connectRules><rule from to/></connectRules>`（W20 新声明） | W28 2026-11-11 实测：`check` `errors=0`；负例（`from="feed" to="primary"` 但全文无对应 `connectClass` 声明）仍 `errors=0` —— `F-CONNECT-RULES-*` 校验（`esml-schema/src/connect_rules.rs:71`）只数 `rule` 条目，不联 `connectClass`；HIR/flat 层无 `connect_rules` 消费点 | 引擎收但零效果（不联 connectClass、不进入求解）→ 按 §5.2 先例**不补示例** |
 
 ### 5.4 章节编号 `§6.2` 缺失
 
@@ -455,7 +459,18 @@ canonical 声明处）＋ 至少一份演示该语法的示例，外加实现侧
 **对照组**：`<fix name="m.x" value="2.0"/>` 在 `<methods><onLoad>` 内
 → `check` 输出 `ok`，`errors=0`（`fix` **被引擎接受**）。
 
-探针件：`/tmp/w14-probes/w19_four.py`（引擎 `~/esml-engine-user3/target/release/esml`，2026-11-11）。
+**W28 复核**（2026-11-11，W20 新声明逐元素探针 `/tmp/w28-probes/`）：
+W20 新增的 19 处声明里，`check` 层面**无新增拒收**——唯一拒收项
+`<vary>` 在 `<methods><onLoad>` 内即上表第 2 行（`F7[]: unknown element
+<vary> at …:9:22`，原文复现）。其余 W20 新声明（方程级 `if/case/for`、
+`selectors`/`initialSelectors`、`initialisationProcedures` 全族、
+`connectRules`/`rule`、`observe`/`var`、`presets`/`preset`、`extendsFrom`
+系统级）`check` 均 `errors=0`；收但零效果的登记见 §5.3 新增四行
+（`<replace>` / `moveTo`·`jumpTo` / `<observe>` / `<connectRules>`）。
+「四处」计数因此不变。
+
+探针件：`/tmp/w14-probes/w19_four.py`（W9 四处拒收）、`/tmp/w28-probes/`
+（W28 逐元素复核；引擎 `~/esml-engine-user3/target/release/esml`，2026-11-11）。
 
 ---
 
