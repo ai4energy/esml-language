@@ -10,14 +10,14 @@
      `check` errors=0。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="D_DocRef">
   <metadata>
-    <doc ref="esml-manual:thermal-chain" title="热链文档条目">
+    <doc ref="thermal.thermal-chain" title="热链文档条目">
       指数衰减热链的文档引用示例：doc 只做引用与摘要，不进求解。
     </doc>
   </metadata>
   <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes>
     <modelType name="Decay" discipline="generic">
-      <doc ref="esml-manual:thermal-chain" title="热链模型条目" summary="指数衰减热链模型：只做引用与摘要，不进求解"/>
+      <doc ref="thermal.thermal-chain" title="热链模型条目" summary="指数衰减热链模型：只做引用与摘要，不进求解"/>
       <parameters><parameter name="k" type="real" default="0.05"/></parameters>
       <variables><variable name="N" type="real" role="state" initial="100.0"/></variables>
       <equations><equation>Der(N) = -k * N</equation></equations>

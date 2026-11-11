@@ -121,7 +121,13 @@ def parse_var_value(output, mode, var):
             try:
                 last = float(toks[col])
             except (ValueError, IndexError):
-                pass
+                # 响亮：数据行（t 列是数值）里该列不是数值 = 引擎输出变了
+                # （NaN/截断/格式漂移）。不许静默跳过拿上一步旧值冒充末步值
+                # （静默假绿方向）⇒ 抛给调用方判红。
+                raise ValueError(
+                    f"simulate 数据行 {ln!r} 第 {col} 列（var={var}）不是数值 ⇒ "
+                    "引擎输出变了（台账没跟上？）"
+                ) from None
     return last
 
 
@@ -184,7 +190,11 @@ def check_expectations(rows, engine, repo, tsv_name):
             red.append(f"{tag} {r['path']} 引擎退出 {rc} ⇒ 引擎行为变了（跑不通了？）⇒ "
                        f"删行（并登记 engine-example-debt.tsv stage=solve）或改台账")
             continue
-        got = parse_var_value(out, r["mode"], r["var"])
+        try:
+            got = parse_var_value(out, r["mode"], r["var"])
+        except ValueError as e:
+            red.append(f"{tag} {r['path']} 输出解析红：{e} ⇒ 引擎输出变了 ⇒ 改台账")
+            continue
         if got is None:
             red.append(f"{tag} {r['path']} 输出里解析不出 {r['var']} ⇒ 引擎输出变了 ⇒ 改台账")
             continue

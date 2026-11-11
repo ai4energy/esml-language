@@ -1,12 +1,15 @@
 <?xml version="1.0"?>
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
-<!-- reassign-probe: 调度序列用 legacy `<reassign>` 步。它是旧调度序列别名，XSD 拒收
-     （`<sequence>` 内容模型 choice 只声明 call/continueFor/continueUntil/reset/stop，
-     无 `reassign`）。canonical 用 `<reset>`，见 `L5-instance/` 调度正例。
-     非零退出是预期行为。
-     规范条文：附录 C 修订史（删三个同义元素：`<reassign>` 留 `<reset>`）。 -->
- -->
+<!-- 负例（预期 XSD 失败）：调度序列用 legacy `<reassign>` 步。它是旧调度序列别名，
+     XSD 拒收（`<sequence>` 内容模型 choice 只声明 call/continueFor/continueUntil/reset/stop，
+     无 `reassign` ⇒ `Unexpected child with tag '…reassign'`（schema 级负例））。
+     【双向事实，务必分清】canonical 拼法是 `<reset>`（调度序列正例见 `L5-instance/`），
+     `<reassign>` 属附录 C 已删旧拼法；但引擎收它 `errors=0`——引擎残留旧拼写、未拒收，
+     这是**引擎债**（见 tools/engine-drift.tsv `child anon-child@esml-canonical-basic.xsd:sequence
+     reassign` 行，方向 lang-wins：语义已裁定 `<reset>` 唯一 canonical，引擎收=引擎债）。
+     读者注意：本例红在 XSD 这层，引擎不红。
+     规范条文：附录 C 修订史（删三个同义元素：`<reassign>` 留 `<reset>`；SPEC:1173）。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L5_ReassignProbe">
   <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="M" discipline="generic">
