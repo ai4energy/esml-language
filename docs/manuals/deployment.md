@@ -1,7 +1,7 @@
 # 语言规范部署手册
 
 > 适用：发布规范版本、发布 XSD/示例、给引擎仓 bump 子模块。
-> 最后核对：2026-10-30（v1.3.3）。
+> 最后核对：2026-11-11（v1.3.3）。
 
 ## 1. 产物
 
@@ -18,13 +18,19 @@
 
 ```sh
 make check
+make strict                 # 撤通配判别力闸（--strict，需 xmlschema）
 .venv/bin/python tools/check-examples.py --self-test
 git status --short          # 只应含本仓改动
 ```
 
 - 入口层注释里的根清单必须是 `validate_roots.py sync` 生成的，不手工改；
 - `SPEC.md` 与 XSD 同版；示例与规范同版；
-- 新负例已登记并说明红在哪一层。
+- 新负例已登记并说明红在哪一层；
+- `make check` 六道闸里有两道跨仓（`check-engine-xsd-parity` 漂移闸、
+  `check-engine-examples` 可运行性闸）需引擎仓：指向引擎仓根设 `ESML_ENGINE_DIR`
+  （不设时用默认 `~/esml-engine-user3`）；**缺引擎仓时这两道打印「跳过」rc=0**，
+  不算红，但发布前应尽量带引擎仓全跑；
+- `make strict` 比 `docs/audit/strict-baseline.txt` 基线：高于基线退出码 1，发布前必须持平或更低。
 
 ## 3. 打 tag
 
