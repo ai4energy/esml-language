@@ -51,16 +51,17 @@
 ## 4. 校验命令
 
 ```sh
-make check                                  # 六道闸全跑，任一红即非零
+make check                                  # 七道闸全跑，任一红即非零
 make roots                                  # 只跑根矩阵
 make examples                               # 只跑示例
 make selftest                               # 根矩阵好例/坏例自证
 make strict                                 # 撤通配判别力闸（--strict，需 xmlschema）
 make elements                               # 只跑元素覆盖双向闸
+make spec-elements                          # 只跑 XSD 声明 ⇄ SPEC 点名闸
 .venv/bin/python tools/check-examples.py --self-test
 ```
 
-`make check` 的六道闸（顺序即 Makefile 行序）：
+`make check` 的七道闸（顺序即 Makefile 行序）：
 
 1. `docs/validate_roots.py` —— 根矩阵：入口根集合 ⇄ canonical 全局元素、注释清单、SPEC §13 表。
 2. `docs/validate_examples.py` —— 规范 ⇄ 示例五道检查（需 xmlschema）。
@@ -68,6 +69,7 @@ make elements                               # 只跑元素覆盖双向闸
 4. `tools/check-element-coverage.py` —— 元素覆盖双向闸（仅标准库）。
 5. `tools/check-attr-coverage.py` —— 属性覆盖双向闸（仅标准库）。
 6. `tools/check-engine-examples.py` —— 引擎 × 示例可运行性闸（需引擎仓；**缺引擎仓时打印「跳过」rc=0**）。
+7. `tools/check-spec-element-coverage.py` —— XSD 声明元素 ⇄ SPEC 正文点名闸（仅标准库）。
 
 示例的引擎冒烟（跨仓，不在本仓门内）：
 

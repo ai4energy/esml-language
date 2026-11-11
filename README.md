@@ -18,7 +18,7 @@ canonical XML 是正统语法；XML Schema 描述 canonical XML，是可机验�
 文字与 schema 出现分歧时，以 schema 为准。
 
 ```sh
-python3 -m venv .venv && .venv/bin/pip install xmlschema lxml   # 一次装齐六道闸的依赖
+python3 -m venv .venv && .venv/bin/pip install xmlschema lxml   # 一次装齐七道闸的依赖
 PY=.venv/bin/python make check                                  # 全绿 = 可以提交
 ```
 
@@ -52,7 +52,7 @@ PY=.venv/bin/python make check                                  # 全绿 = 可�
 
 ## 校验与运行
 
-仓内六道**常驻机判**，`make check` 一起跑（任一失败即非零退出）：
+仓内七道**常驻机判**，`make check` 一起跑（任一失败即非零退出）：
 
 | 脚本 | 查什么 | 依赖 |
 |---|---|---|
@@ -62,9 +62,10 @@ PY=.venv/bin/python make check                                  # 全绿 = 可�
 | [`tools/check-element-coverage.py`](tools/check-element-coverage.py) | **元素覆盖双向闸**：方向 A「每个 XSD 命名元素必须有非负例示例或在台账登记」，方向 B「示例用到的每个元素必须已声明或登记 by-design」；台账 [`tools/element-coverage.tsv`](tools/element-coverage.tsv)，头部计数当场重算 | 仅标准库 |
 | [`tools/check-attr-coverage.py`](tools/check-attr-coverage.py) | **属性覆盖双向闸**：声明→示例（每个 XSD 声明的属性必须有非负例示例或在台账登记）与示例→声明（示例用到的每个属性必须已声明或登记 by-design）；台账 [`tools/attr-coverage.tsv`](tools/attr-coverage.tsv)，头部计数当场重算。与 `attr-acceptance.tsv` 分工：后者记**引擎裁决**（收 / 拒 / 零效果），本闸查**完整性**（声明 ⇄ 示例闭合） | 仅标准库 |
 | [`tools/check-engine-examples.py`](tools/check-engine-examples.py) | **示例 × 引擎可运行性闸**：每个非负例示例（负例识别照抄 `validate_examples.py`）要么 `esml check` 绿（`errors=0`）、要么在 [`tools/engine-example-debt.tsv`](tools/engine-example-debt.tsv) 登记引擎债；台账数字与实测不符即「台账过时」判红；缺引擎跳过（同跨仓漂移闸） | `lxml` 无；逐件实跑引擎，缺引擎仓跳过 rc=0 |
+| [`tools/check-spec-element-coverage.py`](tools/check-spec-element-coverage.py) | **XSD 声明 ⇄ SPEC 点名闸**：每个 XSD 命名元素都必须在 `SPEC.md` 正文点名（判据 `name=` 声明去重、正则以属性/闭合为界）；未点名须在 [`tools/spec-element-coverage.tsv`](tools/spec-element-coverage.tsv) 登记 pending / by-design（依据必填）；台账头部计数当场重算 | 仅标准库 |
 
 ```sh
-make check                                   # 六道都跑
+make check                                   # 七道都跑
 make roots                                   # 只跑根矩阵
 make strict                                  # 只跑撤通配判别力闸
 python3 docs/validate_roots.py selftest      # 根矩阵的自证（好例 / 坏例）
@@ -72,6 +73,7 @@ python3 tools/check-element-coverage.py      # 只跑元素覆盖闸
 python3 tools/check-element-coverage.py --self-test  # 自证：好树零违规、坏树必红
 python3 tools/check-attr-coverage.py --self-test      # 自证：好树零违规、坏树必红
 python3 tools/check-engine-examples.py --self-test   # 自证：台账逻辑（负例识别 / 对账 / 计数）
+make spec-elements                           # 只跑 XSD 声明 ⇄ SPEC 点名闸
 ```
 
 属性面另有台账闸 [`tools/check-attr-acceptance.py`](tools/check-attr-acceptance.py)：
