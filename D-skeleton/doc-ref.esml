@@ -2,9 +2,10 @@
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 文档引用 `<doc>`（DocRefType）：`ref` 必填（指向文档条目的唯一键），
-     `title` / `summary` 可省；`summary` 亦可写作元素文本（本例即用元素文本形态）。
-     三处同型：`<metadata>` 内（本例）、`<modelType>` 内、`<portType>` 内。
-     纯文档元数据，不参与编译与求解。
+     `title` / `summary` 可省；`summary` 有两种写法 —— **元素文本**与**属性**，
+     本例两种形态**并存**：`<metadata>` 内的 `<doc>` 用元素文本，
+     `<modelType>` 内的 `<doc>` 用属性 `summary=`。三处同型：`<metadata>` 内、
+     `<modelType>` 内、`<portType>` 内。纯文档元数据，不参与编译与求解。
      规范条文：§1.1（文档骨架 · 就地短文档引用 `<doc>`，纯文档元数据）。
      `check` errors=0。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="D_DocRef">
@@ -16,6 +17,7 @@
   <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes>
     <modelType name="Decay" discipline="generic">
+      <doc ref="esml-manual:thermal-chain" title="热链模型条目" summary="指数衰减热链模型：只做引用与摘要，不进求解"/>
       <parameters><parameter name="k" type="real" default="0.05"/></parameters>
       <variables><variable name="N" type="real" role="state" initial="100.0"/></variables>
       <equations><equation>Der(N) = -k * N</equation></equations>
