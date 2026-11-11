@@ -68,9 +68,74 @@
     </xs:sequence>
   </xs:complexType>
 
+  <!-- `<project>` 壳内的 `<computeTasks>` 及其载荷核。
+       路由事实（docs/validate_examples.py ROUTE）：project 根文档
+       **只按本 schema 校验**，compute.xsd 不掺和 —— 两份 schema 同
+       targetNamespace 但互不 import，compute 侧的 `<tspan>`/`<solver>`
+       全局元素声明在本 schema 里不存在。strict 闸（撤 xs:any）下
+       project 壳内任何无声明的子树都整树红（撤 xs:any 前靠
+       `##any` 通配兜着，libxml 把它表述为 "character data is not
+       allowed because content is empty"）。故这里自声明载荷核，
+       形状与 compute.xsd 的同名条目**逐属性对齐**（tspan: from/to；
+       solver: name/abstol/reltol/saveat/maxsteps；task: name/kind
+       required，target 等 optional）：project 侧只认壳与核，
+       完整的 kind 载荷表（decision/objective/perturb/…）留在
+       compute.xsd，project 侧不复制、不抢先 —— 两仓对 `<task>`
+       的公共核保持同形，任何单侧收紧都不会让另一侧合法文档变红。
+       载荷子元素在此按 choice 任意序/可重复（compute 侧同纪律）。 -->
+  <xs:complexType name="ProjectTspanType">
+    <xs:attribute name="from" type="xs:double" use="optional"/>
+    <xs:attribute name="to" type="xs:double" use="required"/>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+  <xs:complexType name="ProjectSolverType">
+    <xs:attribute name="name" type="xs:string" use="optional"/>
+    <xs:attribute name="abstol" type="xs:double" use="optional"/>
+    <xs:attribute name="reltol" type="xs:double" use="optional"/>
+    <xs:attribute name="saveat" type="xs:double" use="optional"/>
+    <xs:attribute name="maxsteps" type="xs:int" use="optional"/>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+  <!-- `<decision>` / `<objective>`：optimize 任务载荷核
+       （SPEC §6.8 canonical 形态 + §6.8 结构表「载荷按 kind 取
+       （<tspan> / <solver> / <decision> / <objective> …）」）。
+       project 侧只声明这两个载荷元素的**最小属性核**（decision:
+       name required + lower/upper 界；objective: direction 方向 +
+       纯文本目标式，与 `<body>` 同纪律），完整 kind 载荷表
+       （perturb / scenarioChain 等）留在 compute.xsd，project 侧
+       不复制、不抢先 —— 与 tspan/solver 的同形纪律一致。 -->
+  <xs:complexType name="ProjectDecisionType">
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="lower" type="xs:double" use="optional"/>
+    <xs:attribute name="upper" type="xs:double" use="optional"/>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+  <xs:complexType name="ProjectObjectiveType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="direction" type="xs:string" use="required"/>
+        <xs:anyAttribute processContents="lax"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="ComputeTaskLiteType">
+    <xs:sequence>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="tspan" type="esml:ProjectTspanType"/>
+        <xs:element name="solver" type="esml:ProjectSolverType"/>
+        <xs:element name="decision" type="esml:ProjectDecisionType"/>
+        <xs:element name="objective" type="esml:ProjectObjectiveType"/>
+      </xs:choice>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="kind" type="xs:string" use="required"/>
+    <xs:attribute name="target" type="xs:string" use="optional"/>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
   <xs:complexType name="ComputeTasksType">
     <xs:sequence>
-      <xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="task" type="esml:ComputeTaskLiteType"
+                  minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
     <xs:attribute name="name" type="xs:string" use="optional"/>
     <xs:attribute name="target" type="xs:string" use="optional"/>

@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `<return value="…"/>` 算法段提前返回：`assign` 之后直接返回常量。
+     规范条文：§7（算法段）。
+     `check` errors=0；`solve` 验证 y=5。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L8_AlgorithmReturn">
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
+  <functions>
+    <function name="f" returns="real">
+      <inputs><input name="x" type="real"/></inputs>
+      <outputs><output name="y" type="real"/></outputs>
+      <algorithm>
+        <assign name="y" value="5"/>
+        <return value="5"/>
+      </algorithm>
+    </function>
+  </functions>
+  <modelTypes>
+    <modelType name="M" discipline="generic">
+      <parameters><parameter name="x" type="real" default="3.0"/></parameters>
+      <variables><variable name="y" type="real" role="algebraic"/></variables>
+      <equations><equation>y = f(x)</equation></equations>
+    </modelType>
+  </modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="M"/></instances>
+    <schedule><sequence><continueFor time="0"/></sequence></schedule>
+  </system></systems>
+</esml>

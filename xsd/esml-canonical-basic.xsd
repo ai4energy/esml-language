@@ -130,8 +130,19 @@
     <xs:anyAttribute processContents="lax"/>
   </xs:complexType>
 
-  <!-- 文档元数据：author/license/description 等自由键值块；
-       仅存于文档根，子结构不被强制消费。 -->
+  <!-- 文档元数据：author/license/description/provenance 等自由键值块；
+       仅存于文档根，子结构不被强制消费。
+       SPEC §1.1：「常用子元素 `<author>` / `<license>` / `<description>` /
+       `<provenance>`。其**子结构不固定**（schema 放行任意子元素）」——
+       条文**明文要求**放行任意子元素，故本容器**必须**保留 `xs:any`
+       （把通配删掉换成封闭声明＝推翻条文，XSD 1.0 也不允许同一 choice 组内
+       命名元素与 `##targetNamespace` 通配并存）。strict 闸下 metadata 的
+       3 件红（`D-skeleton/metadata.esml` / `provenance.esml` / `doc-ref.esml`）
+       是**条文与通配撤除的既定冲突**——SPEC 点名「放行任意子元素」，
+       撤掉通配即推翻条文，故这 3 件是规范债（条文欠账），非示例错、
+       非 schema 欠账，基线 `docs/audit/strict-baseline.txt` 即其口径。
+       这四个自由文本子元素 + `<doc>` **不是文档根**，只在 `<metadata>` 下
+       经本容器 `xs:any` 通配放行，故不在全局元素层声明（见「独立根 `<metadata>`」注释）。 -->
   <xs:complexType name="MetadataType" mixed="true">
     <xs:sequence>
       <xs:any namespace="##targetNamespace" processContents="lax"
@@ -183,13 +194,35 @@
     <xs:anyAttribute processContents="lax"/>
   </xs:complexType>
 
+  <!-- 求解器条目：`<solver name abstol reltol saveat maxsteps/>`。SPEC §6.9
+       两处出现：`<computeTasks>` 内 kind=simulate/optimize 的载荷，与顶层
+       `<solutionParameters>` 的子元素形态（属性同形，见 SPEC:799 子元素形态
+       示例，`saveat`/`maxsteps` 即该处所写）。本处是基本层对 `<solver>` 的
+       **首次真声明**：此前 basic 侧只有 `##targetNamespace` 通配兜着，
+       strict 闸（撤 xs:any）下 `<solutionParameters><solver>` 整树红
+       （"character data is not allowed because content is empty" 即
+       targetNS 通配撤掉后 `<solver>` 子树无声明可挂、被当作未解析内容
+       的 libxml 措辞）。compute.xsd 内 task 下的 `<solver>` 是局部声明，
+       两处属性集一致，本处复用同形不另造分歧。 -->
+  <xs:complexType name="SolverType">
+    <xs:attribute name="name" type="xs:string" use="optional"/>
+    <xs:attribute name="abstol" type="xs:double" use="optional"/>
+    <xs:attribute name="reltol" type="xs:double" use="optional"/>
+    <xs:attribute name="saveat" type="xs:double" use="optional"/>
+    <xs:attribute name="maxsteps" type="xs:int" use="optional"/>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+
   <!-- 求解参数容器：字面量容器，不参与求解语义（真正生效的求解设置来自
-       `<task>` 或调用参数）。两种形状均可：仅属性，或带 `<solver>` 子项；
-       未知子项会被显式报告，不会静默丢弃。 -->
+       `<task>` 或调用参数）。两种形状均可：仅属性，或带 `<solver>` 子项。
+       W9 把 `##targetNamespace` 通配换成 `<solver>` 真声明：SPEC 只给了
+       这一种子元素（§6.9 子元素形态），通配既无条文支撑也撑不起 strict
+       闸；`##other` 那条（skip，放行外命名空间内容）保留 —— XSD 1.0 下
+       目标命名空间一旦给出真声明，外命名空间的兜底仍需独立 any。 -->
   <xs:complexType name="SolutionParametersType">
     <xs:sequence>
-      <xs:any namespace="##targetNamespace" processContents="lax"
-              minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="solver" type="esml:SolverType"
+                  minOccurs="0" maxOccurs="unbounded"/>
       <xs:any namespace="##other" processContents="skip"
               minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
@@ -230,12 +263,73 @@
     <xs:anyAttribute processContents="lax"/>
   </xs:complexType>
 
-  <!-- 方法表（`<methods><method name><fix/free/run …>`）：语义在
-       system/schedule 侧消费，条目形状按扩展语法放行 ⇒ lax 透传。 -->
+  <!-- 方法表条目形状：
+       - `<onLoad><set path value/>…</onLoad>`（附录 F5：模型级预设，set 可任意多个）；
+       - `<method name><set path value/>…</method>`（附录 F7b：具名子过程，
+         方法体按 SPEC:96/附录 F7b 只收 `<set>`）；
+       - `<fix name value?/>` / `<vary name/>`（附录 K：method 内 FIX/FREE，
+         与系统级 `<fixed>/<free>` 同一实现路径）；
+       - `<free name/>`（自由释放）；
+       - `<run name/>`（附录 F7b：顺序调用另一 method，run/call 同义）。
+       W9 把 `##targetNamespace` 通配换成上述封闭声明：strict 闸下通配撤掉后
+       方法体整树红，而 SPEC 对命令集是**封闭列举**（set/fix/vary/free/run
+       五件，无开放条款），故按条文封死、不新开前缀。
+       仓内语料实测（2026-11）：`<methods>` 只出现在 L9-method-schedule 三件
+       （onload / methods-run / call-method-body），子元素恰为上述五类，
+       封死后全绿。`<call method=/>` 不在此处 —— 它属于 `<schedule><sequence>`
+       步类型（附录 K），由 Schedule 侧声明。 -->
+  <xs:complexType name="MethodSetType">
+    <xs:attribute name="path" type="xs:string" use="required"/>
+    <xs:attribute name="value" type="xs:string" use="optional"/>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+  <xs:complexType name="MethodOnLoadType">
+    <xs:sequence>
+      <xs:element name="set" type="esml:MethodSetType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+  <xs:complexType name="MethodDefType">
+    <xs:sequence>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="set" type="esml:MethodSetType"/>
+        <xs:element name="fix" type="esml:MethodFixType"/>
+        <xs:element name="free" type="esml:MethodFreeType"/>
+        <xs:element name="vary" type="esml:MethodVaryType"/>
+        <xs:element name="run" type="esml:MethodRunType"/>
+      </xs:choice>
+    </xs:sequence>
+    <xs:attribute name="name" type="esml:Ident" use="required"/>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+  <xs:complexType name="MethodFixType">
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="value" type="xs:string" use="optional"/>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+  <xs:complexType name="MethodFreeType">
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+  <xs:complexType name="MethodVaryType">
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+  <xs:complexType name="MethodRunType">
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
   <xs:complexType name="MethodsType">
     <xs:sequence>
-      <xs:any namespace="##targetNamespace" processContents="lax"
-              minOccurs="0" maxOccurs="unbounded"/>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="onLoad" type="esml:MethodOnLoadType"/>
+        <xs:element name="method" type="esml:MethodDefType"/>
+        <xs:element name="fix" type="esml:MethodFixType"/>
+        <xs:element name="free" type="esml:MethodFreeType"/>
+        <xs:element name="vary" type="esml:MethodVaryType"/>
+        <xs:element name="run" type="esml:MethodRunType"/>
+      </xs:choice>
     </xs:sequence>
     <xs:anyAttribute processContents="lax"/>
   </xs:complexType>
@@ -285,8 +379,21 @@
     <xs:anyAttribute processContents="lax"/>
   </xs:complexType>
 
-  <!-- 变量类型：类别 wrapper（<typesGeneric> 等 types* 族）内 <type> -->
+  <!-- 枚举字面量（SPEC:152：`type E = enumeration(a,b,c)` 字面量也可用
+       子元素 `<literal name="a"/>`）。W9 补真声明：VariableType 原先无
+       子元素声明，`<literal>` 只能靠上层 anyAttribute 旁路，strict 闸下
+       枚举例（type-unit.esml 等）会红。 -->
+  <xs:complexType name="LiteralType">
+    <xs:attribute name="name" type="esml:Ident" use="required"/>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+
+  <!-- 变量类型：裸放或类别 wrapper（<typesGeneric> 等 types* 族）内 <type> -->
   <xs:complexType name="VariableType">
+    <xs:sequence>
+      <xs:element name="literal" type="esml:LiteralType"
+                 minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
     <xs:attribute name="name" type="esml:Ident" use="required"/>
     <xs:attribute name="unit" type="esml:UnitExpressionType" use="optional"/>
     <xs:attribute name="quantity" type="xs:string" use="optional"/>
@@ -308,15 +415,32 @@
       <xs:element name="type" type="esml:VariableType" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
     <xs:attribute name="name" type="xs:string" use="optional"/>
+    <!-- W9：`discipline=` 由 anyAttribute 兜底改为真声明。SPEC:173（§1
+         「类型按类别包裹」）明写 wrapper 带「`discipline=` 可选」；
+         strict 闸（撤 anyAttribute）下语料 L6-connect/connect-rules.esml
+         的 `<typesDimensionless discipline="generic">` 因此转红，补上。 -->
+    <xs:attribute name="discipline" type="xs:string" use="optional"/>
     <xs:anyAttribute processContents="lax"/>
   </xs:complexType>
+  <!-- `<variableTypes>` 容器（W9 补真声明，此前全靠 `xs:any` 通配当声明，
+       strict 闸 123 件红中 117 件首因在此）。合法子元素集合按 SPEC §1
+       「类型按类别包裹（wrapper）」条文**封闭**为：
+         1. 裸 `<type>`（VariableType）
+         2. `<typesGeneric>` / `<typesThermal>` / `<typesDimensionless>`
+            —— 各含若干 `<type>`，`discipline=`/`name=` 可选（TypesCategoryType）。
+       **wrapper 前缀不是开放枚举**：SPEC 只点名上述三个（`grep '按类别' SPEC.md`
+       无 `types-` 开放前缀条文），故**不**对未知 wrapper 保留宽容——新增
+       `<typesElectrical>` 之类须先改 SPEC 条文再补声明，否则 XSD 响亮拒收
+       （这正是本闸要的判别力：错拼/未裁决的拼法不许靠通配静默绿）。
+       裸 `<type>` 的 `<literal name=…/>` 子元素（SPEC:152 枚举字面量，
+       VariableType 注释亦点名）一并补进 VariableType。 -->
   <xs:complexType name="VariableTypesType">
     <xs:sequence>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-        <!-- 任意 `types-<domain>` wrapper 均可（canonical 只列常用若干）→ 开放为
-             目标命名空间通配（lax 校验：错拼名原样保留，由语义校验报告）。 -->
-        <xs:any namespace="##targetNamespace" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
-        <xs:any namespace="##other" processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="type" type="esml:VariableType"/>
+        <xs:element name="typesGeneric" type="esml:TypesCategoryType"/>
+        <xs:element name="typesThermal" type="esml:TypesCategoryType"/>
+        <xs:element name="typesDimensionless" type="esml:TypesCategoryType"/>
       </xs:choice>
     </xs:sequence>
     <xs:attribute name="name" type="xs:string" use="optional"/>
@@ -925,7 +1049,15 @@
        合法语法（序集是平铺的表，没有「集合的集合」节点）。 -->
   <xs:element name="orderedSet" type="esml:OrderedSetType"/>
 
-  <!-- 独立根 `<metadata>` 块（文档根元数据；子结构不被消费，lax 通过）。 -->
+  <!-- 独立根 `<metadata>` 块（文档根元数据；子结构不被消费，lax 通过）。
+       SPEC §1.1 点名的四个自由文本子元素 `<author>`/`<license>`/`<description>`/
+       `<provenance>` 与 T-DOCREF 的 `<doc>` **不是文档根**——它们只是 `<metadata>`
+       的子元素。库根 `<metadata>` 文档（`D-skeleton/metadata.esml` 等）里，它们
+       靠 `MetadataType` 的 `xs:any namespace="##targetNamespace"` 通配（lax）放行，
+       故 plain 校验绿；strict 闸（撤 xs:any）下 `metadata`/`provenance`/`doc-ref`
+       三件仍红——这是条文「子结构不固定、放行任意子元素」与撤通配的**既定冲突**，
+       记在 `docs/audit/strict-baseline.txt` 基线 3 里，属规范债，**不靠把它们提成
+       全局根来假绿**（提成全局根会污染 canonical 全局元素集、反与入口 schema 失配）。 -->
   <xs:element name="metadata" type="esml:MetadataType"/>
   <xs:element name="modelTypes">
     <xs:complexType><xs:sequence>
@@ -965,7 +1097,182 @@
     <xs:attribute name="unit" type="esml:UnitExpressionType" use="optional"/>
     <xs:anyAttribute processContents="lax"/>
   </xs:complexType>
-  <xs:complexType name="ExternType">
+  <!-- 函数局部量（SPEC 附录 I）：`<locals><local name="t"/></locals>`，
+       只有 `name=`；声明性元数据，进 `<algorithm>` 体内内联展开。 -->
+  <xs:complexType name="FunctionLocalType">
+    <xs:attribute name="name" type="esml:Ident" use="required"/>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+  <!-- 算法段 / 过程体 / 事件动作共用一条寻址：`path=` 或 `name=` 二选一
+       required（XSD 1.0 表达不了跨属性互斥，用 pattern 封死「两者皆无」与
+       「同义两拼」；两者俱有时响亮放行，语义优先级由解析层裁决）。
+       三处语料形状：
+         * 事件动作（附录 F3 / §96）：`<assign path="on" value="1.0"/>`
+           —— 离散状态置值，**无 name 属性**。
+         * 函数算法段（附录 I）：`<assign name="t" value="…"/>` —— 对函数
+           局部量赋值，**无 path 属性**（`L8-function/locals.esml`）。
+         * 初始化过程（§6.7）：`<start>` 内 `<set>` / `<assign>` 寻址用 `path=`，
+           与上列事件动作同形（`L2-discrete/initialisationprocedures.esml`）。
+       统一 `xs:string` 类型：`value` 是表达式文本，`unit` 复用既有单位类型。 -->
+  <xs:simpleType name="AddressPatternType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value=".*[a-zA-Z].*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="AssignType">
+    <xs:attribute name="name" type="esml:Ident" use="optional"/>
+    <xs:attribute name="path" type="esml:AddressPatternType" use="optional"/>
+    <xs:attribute name="value" type="xs:string" use="optional"/>
+    <xs:attribute name="unit" type="esml:UnitExpressionType" use="optional"/>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+  <!-- `<condition>`：条件文本容器（`<algorithm>` 内 `<if>`/`<while>` 的判据、
+       `<events><when condition=>` 的同义子元素写法）。语料中为纯文本，
+       与函数 `<body>` 同纪律（内容不逐句机验，响亮拒收未知子元素）。 -->
+  <xs:complexType name="ConditionType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="condition" type="xs:string" use="optional"/>
+        <xs:anyAttribute processContents="lax"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <!-- `<algorithm>` 语句集（W14 按**引擎实测**重封，非 SPEC 字面猜）：
+       五件 `assign` / `if` / `for` / `return` / `while`。
+       依据：W14 实测表（引擎 esml check/solve）—— T1-T8 全 errors=0，
+       <for>/<return> 引擎真吃、<if condition=> 属性形引擎真读（components.rs:311）；
+       W9 旧版只封 assign/if/while 且 <if> 用 <condition> 子元素 + <then> 必填，
+       致 T2/T3/T4/T7 被 XSD 假拒收。本单恢复 for/return，<if> 改属性形 + <then>
+       可选，<while> condition 改 optional default=false。
+       分支体声明引擎实测过且有仓内示例的语句（至少 assign），铺不满的写注释。
+       引擎欠账三行（T5/T6/T8 errors=0 但算错）与本 XSD 无关，见 engine-drift.tsv。 -->
+  <xs:complexType name="AlgorithmType">
+    <xs:sequence>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <!-- <assign>：逐句赋值（引擎 components.rs assign 分支，实测 T1） -->
+        <xs:element name="assign" type="esml:AssignType"/>
+        <!-- <if condition="...">：condition 是**属性**（引擎 components.rs:311
+             attr_or(ch,"condition","") 读属性非子元素）；分支体 = 非 <else> 子元素
+             （components.rs:312-316），故 <then> 是可选壳。
+             算法段 <if> **不**用 <condition> 子元素（那是模型级 <if> 读点
+             model.rs:217-250，另一套，本单不动）。 -->
+        <xs:element name="if">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element name="assign" type="esml:AssignType"/>
+                <!-- <then> 壳：引擎 bug（T8 静默错算），不在 XSD 合法化；
+                     但引擎文档可出现 <then>（components.rs:312-316 非 <else> 子元素
+                     全当 then 体），本 schema 放行 <then> 以不假拒收合法文档。 -->
+                <xs:element name="then">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:choice minOccurs="0" maxOccurs="unbounded">
+                        <xs:element name="assign" type="esml:AssignType"/>
+                      </xs:choice>
+                    </xs:sequence>
+                    <xs:anyAttribute processContents="lax"/>
+                  </xs:complexType>
+                </xs:element>
+                <!-- <else> 壳：引擎 <if> 找 <else> 作为 else 分支
+                     （components.rs:318-322），<else> 内的子元素是 else 体。
+                     本 schema 放行 <else>（引擎 errors=0 接受它）。 -->
+                <xs:element name="else">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:choice minOccurs="0" maxOccurs="unbounded">
+                        <xs:element name="assign" type="esml:AssignType"/>
+                      </xs:choice>
+                    </xs:sequence>
+                    <xs:anyAttribute processContents="lax"/>
+                  </xs:complexType>
+                </xs:element>
+                <!-- <for>/<return>/嵌套 <if> 引擎也吃得下（exec_algorithm 递归），
+                     但本仓尚无对应示例，按 W14 不铺——写注释留待补 -->
+              </xs:choice>
+            </xs:sequence>
+            <xs:attribute name="condition" type="xs:string" use="optional"/>
+            <xs:anyAttribute processContents="lax"/>
+          </xs:complexType>
+        </xs:element>
+        <!-- <for var="i" in="lo..hi">：SPEC:241/1282/1298 写 in="lo..hi"
+             （方程级 <for> 读点 model.rs:527），`in` 是 canonical。
+             但**算法段** `<for>` 引擎只认 `range="a:b"`（components.rs:345），
+             `in=` 在此宿主被静默忽略（零次迭代、不报错、solve 得 0.0），
+             六拼法里唯一能算对的就是 `range="a:b"` 且无 <body> 壳——
+             静默错答，严重度高于普通拼写漂移。全表见
+             L8-function/algorithm-for.esml 头注；台账 engine-drift.tsv
+             attr algorithm-for 三行 + docs/coverage.md §5.3。
+             本 schema 声明 in 与 range 皆 optional：in 是 canonical，
+             range 是引擎算法段唯一有效拼写（见下表）。 -->
+        <xs:element name="for">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element name="assign" type="esml:AssignType"/>
+                <!-- <body> 壳：引擎 bug（T6 静默错算），不在 XSD 合法化；
+                     但引擎文档可出现 <body>（components.rs:345 直取 children），
+                     本 schema 放行 <body> 以不假拒收合法文档。 -->
+                <xs:element name="body">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:choice minOccurs="0" maxOccurs="unbounded">
+                        <xs:element name="assign" type="esml:AssignType"/>
+                      </xs:choice>
+                    </xs:sequence>
+                    <xs:anyAttribute processContents="lax"/>
+                  </xs:complexType>
+                </xs:element>
+
+              </xs:choice>
+            </xs:sequence>
+            <xs:attribute name="var" type="xs:string" use="optional"/>
+            <xs:attribute name="in" type="xs:string" use="optional"/>
+            <!-- range：引擎算法段唯一有效拼写（components.rs:345），
+                 `in` 在此宿主静默不算（零次迭代、不报错，见上方六拼法表）。
+                 台账 engine-drift.tsv attr algorithm-for 三行；
+                 canonical 拼写仍是 in（方程级 <for> 读 in，SPEC:241/1282/1298）。 -->
+            <xs:attribute name="range" type="xs:string" use="optional"/>
+            <xs:anyAttribute processContents="lax"/>
+          </xs:complexType>
+        </xs:element>
+        <!-- <return value="..."/>：引擎 components.rs return 分支，实测 T2/T3 -->
+        <xs:element name="return">
+          <xs:complexType>
+            <xs:attribute name="value" type="xs:string" use="optional"/>
+            <xs:anyAttribute processContents="lax"/>
+          </xs:complexType>
+        </xs:element>
+        <!-- <while condition="c">：SPEC:846-848 点名（规范意图），保留。
+             引擎 KNOWN_SUB_TAGS 无 while（unknown.rs），F7 拒收——引擎欠账，
+             已登记 engine-drift.tsv（child algorithm while lang-wins SPEC-L846）。
+             condition 改 optional default=false：SPEC 说仅常量 false 可处理，
+             false 是语义缺省，required 是无线据加严。 -->
+        <xs:element name="while">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element name="assign" type="esml:AssignType"/>
+              </xs:choice>
+            </xs:sequence>
+            <xs:attribute name="condition" type="xs:string" use="optional" default="false"/>
+            <xs:anyAttribute processContents="lax"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:sequence>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+  <xs:complexType name="AlgorithmThenType">
+    <xs:sequence>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="assign" type="esml:AssignType"/>
+      </xs:choice>
+    </xs:sequence>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+
+    <xs:complexType name="ExternType">
     <xs:attribute name="ffi" type="esml:FfiKindType" use="optional" default="c"/>
     <xs:attribute name="library" type="xs:string" use="required"/>
     <xs:attribute name="symbol" type="xs:string" use="required"/>
@@ -1011,14 +1318,20 @@
           <xs:element name="input" type="esml:FunctionInputType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
       </xs:element>
+      <!-- W9：`<outputs>`/`<locals>` 原来是 `xs:any processContents="skip"`
+           裸兜底（strict 闸下撤掉即红，且 skip 语义本身就在假装「内容不
+           校验」）。语料实测（2026-11）：`<output>` 形状 = `<output name [type=unit=]/>`，
+           与 `FunctionInputType` 同形（name required，type/unit optional）；
+           `<local>` 只有 `name=`（SPEC 附录 I：`<locals><local name="t"/>`）。
+           按实测封死，未知子元素自此响亮拒收。 -->
       <xs:element name="outputs" minOccurs="0">
         <xs:complexType><xs:sequence>
-          <xs:any processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="output" type="esml:FunctionInputType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
       </xs:element>
       <xs:element name="locals" minOccurs="0">
         <xs:complexType><xs:sequence>
-          <xs:any processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="local" type="esml:FunctionLocalType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
       </xs:element>
       <xs:choice minOccurs="0" maxOccurs="1">
@@ -1032,11 +1345,7 @@
           <xs:element name="derivative" type="esml:DerivativeType" minOccurs="0"/>
           <xs:element name="fd" type="esml:FdType" minOccurs="0"/>
         </xs:sequence>
-        <xs:element name="algorithm">
-          <xs:complexType mixed="true"><xs:sequence>
-            <xs:any processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
-          </xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
-        </xs:element>
+        <xs:element name="algorithm" type="esml:AlgorithmType"/>
       </xs:choice>
       <!-- `<partials>`（函数级偏导表）与 `<body>` **可共存**
            （见 examples/syntax/L3-model/partials.esml），故不能留在上面的

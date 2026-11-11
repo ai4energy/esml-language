@@ -855,9 +855,17 @@ kebab-case 拼写**不是合法语法**，报错（§2 收紧集）。
   重写变量的事件驱动。
 - 数组变量求和/极值：内建 `sum(X)` / `mean(X)` / `min(X)` / `max(X)` /
   `size(X)`（附录 F8）。
+- **算法段语句集**：`<algorithm>` 内的 `<assign name|path value>`、`<if condition>`+`<then>`/
+  `<else>`、`<for var in|range>`、`<return value>`、`<while condition>`。算法段降级为纯表达式
+  （静态展开：`assign` 代入、`if/else`→`ifelse`、常量 `for` 展开）。示例：
+  `L8-function/algorithm-for.esml`（`for`）、`algorithm-if.esml`（`if`）、`algorithm-return.esml`（`return`）。
+- **算法段 `return`**：`<algorithm>` 内的 `<return value="e"/>` 把函数返回值定为 `e`
+  （按当时绑定代入实参/局部量）；**多个 `<return>` 以最后一个为准**，`return` 之后的
+  `<assign>` 不影响返回值；**不写 `<return>`** 时取首个 `<outputs>` 的**最后一次赋值**
+  （两者都没有 ⇒ 响亮错误）。语义按引擎实测口径书写：`return value="5"` 于 `assign y=1`
+  之后 ⇒ 函数得 5（不是 1）。
 - **算法段 `while`**：`<algorithm>` 内的 `<while condition="c">…</while>`。
-  算法段降级为纯表达式（静态展开：`assign` 代入、`if/else`→`ifelse`、常量 `for` 展开），
-  故仅**常量 `false`** 条件可处理（零次迭代）；**运行时条件为响亮错误**（不支持运行时循环）。
+  仅**常量 `false`** 条件可处理（零次迭代）；**运行时条件为响亮错误**（不支持运行时循环）。
 - **向量/矩阵表达式（「不拍平」）**：物化前把向量/矩阵方程展开为逐标量方程。
   支持：数组字面量 `{e1,…}`、comprehension `{f(i) for i in a:b}`（含 `if…then…else` 三元，
   展开期折叠）、`linspace(a,b,n)`、`fill(v,n[,m])`、切片 LHS `der(T[2:n-1])`/`T[a:b]`、

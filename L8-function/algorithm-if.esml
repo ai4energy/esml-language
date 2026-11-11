@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点 `<if condition="…">…<else>…</else></if>` 算法段条件分支（属性形）。
+     规范条文：§7（算法段）。
+     引擎读 `<if>` 的 `condition` 属性（components.rs:311），非 `<else>` 子元素全当 then 体。
+     `check` errors=0；`solve` 验证 y=2（x=3 > 1，走 then 分支）。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L8_AlgorithmIf">
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
+  <functions>
+    <function name="f" returns="real">
+      <inputs><input name="x" type="real"/></inputs>
+      <outputs><output name="y" type="real"/></outputs>
+      <algorithm>
+        <if condition="x &gt; 1">
+          <assign name="y" value="2"/>
+        <else>
+          <assign name="y" value="0"/>
+        </else>
+        </if>
+      </algorithm>
+    </function>
+  </functions>
+  <modelTypes>
+    <modelType name="M" discipline="generic">
+      <parameters><parameter name="x" type="real" default="3.0"/></parameters>
+      <variables><variable name="y" type="real" role="algebraic"/></variables>
+      <equations><equation>y = f(x)</equation></equations>
+    </modelType>
+  </modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="M"/></instances>
+    <schedule><sequence><continueFor time="0"/></sequence></schedule>
+  </system></systems>
+</esml>
