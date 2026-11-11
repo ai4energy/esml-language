@@ -56,6 +56,17 @@ SPEC.md 是散文，没有「根清单」字段，只能从正文里抽。抽取
   R6  示例块 —— ```` ```xml ```` 代码块的**最外层**元素另行单列成
       「SPEC 示例顶层元素」表，并机验它至少在 XSD 里有同名声明
       （示例顶层写了个 XSD 里根本没声明的名字 ⇒ 一定是拼写漂移）。
+  R7  成员级「顶层」——「顶层」后面紧跟行内代码 span 且该 span 后**不是**「根」，
+      ⇒ 说的是某个元素的**成员段**（「顶层 `<solutionParameters>` 段」），不是文档根。
+  R8  「`<X>` 根」句式独占 —— 紧跟在「根」前面的那个 span 才是被声明的根；
+      同一子句里并列提到的别的 span 不算（§1.1 标题「（`<esml>` 根 ·
+      `<metadata>`）」里 `<metadata>` 只是骨架的一项）。
+  R9  「文档根 `<X>`」句式独占 —— 强根标记词（文档根 / 文档顶层 / 根清单 / 根元素 /
+      独立根 / 顶层声明 / 顶层壳 / 顶层）**紧跟**行内代码 span ⇒ 只有被标记
+      点名的 span 是被声明的根；同一子句**并列提到的**其它 span 不算（「三处宿主：
+      `<a>`、`<b>`、文档根 `<c>`」⇒ 只有 `c`）。标记与 span 之间只许空白；
+      标记后不是 span ⇒ 回落全抓（保守，宁可多报不假绿）。R8 优先：
+      「`<esml>` 根」这类先被 R8 命中。
 
 by-design 登记表
 --------------
@@ -66,7 +77,7 @@ by-design 登记表
 自证（`--self-test`）
 --------------------
 一个「检查器」如果对任何东西都说 OK，它和没有检查器等价。所以本脚本自带
-构造样例（**5 好 4 坏**）证明它**真的会红**：好树必须 0 红、坏树必须红，
+构造样例（**6 好 4 坏**）证明它**真的会红**：好树必须 0 红、坏树必须红，
 任一翻转都算自证失败。坏例正是两类历史事故的重演：
 人为**删一个根**（漏收）、人为**多一个根**（多收），外加 SPEC 侧的两种
 （声明了 XSD 不认的根 / canonical 有根而 SPEC 只字不提）。
@@ -75,7 +86,7 @@ by-design 登记表
 ----
     tools/check-spec-xsd-parity.py                # 全量对账；退出码 0 = 三方一致
     tools/check-spec-xsd-parity.py --report        # 附带 SPEC 根声明清单与证据行
-    tools/check-spec-xsd-parity.py --self-test     # 5 好 4 坏自证
+    tools/check-spec-xsd-parity.py --self-test     # 6 好 4 坏自证
 
 依赖：仅标准库（`xml.etree` / `re` / `argparse`）—— 不需要 lxml / xmllint。
 """
@@ -128,8 +139,18 @@ CLAUSE_SEP = "；;。，,\n"
 INLINE_CODE = re.compile(r"`([^`]+)`")
 BARE_LIST = re.compile(r"([A-Za-z][A-Za-z0-9]*(?:/[A-Za-z][A-Za-z0-9]*)+)")
 ELEMENT_NAME = re.compile(r"[a-z][A-Za-z0-9]*")
-# 「`<X>` 根」句式：span 后面紧跟「根」⇒ 这个 span 就是被声明的根。
+# 「`<X>` 根」句式（R8）：span 后面紧跟「根」⇒ 这个 span 就是被声明的根。
 SPAN_FOLLOWED_BY_ROOT = re.compile(r"^\s*根")
+# 「文档根 `<X>`」句式（R9）：强根标记词（文档根 / 文档顶层 / 根清单 / 根元素 /
+# 独立根 / 顶层声明 / 顶层壳 / 顶层）**紧跟**行内代码 span ⇒ 被声明的根是**那些
+# 被标记点名的 span**；同一子句里并列提到的其它 span 不算（「三处宿主：
+# `<a>`、`<b>`、文档根 `<c>`」里 `<a>`/`<b>` 只是并列宿主，不是根声明）。
+# 边界：标记词与 span 之间只许空白 —— 标点 / 其它文字 ⇒ 标记不归属这些 span，
+# 回落全抓（保守：宁可多报不假绿）。只收「指向文档根的」词形，不放宽到裸「根」
+# （「`<esml>` 根」（R8）、「可加库根」等其它句式各有其规则）。
+ROOT_BEFORE_SPAN = re.compile(
+    r"\b(文档根|文档顶层|根清单|根元素|独立根|顶层声明|顶层壳|顶层)\s*[*`]*`[^`]+`"
+)
 # 一段文字开头的行内代码 span（允许 `**` 粗体标记在前）。
 FIRST_SPAN = re.compile(r"[*`]*`([^`]+)`")
 
@@ -314,10 +335,15 @@ def extract_root_names(segment, allow_bare_list=False, require_marker=True):
       本身就是标记）；
     * 行内代码 span：能解析成 XML 就取根元素名，否则取最外层标签名；
     * allow_bare_list：额外收 `/` 分隔的裸列表（`units/variableTypes/…`）；
-    * **「`<X>` 根」句式独占**：紧跟在「根」前面的那个 span 才是被声明的根，
-      同一子句里并列提到的别的名字不算 —— §1.1 标题
+    * **「`<X>` 根」句式独占（R8）**：紧跟在「根」前面的那个 span 才是被声明的
+      根，同一子句里并列提到的别的名字不算 —— §1.1 标题
       「（`<esml>` 根 · `<metadata>`）」里 `<metadata>` 只是骨架的一项，
       不是「它是根」的声明。
+    * **「文档根 `<X>`」句式独占（R9）**：强根标记词（文档根 / 顶层 / …）
+      **紧跟**行内代码 span ⇒ 被标记点名的那些 span 才是被声明的根；同句并列
+      提到的其它 span 不算（「三处宿主：`<a>`、`<b>`、文档根 `<c>`」⇒ 只有 `c`）。
+      标记与 span 之间只许空白，否则回落全抓（保守，宁可多报不假绿）。
+      R8 优先：「`<esml>` 根」这类先被 R8 命中。
     """
     out = []
     for clause, spans in clauses_of(segment):
@@ -329,6 +355,19 @@ def extract_root_names(segment, allow_bare_list=False, require_marker=True):
             s for s, pos in spans
             if SPAN_FOLLOWED_BY_ROOT.match(segment[pos + len(s) + 2:])
         ]
+        if not anchored:
+            # R9：根标记词紧跟行内代码 span ⇒ 被标记点名的 span 算根；同句
+            # 并列提到的其它 span 不算。取子句内每个标记匹配里**那个 span** 的
+            # 文本（只按子句内的 span 集合匹配，防止跨子句串味）；点名的 span
+            # 之后紧跟 `/` / `、` / `·` 分隔符的并列 span 一并算（同一清单的
+            # 成员）；标记后不是 span ⇒ 回落全抓（保守，宁可多报不假绿）。
+            marked = []
+            for m in ROOT_BEFORE_SPAN.finditer(clause):
+                hit = next((s for s, _ in spans if s in m.group(0)), None)
+                if hit is None:
+                    continue
+                marked.append(hit)
+            anchored = marked
         for s in (anchored or [s for s, _ in spans]):
             out.extend(mentions_of(s))
         if allow_bare_list:
@@ -535,7 +574,7 @@ def report(data, fs, bydesign, stream):
 
 
 def self_test(stream):
-    """5 好 4 坏：好树必须 0 红，坏树必须红。任一翻转 = 自证失败。
+    """6 好 4 坏：好树必须 0 红，坏树必须红。任一翻转 = 自证失败。
 
     坏例照着历史事故重演：人为删一个根（漏收）、人为多一个根（多收）。
     """
@@ -601,6 +640,12 @@ def self_test(stream):
         ("好 5：并列提及不算根声明", True,
          ["esml", "units"], ["esml", "units"], ["esml", "units"],
          "\n### 1.1 文档骨架（`<esml>` 根 · `<metaSeg>`）\n"),
+        # 好 6：「文档根 `<X>`」句式独占（R9）——根标记词**在 span 前面**时，
+        #      只有被标记点名的 span 算根；同句并列提到的 `<a>`/`<b>` 不算。
+        #      拆掉 R9（标记词+紧跟 span 判根），`<a>`/`<b>` 漏进根声明集 → C3 变红。
+        ("好 6：根在 span 前时只有被点名者算根", True,
+         ["esml", "units"], ["esml", "units"], ["esml", "units"],
+         "\n三处宿主：`<a>`、`<b>`、文档根 `<esml>`。\n"),
         # ↓ 坏例
         ("坏 1：入口层删了一个根（漏收）", False,
          ["esml", "units"], ["esml"], ["esml", "units"], ""),
@@ -623,7 +668,7 @@ def self_test(stream):
             ok = not fs
             results.append((name, should_pass, ok, fs))
 
-    w("[self-test] 构造样例 5 好 4 坏 —— 证明本检查器真的会红\n")
+    w("[self-test] 构造样例 6 好 4 坏 —— 证明本检查器真的会红\n")
     failures = 0
     for name, should_pass, ok, fs in results:
         verdict = "PASS" if ok == should_pass else "BROKEN"
