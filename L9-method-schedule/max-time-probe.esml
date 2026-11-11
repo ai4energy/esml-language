@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 负例（预期失败）：`<continueUntil … max-time="10"/>` 用 kebab 拼法。它是 legacy
+     属性拼法，XSD 拒收：`ScheduleContinueUntilType` 上 `maxTime` 为 required，
+     只显式声明 camelCase，kebab `max-time=` 填不上必填位 ⇒ `missing required
+     attribute 'maxTime'`（lax 通配兜不住必填，故拒）。canonical 用
+     `maxTime=`，见 `L9-method-schedule/continue-until.esml` 正例。
+     非零退出是预期行为。
+     规范条文：附录 K（METHOD × Schedule 编排，`<continueUntil condition maxTime/>`）＋ 附录 C（v1.3.3 kebab `max-time` 退位）。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L9_MaxTimeProbe">
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
+  <modelTypes><modelType name="Ramp" discipline="generic">
+    <variables><variable name="x" type="real" role="state" initial="0.0"/></variables>
+    <equations><equation>Der(x) = 1.0</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="Ramp"/></instances>
+    <schedule><sequence>
+      <continueUntil condition="m.x &lt; 1.0" max-time="10"/>
+    </sequence></schedule>
+  </system></systems>
+</esml>
