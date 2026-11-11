@@ -1,0 +1,31 @@
+# 属性覆盖台账 —— XSD 命名属性 ↔ 示例用法 双向差集（W29，2026-11-11 当场重算登记）。
+# 列：kind  item(@属性名)  verdict  owner  evidence(一行可复核)
+# kind  值域：attribute（方向 A：XSD 声明了、非负例示例没写）/ example（方向 B：示例写了、XSD 未声明且不在 anyAttribute 宿主上）
+# verdict 值域：has-example（已落地，只作记录）/ pending（待落地）/ by-design（刻意如此，依据写清）
+#              covered（已有 attr-acceptance.tsv 行裁决 —— 指向它，本台账不重复登记）
+# owner  值域：W1 / W3 / W4 / engine-debt
+# 方向 A：pending 且 owner∈{W1,W3,W4} ⇒ 警告不红；owner=engine-debt ⇒ 红。
+#         covered ⇒ 不算缺（登记来源在 attr-acceptance.tsv，本闸只核闭合）。
+# 方向 B：by-design ⇒ 警告；落在 anyAttribute 宿主上的未声明属性 ⇒ 宽松放行（by-design，机判）。
+# 台账行必须与当天重算差集闭合：补了示例/声明 ⇒ 删行或改 verdict；闸门机判闭合，过时即红。
+# 共 10 行
+# pending：0 行（首版全部 covered / by-design，无 pending；方向 A 零示例 9 个：9 个 covered 指向
+# attr-acceptance.tsv（W25 derivative-analytic.esml 落了 @order 示例，原 @order by-design 行已删）；
+#
+# —— 方向 A：声明了、非负例示例零使用（10 个）。
+# 9 个已由 attr-acceptance.tsv 裁决（verdict=covered，指向它；本台账只记「已被裁决、不重复建」）。
+# @order 不在 attr-acceptance：它的两个宿主 <discretization>/<derivativeSymbol> 都带 xs:anyAttribute，
+# 且 basic:184-186 注释明说 method/order 是「扩展属性、不参与求解语义」⇒ by-design（不是编的，见 evidence 行号）。
+attribute	@aPart	covered	engine-debt	零示例；attr-acceptance.tsv 已裁决（connection，rejected-f7/engine-debt）⇒ 登记来源在那，本行只核闭合
+attribute	@bPart	covered	engine-debt	零示例；attr-acceptance.tsv 已裁决（connection，rejected-f7/engine-debt）⇒ 登记来源在那，本行只核闭合
+attribute	@domain	covered	engine-debt	零示例；attr-acceptance.tsv 已裁决（instance/modelType/system，no-example；portType，rejected-legacy）⇒ 登记来源在那
+attribute	@nominal	covered	engine-debt	零示例；attr-acceptance.tsv 已裁决（variable，rejected-f7/engine-debt）⇒ 登记来源在那，本行只核闭合
+attribute	@param	covered	engine-debt	零示例；attr-acceptance.tsv 已裁决（set，no-example/engine-debt）⇒ 登记来源在那，本行只核闭合
+attribute	@phase	covered	engine-debt	零示例；attr-acceptance.tsv 已裁决（clock，rejected-f7/engine-debt）⇒ 登记来源在那，本行只核闭合
+attribute	@quantity	covered	engine-debt	零示例；attr-acceptance.tsv 已裁决（variable，rejected-f7/engine-debt）⇒ 登记来源在那，本行只核闭合
+attribute	@side	covered	engine-debt	零示例；attr-acceptance.tsv 已裁决（port，rejected-legacy/no-example）⇒ 登记来源在那，本行只核闭合
+attribute	@synchronize	covered	engine-debt	零示例；attr-acceptance.tsv 已裁决（transition，rejected-ie/engine-debt）⇒ 登记来源在那，本行只核闭合
+#
+# —— 方向 B：非负例示例在用、XSD 未命名声明（1 个）。
+# @xmlns 是 XML 命名空间属性（https://www.ai4energy.cn/esml/v1），从不是 xs:attribute ⇒ by-design。
+example	@xmlns	by-design	W3	XML 命名空间属性，非 xs:attribute，XSD 无法声明它；所有示例根 <esml xmlns=…> 都写它
