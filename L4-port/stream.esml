@@ -1,17 +1,23 @@
 <?xml version="1.0"?>
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
-<!-- 语法点 端口变量 `portRole="stream"` 的 canonical 形态：`<portVariable name type
-     portRole="stream"/>`。旧的元素形态 `<stream name type/>` 已退役（解析期响亮拒收），
-     本例用 canonical 形态：Mix 进出组分直通 out.c = in.c。
-     规范条文：附录 F1（stream 流股）。
+<!-- 语法点 ① 端口变量 `portRole="stream"` 的 canonical 形态：
+     `<portVariable name type portRole="stream"/>`。旧的元素形态 `<stream name type/>`
+     已退役（解析期响亮拒收），本例用 canonical 形态：Mix 进出组分直通 out.c = in.c。
+     语法点 ② 端口 `portSet`（参数沿流股传播）：`<port … portSet="flow"/>`——
+     同模型同 portSet 参数等值；本例 in/out 两个 StreamPort 实例同属 `flow` 集，
+     即该 Mix 上沿 stream 流股传播的参数在这对端口间等值。
+     规范条文：① 附录 F1（stream 流股）；② 附录 B（续）PORTSET，§2.7。
      `check` errors=0（单实例 stream 对无回路，方程欠定，故本例只验声明与角色映射）。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_PortVarStream">
   <portTypes><portType name="StreamPort" connectorFamily="stream">
     <portVariable name="c" type="real" portRole="stream"/>
   </portType></portTypes>
   <modelTypes><modelType name="Mix">
-    <ports><port name="in"  portType="StreamPort"/><port name="out" portType="StreamPort"/></ports>
+    <ports>
+      <port name="in"  portType="StreamPort" portSet="flow"/>
+      <port name="out" portType="StreamPort" portSet="flow"/>
+    </ports>
     <variables>
       <variable name="in.c"  type="real" role="algebraic"/>
       <variable name="out.c" type="real" role="algebraic"/>
