@@ -283,10 +283,16 @@
     <xs:attribute name="value" type="xs:string" use="optional"/>
     <xs:anyAttribute processContents="lax"/>
   </xs:complexType>
+  <!-- `<onLoad>`：`<set>`（附录 F5 on_load 预设）+ `<fix>`/`<vary>`（SPEC:1526
+       METHOD FIX/VARY「`<system><methods><onLoad>` 内 `<fix name= value?/>`/`<vary name/>`，
+       与系统级 `<fixed>/<free>` 同一 FIX/FREE 路径）。choice 允许三者混排。 -->
   <xs:complexType name="MethodOnLoadType">
     <xs:sequence>
-      <xs:element name="set" type="esml:MethodSetType"
-                  minOccurs="0" maxOccurs="unbounded"/>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="set" type="esml:MethodSetType"/>
+        <xs:element name="fix" type="esml:MethodFixType"/>
+        <xs:element name="vary" type="esml:MethodVaryType"/>
+      </xs:choice>
     </xs:sequence>
     <xs:anyAttribute processContents="lax"/>
   </xs:complexType>
@@ -548,7 +554,15 @@
   </xs:complexType>
   <xs:complexType name="InstRefType">
       <xs:sequence>
-        <xs:element name="set" type="xs:anyType" minOccurs="0" maxOccurs="unbounded"/>
+        <!-- 实例级初值覆盖 `<set path=… value?=…/>`（SPEC:427 实例覆盖；
+             SetType 定义在 project.xsd 跨 include 不可引用 ⇒ 就地内联同名形状）。 -->
+        <xs:element name="set" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:attribute name="path" type="xs:string" use="required"/>
+            <xs:attribute name="value" type="xs:string" use="optional"/>
+            <xs:anyAttribute processContents="lax"/>
+          </xs:complexType>
+        </xs:element>
       </xs:sequence>
     <xs:attribute name="name" type="esml:Ident" use="required"/>
     <xs:attribute name="type" type="xs:string" use="required"/>
@@ -658,8 +672,26 @@
       <xs:element name="initial" type="esml:ModelInitialType" minOccurs="0" maxOccurs="1"/>
       <!-- L-ANNOT：图形/图标/摆位/端口落点；不进语义，求解器忽略；可多份并列 -->
       <xs:element name="annotation" type="esml:AnnotationType" minOccurs="0" maxOccurs="unbounded"/>
-      <!-- 选择器（规范附录 SELECTOR / CASE·STN）：<selectors><selector …/></selectors> -->
-      <xs:element name="selectors" type="xs:anyType" minOccurs="0" maxOccurs="unbounded"/>
+      <!-- 选择器（规范附录 SELECTOR / CASE·STN；示例 L3-model/selector-values.esml）：
+           <selectors><selector name=…><values><value>…</value>*</values><default>…</default></selector>*</selectors> -->
+      <xs:element name="selectors" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType><xs:sequence>
+          <xs:element name="selector" minOccurs="0" maxOccurs="unbounded">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="values" minOccurs="0">
+                  <xs:complexType><xs:sequence>
+                    <xs:element name="value" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                  </xs:sequence></xs:complexType>
+                </xs:element>
+                <xs:element name="default" type="xs:string" minOccurs="0"/>
+              </xs:sequence>
+              <xs:attribute name="name" type="xs:string" use="optional"/>
+              <xs:anyAttribute processContents="lax"/>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence></xs:complexType>
+      </xs:element>
       <!-- 基类（子元素文本，逗号分隔）。canonical 拼法是 camelCase `extendsFrom`
            （规范 §4.0）；kebab `extends-from` 不是合法语法，不在此声明。 -->
       <xs:choice minOccurs="0" maxOccurs="unbounded">
@@ -682,13 +714,14 @@
       </xs:element>
       <xs:element name="equations" minOccurs="0">
         <xs:complexType><xs:choice minOccurs="0" maxOccurs="unbounded">
-          <!-- 选择器 <case>（规范附录 SELECTOR / CASE·STN） -->
-          <xs:element name="case" type="xs:anyType" minOccurs="0" maxOccurs="unbounded"/>
+          <!-- 选择器 <case on=>（规范附录 SELECTOR / CASE·STN；示例 L2-discrete/case-branch.esml） -->
+          <xs:element name="case" type="esml:EquationCaseType" minOccurs="0" maxOccurs="unbounded"/>
           <!-- 模型级条件 <if>（规范附录「模型级 IF」：对称可逆，两分支 lhs 须一致，
-               语义为 lhs = ifelse(c, rhsA, rhsB)） -->
-          <xs:element name="if" type="xs:anyType" minOccurs="0" maxOccurs="unbounded"/>
-          <!-- 方程级 <for var in="lo..hi"> 循环（规范附录「FOR 循环」）。 -->
-          <xs:element name="for" type="xs:anyType" minOccurs="0" maxOccurs="unbounded"/>
+               语义为 lhs = ifelse(c, rhsA, rhsB)；示例 L3-model/if.esml） -->
+          <xs:element name="if" type="esml:EquationIfType" minOccurs="0" maxOccurs="unbounded"/>
+          <!-- 方程级 <for var in="lo..hi"> 循环（规范附录「FOR 循环」；
+               示例 L1-expr-equation/for-in.esml） -->
+          <xs:element name="for" type="esml:EquationForType" minOccurs="0" maxOccurs="unbounded"/>
           <xs:element name="equation" minOccurs="0" maxOccurs="unbounded">
             <xs:complexType mixed="true">
               <xs:sequence><xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/></xs:sequence>
@@ -719,14 +752,15 @@
       <xs:element name="connections" minOccurs="0">
         <xs:complexType><xs:choice minOccurs="0" maxOccurs="unbounded">
           <xs:element name="connection" type="esml:ConnectType" minOccurs="0" maxOccurs="unbounded"/>
-          <!-- 连接级 <for var in=…> 循环（规范 §7） -->
-          <xs:element name="for" type="xs:anyType" minOccurs="0" maxOccurs="unbounded"/>
+          <!-- 连接级 <for var in=…> 循环（规范 §7；形状同方程级，body 收 <connection>） -->
+          <xs:element name="for" type="esml:EquationForType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:choice></xs:complexType>
       </xs:element>
       <xs:element name="methods" type="esml:MethodsType" minOccurs="0"/>
-    
-      <!-- 严格层此前未声明/顺序敏感；xs:anyType 占位，待细化 -->
-      <xs:element name="discrete" type="xs:anyType" minOccurs="0" maxOccurs="unbounded"/>
+
+      <!-- 离散段 `<discrete><variable …/></discrete>`（示例 L2-discrete/elsewhen.esml
+           等三件：段内只声明离散变量，when/events 在 <events> 宿主另行收）。 -->
+      <xs:element name="discrete" type="esml:DiscreteSegmentType" minOccurs="0" maxOccurs="unbounded"/>
       <xs:element name="events" minOccurs="0" maxOccurs="unbounded">
         <xs:complexType>
           <!-- `<elsewhen>` 与 `<when>` 平级（`WhenType` 自身另可嵌套 elsewhen，
@@ -792,12 +826,107 @@
     </xs:sequence>
     <xs:attribute name="instance" type="esml:Ident" use="required"/>
   </xs:complexType>
+  <!-- `<equation>` 共用内容模型（mixed 文本 + name/description 属性 + lax 通配，
+       与原模型级/系统级 equations choice 内的匿名声明逐字一致）。 -->
+  <xs:complexType name="EquationType" mixed="true">
+    <xs:sequence>
+      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="optional"/>
+    <xs:attribute name="description" type="xs:string" use="optional"/>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+  <!-- 方程级 <case on=…>：`<branch value=…><equation>…</equation></branch>*`
+       （规范附录 SELECTOR / CASE·STN；示例 L2-discrete/case-branch.esml）。 -->
+  <xs:complexType name="EquationCaseType">
+    <xs:sequence>
+      <xs:element name="branch" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType><xs:sequence>
+          <xs:element name="equation" type="esml:EquationType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="value" type="xs:string" use="optional"/>
+        <xs:anyAttribute processContents="lax"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="on" type="xs:string" use="optional"/>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+  <!-- 模型/系统级 <if>：`<condition>…</condition><then><equation>…` + `<else>`
+       （规范附录「模型级 IF」；示例 L3-model/if.esml）。`condition` 是**元素**
+       （非属性）——属性形 `<if condition=>` 是算法段 if，另一套，不在本宿主。 -->
+  <xs:complexType name="EquationIfType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="condition" type="esml:ConditionType"/>
+      <xs:element name="then">
+        <xs:complexType><xs:sequence>
+          <xs:element name="equation" type="esml:EquationType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
+      </xs:element>
+      <xs:element name="else">
+        <xs:complexType><xs:sequence>
+          <xs:element name="equation" type="esml:EquationType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
+      </xs:element>
+    </xs:choice>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+  <!-- 方程/连接级 <for var=… in=…|range=…>：直接 `<equation>` 或经 `<body>` 包裹
+       两种拼法等价（for-in.esml 头注）；连接级宿主内收 `<connection>`。
+       （规范附录「FOR 循环」；示例 L1-expr-equation/for-in.esml。） -->
+  <xs:complexType name="EquationForType">
+    <xs:sequence>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="equation" type="esml:EquationType"/>
+        <xs:element name="connection" type="esml:ConnectType"/>
+        <xs:element name="body">
+          <xs:complexType><xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+              <xs:element name="equation" type="esml:EquationType"/>
+              <xs:element name="connection" type="esml:ConnectType"/>
+            </xs:choice>
+          </xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:sequence>
+    <xs:attribute name="var" type="xs:string" use="optional"/>
+    <xs:attribute name="in" type="xs:string" use="optional"/>
+    <xs:attribute name="range" type="xs:string" use="optional"/>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+  <!-- <discrete> 段：声明离散变量（示例 L2-discrete/elsewhen.esml 等
+       `<discrete><variable name=… type=… default=…/></discrete>`），
+       属性同 VariableDeclType 的子集。 -->
+  <xs:complexType name="DiscreteSegmentType">
+    <xs:sequence>
+      <xs:element name="variable" type="esml:VariableDeclType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
   <xs:complexType name="SystemType">
     <xs:choice minOccurs="0" maxOccurs="unbounded">
       <!-- L-ANNOT：图形/图标/摆位/端口落点；不进语义，求解器忽略；可多份并列 -->
       <xs:element name="annotation" type="esml:AnnotationType" minOccurs="0" maxOccurs="unbounded"/>
-      <!-- 初始选择器（规范 §135 / 附录 SELECTOR）：system 级初值选择 -->
-      <xs:element name="initialSelectors" type="xs:anyType" minOccurs="0" maxOccurs="unbounded"/>
+      <!-- 初始选择器（SPEC:1279 / 附录 SELECTOR；示例 L3-model/selector-values.esml
+           系统级段）：<initialSelectors><scope instance=…><initialSelector path= value?/></scope>*</initialSelectors> -->
+      <xs:element name="initialSelectors" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType><xs:sequence>
+          <xs:element name="scope" minOccurs="0" maxOccurs="unbounded">
+            <xs:complexType><xs:sequence>
+              <xs:element name="initialSelector" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:attribute name="path" type="xs:string" use="required"/>
+                  <xs:attribute name="value" type="xs:string" use="optional"/>
+                  <xs:anyAttribute processContents="lax"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="instance" type="esml:Ident" use="required"/>
+            <xs:anyAttribute processContents="lax"/>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence></xs:complexType>
+      </xs:element>
       <!-- partition 表（稳定小 id，供 instances/links 引用）。 -->
       <xs:element name="partitions" minOccurs="0">
         <xs:complexType><xs:sequence>
@@ -812,8 +941,8 @@
       <xs:element name="connections" minOccurs="0">
         <xs:complexType><xs:choice minOccurs="0" maxOccurs="unbounded">
           <xs:element name="connection" type="esml:ConnectType" minOccurs="0" maxOccurs="unbounded"/>
-          <!-- 连接级 <for var in=…> 循环（规范 §7） -->
-          <xs:element name="for" type="xs:anyType" minOccurs="0" maxOccurs="unbounded"/>
+          <!-- 连接级 <for var in=…> 循环（规范 §7；形状同模型级） -->
+          <xs:element name="for" type="esml:EquationForType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:choice></xs:complexType>
       </xs:element>
       <xs:element name="links" minOccurs="0">
@@ -825,12 +954,12 @@
            （build 期折为 `inst__var`）。 -->
       <xs:element name="equations" minOccurs="0">
         <xs:complexType><xs:choice minOccurs="0" maxOccurs="unbounded">
-          <!-- 选择器 <case>（规范附录 SELECTOR / CASE·STN） -->
-          <xs:element name="case" type="xs:anyType" minOccurs="0" maxOccurs="unbounded"/>
-          <!-- 系统级条件 <if>（语义同 modelType 级）。 -->
-          <xs:element name="if" type="xs:anyType" minOccurs="0" maxOccurs="unbounded"/>
-          <!-- 系统级 <for> 方程循环（规范附录「FOR 循环」） -->
-          <xs:element name="for" type="xs:anyType" minOccurs="0" maxOccurs="unbounded"/>
+          <!-- 选择器 <case on=>（规范附录 SELECTOR / CASE·STN；形状同模型级，SPEC §6.6） -->
+          <xs:element name="case" type="esml:EquationCaseType" minOccurs="0" maxOccurs="unbounded"/>
+          <!-- 系统级条件 <if>（语义同 modelType 级；SPEC §6.6） -->
+          <xs:element name="if" type="esml:EquationIfType" minOccurs="0" maxOccurs="unbounded"/>
+          <!-- 系统级 <for> 方程循环（规范附录「FOR 循环」；SPEC §6.6） -->
+          <xs:element name="for" type="esml:EquationForType" minOccurs="0" maxOccurs="unbounded"/>
           <xs:element name="equation" minOccurs="0" maxOccurs="unbounded">
             <xs:complexType mixed="true">
               <xs:sequence><xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/></xs:sequence>
@@ -915,12 +1044,152 @@
         </xs:sequence></xs:complexType>
       </xs:element>
     
-      <!-- 严格层此前未声明/顺序敏感；xs:anyType 占位，待细化 -->
-      <xs:element name="extendsFrom" type="xs:anyType" minOccurs="0" maxOccurs="unbounded"/>
-      <xs:element name="initialisationProcedures" type="xs:anyType" minOccurs="0" maxOccurs="unbounded"/>
-      <xs:element name="connectRules" type="xs:anyType" minOccurs="0" maxOccurs="unbounded"/>
-      <xs:element name="observe" type="xs:anyType" minOccurs="0" maxOccurs="unbounded"/>
-      <xs:element name="presets" type="xs:anyType" minOccurs="0" maxOccurs="unbounded"/>
+      <!-- 系统级继承：拼写单轨同模型级 `<extendsFrom>` 文本（§4.0 继承）；
+           仓内暂无系统级示例（模型级见 L3-model/extendsfrom*.esml），形状按同拼法文本。 -->
+      <xs:element name="extendsFrom" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+      <!-- 初始化过程表（SPEC §6.7 表；示例 L2-discrete/initialisationprocedures.esml
+           / initialisationprocedure-advance.esml）：
+           <initialisationProcedures><initialisationProcedure name=…>
+             <use><unit name= procedure=?/></use>
+             <start><set|assign|selector|replace path= value?/>*</start>
+             <next><moveTo|jumpTo><set …/></moveTo|jumpTo><advance|complete unit=?/></next>
+           </initialisationProcedure>*</initialisationProcedures> -->
+      <xs:element name="initialisationProcedures" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType><xs:sequence>
+          <xs:element name="initialisationProcedure" minOccurs="0" maxOccurs="unbounded">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="use" minOccurs="0">
+                  <xs:complexType><xs:sequence>
+                    <xs:element name="unit" minOccurs="0" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:attribute name="name" type="xs:string" use="optional"/>
+                        <xs:attribute name="procedure" type="xs:string" use="optional"/>
+                        <xs:anyAttribute processContents="lax"/>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
+                </xs:element>
+                <xs:element name="start" minOccurs="0">
+                  <xs:complexType><xs:sequence>
+                    <xs:choice minOccurs="0" maxOccurs="unbounded">
+                      <xs:element name="set"><xs:complexType>
+                        <xs:attribute name="path" type="xs:string" use="required"/>
+                        <xs:attribute name="value" type="xs:string" use="optional"/>
+                        <xs:anyAttribute processContents="lax"/>
+                      </xs:complexType></xs:element>
+                      <xs:element name="assign"><xs:complexType>
+                        <xs:attribute name="path" type="xs:string" use="required"/>
+                        <xs:attribute name="value" type="xs:string" use="optional"/>
+                        <xs:anyAttribute processContents="lax"/>
+                      </xs:complexType></xs:element>
+                      <xs:element name="selector"><xs:complexType>
+                        <xs:attribute name="path" type="xs:string" use="required"/>
+                        <xs:attribute name="value" type="xs:string" use="optional"/>
+                        <xs:anyAttribute processContents="lax"/>
+                      </xs:complexType></xs:element>
+                      <xs:element name="replace"><xs:complexType>
+                        <xs:attribute name="path" type="xs:string" use="required"/>
+                        <xs:attribute name="value" type="xs:string" use="optional"/>
+                        <xs:anyAttribute processContents="lax"/>
+                      </xs:complexType></xs:element>
+                    </xs:choice>
+                  </xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
+                </xs:element>
+                <xs:element name="next" minOccurs="0">
+                  <xs:complexType><xs:sequence>
+                    <xs:choice minOccurs="0" maxOccurs="unbounded">
+                      <xs:element name="moveTo"><xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="set" minOccurs="0" maxOccurs="unbounded">
+                            <xs:complexType>
+                              <xs:attribute name="path" type="xs:string" use="required"/>
+                              <xs:attribute name="value" type="xs:string" use="optional"/>
+                              <xs:anyAttribute processContents="lax"/>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence><xs:anyAttribute processContents="lax"/>
+                      </xs:complexType></xs:element>
+                      <xs:element name="jumpTo"><xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="set" minOccurs="0" maxOccurs="unbounded">
+                            <xs:complexType>
+                              <xs:attribute name="path" type="xs:string" use="required"/>
+                              <xs:attribute name="value" type="xs:string" use="optional"/>
+                              <xs:anyAttribute processContents="lax"/>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence><xs:anyAttribute processContents="lax"/>
+                      </xs:complexType></xs:element>
+                      <xs:element name="advance"><xs:complexType>
+                        <xs:attribute name="unit" type="xs:string" use="optional"/>
+                        <xs:anyAttribute processContents="lax"/>
+                      </xs:complexType></xs:element>
+                      <xs:element name="complete"><xs:complexType>
+                        <xs:attribute name="unit" type="xs:string" use="optional"/>
+                        <xs:anyAttribute processContents="lax"/>
+                      </xs:complexType></xs:element>
+                    </xs:choice>
+                  </xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
+                </xs:element>
+              </xs:sequence>
+              <xs:attribute name="name" type="xs:string" use="optional"/>
+              <xs:anyAttribute processContents="lax"/>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence></xs:complexType>
+      </xs:element>
+      <!-- 连接规则表（SPEC:1366 附录 F4；示例 L6-connect/connect-rules.esml）：
+           <connectRules><rule from= to=/>*</connectRules>，from/to 为规范明写必填。 -->
+      <xs:element name="connectRules" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType><xs:sequence>
+          <xs:element name="rule" minOccurs="0" maxOccurs="unbounded">
+            <xs:complexType>
+              <xs:attribute name="from" type="xs:string" use="required"/>
+              <xs:attribute name="to" type="xs:string" use="required"/>
+              <xs:anyAttribute processContents="lax"/>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
+      </xs:element>
+      <!-- 观察列表（SPEC §6.10；示例 L0-type-unit/observe-list.esml）：
+           <observe name=?><var path= name?/>*</observe> -->
+      <xs:element name="observe" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType><xs:sequence>
+          <xs:element name="var" minOccurs="0" maxOccurs="unbounded">
+            <xs:complexType>
+              <xs:attribute name="path" type="xs:string" use="required"/>
+              <xs:attribute name="name" type="xs:string" use="optional"/>
+              <xs:anyAttribute processContents="lax"/>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute name="name" type="xs:string" use="optional"/>
+        <xs:anyAttribute processContents="lax"/>
+      </xs:complexType>
+      </xs:element>
+      <!-- 方法级预设（SPEC §6.10；示例 L9-method-schedule/fixed-preset.esml）：
+           <presets><scope instance=…><preset path= value? lower? upper?/></scope>*</presets> -->
+      <xs:element name="presets" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType><xs:sequence>
+          <xs:element name="scope" minOccurs="0" maxOccurs="unbounded">
+            <xs:complexType><xs:sequence>
+              <xs:element name="preset" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:attribute name="path" type="xs:string" use="required"/>
+                  <xs:attribute name="value" type="xs:string" use="optional"/>
+                  <xs:attribute name="lower" type="xs:string" use="optional"/>
+                  <xs:attribute name="upper" type="xs:string" use="optional"/>
+                  <xs:anyAttribute processContents="lax"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="instance" type="esml:Ident" use="required"/>
+            <xs:anyAttribute processContents="lax"/>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence><xs:anyAttribute processContents="lax"/></xs:complexType>
+      </xs:element>
 </xs:choice>
     <xs:attribute name="name" type="esml:Ident" use="required"/>
     <!-- `domain` 是否退役留待单轨复核（SPEC L186 用 `discipline=`；引擎 XSD 亦用 `domain`）。 -->
