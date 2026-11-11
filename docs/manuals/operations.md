@@ -1,7 +1,7 @@
 # 语言规范运维手册
 
 > 适用：维护规范/XSD/示例的持续一致性，处置版本漂移与门红。
-> 最后核对：2026-10-30（v1.3.3）。
+> 最后核对：2026-11-11（v1.3.3）。
 
 ## 1. 日常巡检
 
@@ -21,6 +21,13 @@ python3 docs/validate_roots.py selftest
 | 示例五检查 | `docs/validate_examples.py` | 规范与示例不同步 |
 | 双 schema | `tools/check-examples.py` | 入口 lax 放过、canonical 拒收 |
 | 负例登记 | `tools/negatives.tsv` | 判据退化/文件漂移 |
+| 跨仓 XSD 漂移闸 | `tools/check-engine-xsd-parity.py` + `tools/engine-drift.tsv` | 本仓 `xsd/` 与引擎仓 schema 有分歧且台账未裁决（缺引擎仓时跳过） |
+| 元素覆盖双向闸 | `tools/check-element-coverage.py` + `tools/element-coverage.tsv` | XSD 元素声明 ⇄ 示例用法差集未闭合（台账没跟上） |
+| 属性覆盖双向闸 | `tools/check-attr-coverage.py` + `tools/attr-coverage.tsv`（登记来源 `attr-acceptance.tsv`） | XSD 属性声明 ⇄ 示例用法差集未闭合 |
+| 引擎 × 示例可运行性闸 | `tools/check-engine-examples.py` + `tools/engine-example-debt.tsv` | 非负例示例 `esml check` 有错且台账没登记 / 台账 errors 数与实测不符（缺引擎仓时跳过） |
+
+五张台账（element-coverage / attr-coverage / attr-acceptance / engine-drift / engine-example-debt）
+各管一件事、互不重叠；owner 语义（`W1`/`W3`/`W4` 警告不红 vs `engine-debt` 红）见 development.md 台账表。
 
 负例是**棘轮**：标 `schema` 的负例必须被 XSD 拒收；它变绿说明判据漏了。
 
@@ -51,6 +58,9 @@ python3 docs/validate_roots.py selftest
 | 负例变绿 | 补 XSD/校验；确认不是把负例误改成好例 |
 | 引擎不认新元素 | 子模块指针未 bump 或引擎未实现；先查指针 |
 | 下游库/书大面积红 | 多半是拼写收窄；给迁移说明，不要回退判据 |
+| 跨仓 XSD 漂移闸红 | 本仓 `xsd/` 与引擎仓有分歧且 `engine-drift.tsv` 没裁决 ⇒ 补台账行写明依据；分歧已消解决策可删该行（不炸）。缺引擎仓时本闸打印「跳过」不算红 |
+| 元素/属性覆盖闸红 | 台账没跟上当天差集 ⇒ 当场重算差集，补行（pending / by-design）或把已消解的行删掉；`covered` 行必须指向 attr-acceptance 已有行，别重复建 |
+| 引擎可运行性闸红 | 某非负例 `esml check` 有错而台账没登记 ⇒ 补 `engine-example-debt.tsv` 行（owner `engine-debt`、errors 数写实测值）；台账 errors 数与实测不符 ⇒ 引擎或示例变了，台账没跟上，重跑更新；缺引擎仓时本闸打印「跳过」不算红 |
 
 ## 6. 备份与恢复
 
