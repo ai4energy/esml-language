@@ -29,6 +29,7 @@
 | `tools/check-element-coverage.py` | 元素覆盖双向闸：XSD 命名元素 ⇄ 非负例示例用法，台账 `tools/element-coverage.tsv`（第 4 道；仅标准库） |
 | `tools/check-attr-coverage.py` | 属性覆盖双向闸：XSD 命名属性 ⇄ 非负例示例用法，台账 `tools/attr-coverage.tsv`（第 5 道；仅标准库） |
 | `tools/check-engine-examples.py` | 引擎 × 示例可运行性闸：逐件 `esml check` 非负例，台账 `tools/engine-example-debt.tsv`（第 6 道；缺引擎仓时跳过） |
+| `tools/check-example-expectations.py` | 示例「期望值」台账闸：逐台账行实跑引擎、解析变量值、与台账 `value` 按 `tol` 比对；台账 `tools/example-expectations.tsv`（第 8 道；缺引擎仓时跳过） |
 
 台账六张（前五张与上面脚本一一对应，各管一件事、互不重叠；`solve-smoke.tsv` 为普查台账，无对应闸脚本，口径见行内说明）：
 
@@ -52,17 +53,18 @@
 ## 4. 校验命令
 
 ```sh
-make check                                  # 七道闸全跑，任一红即非零
+make check                                  # 八道闸全跑，任一红即非零
 make roots                                  # 只跑根矩阵
 make examples                               # 只跑示例
 make selftest                               # 根矩阵好例/坏例自证
 make strict                                 # 撤通配判别力闸（--strict，需 xmlschema）
 make elements                               # 只跑元素覆盖双向闸
 make spec-elements                          # 只跑 XSD 声明 ⇄ SPEC 点名闸
+make expectations                           # 只跑示例「期望值」台账闸
 .venv/bin/python tools/check-examples.py --self-test
 ```
 
-`make check` 的七道闸（顺序即 Makefile 行序）：
+`make check` 的八道闸（顺序即 Makefile 行序）：
 
 1. `docs/validate_roots.py` —— 根矩阵：入口根集合 ⇄ canonical 全局元素、注释清单、SPEC §13 表。
 2. `docs/validate_examples.py` —— 规范 ⇄ 示例五道检查（需 xmlschema）。
@@ -71,6 +73,7 @@ make spec-elements                          # 只跑 XSD 声明 ⇄ SPEC 点名�
 5. `tools/check-attr-coverage.py` —— 属性覆盖双向闸（仅标准库）。
 6. `tools/check-engine-examples.py` —— 引擎 × 示例可运行性闸（需引擎仓；**缺引擎仓时打印「跳过」rc=0**）。
 7. `tools/check-spec-element-coverage.py` —— XSD 声明元素 ⇄ SPEC 正文点名闸（仅标准库）。
+8. `tools/check-example-expectations.py` —— 示例「期望值」台账闸（需引擎仓；**缺引擎仓时打印「跳过」rc=0**）。
 
 示例的引擎冒烟（跨仓，不在本仓门内）：
 
