@@ -31,11 +31,11 @@ element	component	instance	复合成员 / 实例位的 legacy 元素名
 element	components	modelTypes	复数容器另有其名
 element	compute-tasks	computeTasks	kebab 容器
 element	connect	connection	连接元素的 legacy 元素名
-element	connect-block	connectBlock	待入：kebab 容器（实现侧 owner 裁决；本仓 XSD 尚未收）
-element	connect-port	connectPort	待入：kebab 拼写（无连字符的 connectport 是另一条 legacy）
-element	connect-rule	connectRules	待入：SPEC 附录 F4 的容器拼法是复数 <connectRules>
-element	connect-rules	connectRules	待入：kebab 复数容器
-element	connectRule	connectRules	待入：camelCase 单数同样不是合法拼法（容器是复数）
+element	connect-block	connectBlock	待入：kebab 容器（实现侧 owner 裁决；本仓 XSD 未声明 <connectBlock>）
+element	connect-port	connectPort	待入：kebab 拼写（本仓 XSD 未声明 <connectPort>；无连字符的 connectport 是另一条 legacy）
+element	connect-rule	connectRules	kebab 单数拼写；canonical 容器 <connectRules> 已声明（basic:1153，system 内成员）；注件实测拒收
+element	connect-rules	connectRules	kebab 复数拼写；canonical 容器 <connectRules> 已声明（basic:1153，system 内成员）；注件实测拒收
+element	connectRule	connectRules	驼峰单数拼写不是合法拼法（容器是复数 <connectRules>，basic:1153）；注件实测拒收
 element	connectport	connection	无连字符的 legacy 元素名
 element	continue-for	continueFor	kebab 拼写
 element	control-vars	controlVars	kebab 容器
@@ -43,7 +43,7 @@ element	design-vars	designVars	kebab 容器
 element	bind	set	实例覆盖的 legacy 元素名（SPEC:122/427 明写「<bind name= value=> → 报错」；canonical 是 <set path= value=>）
 element	computetask	task	任务条目单数的 legacy 元素名（SPEC:694-695 明写「<computeTask> 在任何 schema 里都不存在，一律拒绝」；canonical 是 <computeTasks> 容器内的 <task>）
 element	constant	portVariable	旧元素形端口变量（与 <flow>/<potential>/<stream> 同批，SPEC:131/1210 明写「元素形已退役、解析期拒收」；canonical 是 <portVariable> 属性形）
-element	constants	constantVariables	待入：kebab 容器（SPEC:1248 明写「带 <constants>/<initialisation-procedures> 等旧容器」拒收；canonical 容器名以 §4/§5 为准，本仓 XSD 尚未声明该语法点）
+element	constants	constantVariables	待入：kebab 容器（SPEC:1248 明写「带 <constants> 等旧容器」拒收；本仓 XSD 未声明 <constantVariables>）
 element	connectortype	connection	连接类型参数的 legacy 元素名（SPEC:1463 表行与 <portSet> 并列旧名；canonical 是 <connection> + portSet 属性）
 element	duration	tspan	段长的 legacy 元素名（SPEC:697 明写「没有 <duration> 这种元素」；段长 canonical 拼法是 <tspan from to/>）
 element	discretes	stateMachine	MathML 混合状态机旧容器（SPEC:1247/1254 明写「旧文档里的 legacy 形态」；canonical 状态机拼法见 state-machine/state-machines 行）
@@ -51,12 +51,12 @@ element	flow	portVariable	旧元素形端口变量（SPEC:131/1190/1210 明写�
 element	extends-from	extendsFrom	kebab 元素名
 element	foreign-objects	foreignObjects	kebab 容器
 element	hyper-params	hyperParams	kebab 容器
-element	initialisation-procedure	initialisationProcedure	待入：kebab 拼写
-element	initialisation-procedures	initialisationProcedures	待入：kebab 容器
-element	initialisationprocedure	initialisationProcedure	待入：全小写拼写
+element	initialisation-procedure	initialisationProcedure	kebab 单数拼写；canonical <initialisationProcedure> 已声明（basic:1068）；注件实测拒收
+element	initialisation-procedures	initialisationProcedures	kebab 容器拼写；canonical <initialisationProcedures> 已声明（basic:1066）；注件实测拒收
+element	initialisationprocedure	initialisationProcedure	全小写拼写；canonical <initialisationProcedure> 已声明（basic:1068）；注件实测拒收
 element	interfaces	portTypes	复数容器另有其名
-element	jump-to	jumpTo	待入：kebab 拼写
-element	jumpto	jumpTo	待入：全小写拼写
+element	jump-to	jumpTo	kebab 拼写；canonical <jumpTo> 已声明（basic:1122）；注件实测拒收
+element	jumpto	jumpTo	全小写拼写；canonical <jumpTo> 已声明（basic:1122）；注件实测拒收
 element	link	crosslink	跨分区边界边的 legacy 元素名
 element	model-instance	instance	实例元素的 legacy 元素名
 element	modeltype	modelType	驼峰大小写变体（SPEC:82 明写「camelCase 书写」，§2 收紧集把 <model-types> 等 kebab/大小写变体一律点名非合法语法；与 model-type/model-types 行同宿主）
@@ -70,8 +70,8 @@ element	model-type	modelType	类型声明的 legacy 元素名
 element	model-types	modelTypes	kebab 容器
 element	modelinstance	instance	实例元素的 legacy 元素名
 element	models	modelTypes	复数容器另有其名
-element	move-to	moveTo	待入：kebab 拼写
-element	moveto	moveTo	待入：全小写拼写
+element	move-to	moveTo	kebab 拼写；canonical <moveTo> 已声明（basic:1111）；注件实测拒收
+element	moveto	moveTo	全小写拼写；canonical <moveTo> 已声明（basic:1111）；注件实测拒收
 element	ordered-set	orderedSet	单数容器
 element	ordered-sets	orderedSet	kebab 拼写；本仓序集只有单数拼法
 element	orderedSets	orderedSet	复数容器不是合法语法（入口 schema 明写）
@@ -83,18 +83,18 @@ element	record-type	recordType	记录类型声明的 legacy 元素名
 element	record-types	recordTypes	kebab 容器
 element	reassign	reset	调度 sequence 里 step 的第二个别名
 element	solution-parameters	solutionParameters	kebab 容器
-element	state-machine	stateMachine	待入：状态机声明的 legacy 元素名
-element	state-machines	stateMachines	待入：kebab 容器
+element	state-machine	stateMachine	状态机 legacy 元素名；canonical <stateMachine> 已声明（basic:752/645）；注件实测拒收
+element	state-machines	stateMachines	待入：kebab 容器（复数容器非 canonical；单数行 state-machine→stateMachine 已转正，<stateMachines> 本仓 XSD 未声明）
 element	test-data	testData	kebab 拼写
 element	topology	connections	复数容器另有其名
-element	types-dimensionless	typesDimensionless	待入：kebab 容器
-element	types-generic	typesGeneric	待入：kebab 容器
-element	types-hydraulic	typesHydraulic	待入：kebab 容器
-element	types-thermal	typesThermal	待入：kebab 容器
-element	types-water	typesWater	待入：kebab 容器
+element	types-dimensionless	typesDimensionless	kebab 拼写；canonical <typesDimensionless> 已声明（basic:458）；注件实测拒收
+element	types-generic	typesGeneric	kebab 拼写；canonical <typesGeneric> 已声明（basic:456）；注件实测拒收
+element	types-hydraulic	typesHydraulic	待入：kebab 拼写（SPEC §1 只点名 typesGeneric/typesThermal/typesDimensionless 三个 wrapper，未声明 typesHydraulic）
+element	types-thermal	typesThermal	kebab 拼写；canonical <typesThermal> 已声明（basic:457）；注件实测拒收
+element	types-water	typesWater	待入：kebab 拼写（同 types-hydraulic：SPEC 未点名 typesWater，本仓 XSD 未声明）
 element	units-base	unitsBase	kebab 容器
 element	units-derived	unitsDerived	kebab 容器
-element	units-instance	unitsInstance	待入：kebab 容器
+element	units-instance	unitsInstance	待入：kebab 容器（本仓 XSD 未声明 <unitsInstance>）
 element	variable-types	variableTypes	kebab 容器
 # --- attribute ---
 attribute	a-part	aPart	kebab 属性
@@ -103,23 +103,23 @@ attribute	component	type	实例属性形态：<instance component="M"> 已移除
 attribute	control-horizon	controlHorizon	kebab 属性
 attribute	desc	description	legacy 缩写属性
 attribute	dir	category	legacy 属性
-attribute	extends	extendsFrom	待入：引擎 F7 unknown attribute extendsFrom 响亮拒收、kebab 亦被 parser 拒 ⇒ 本仓 XSD 与引擎两侧都还没收（属性形态；canonical 见 SPEC §4.0）
-attribute	extends-from	extendsFrom	待入：引擎 F7 unknown attribute、parser 连 kebab extends-from 也拒 ⇒ 本仓 XSD 尚未声明该属性形态（本仓与引擎两侧都还没收）
-attribute	from_state	fromState	待入：snake 属性
+attribute	extends	extendsFrom	待入：属性形态（引擎 F7 对 unknown attribute extendsFrom 响亮拒收 ⇒ 本仓与引擎两侧都还没收；canonical 见 SPEC §4.0）
+attribute	extends-from	extendsFrom	待入：属性形态（引擎 F7 拒 unknown attribute、parser 拒 kebab extends-from ⇒ 本仓 XSD 未声明该属性形态）
+attribute	from_state	fromState	待入：snake 属性（本仓 XSD 未声明 fromState=）
 attribute	interface	portType	legacy 属性（只在 <crosslink> 上曾被容忍；canonical 拼法是 portType）
 attribute	lower-bound	lowerBound	kebab 属性
 attribute	lower_bound	lowerBound	snake 属性
 attribute	max-time	maxTime	kebab 属性
 attribute	model-type	type	实例属性形态：<instance model-type="M"> 已移除，只认 type=
-attribute	out_kind	outKind	待入：snake 属性
-attribute	out_state	outState	待入：snake 属性
-attribute	out_system	outSystem	待入：snake 属性
-attribute	port-set	portSet	待入：kebab 属性
+attribute	out_kind	outKind	待入：snake 属性（本仓 XSD 未声明 outKind=）
+attribute	out_state	outState	待入：snake 属性（本仓 XSD 未声明 outState=）
+attribute	out_system	outSystem	待入：snake 属性（本仓 XSD 未声明 outSystem=）
+attribute	port-set	portSet	kebab 属性；canonical portSet= 已声明（basic:526，<port> 实例位）；注件实测拒收
 attribute	porttype	portType	小写 legacy 属性
 attribute	sample-time	sampleTime	kebab 属性
 attribute	time-layer	timeLayer	kebab 属性
 attribute	time_layer	timeLayer	snake 属性
-attribute	to_state	toState	待入：snake 属性
+attribute	to_state	toState	待入：snake 属性（本仓 XSD 未声明 toState=）
 attribute	tolerance_pct	tolerancePct	snake 属性
 attribute	upper-bound	upperBound	kebab 属性
 attribute	upper_bound	upperBound	snake 属性
