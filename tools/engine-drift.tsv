@@ -180,7 +180,7 @@ attr	anon@esml-canonical-basic.xsd:40	value	lang-wins	W20 真声明：算法段 
 attr	anon@esml-canonical-basic.xsd:41	condition	lang-wins	W20 真声明：算法段 <while condition>（原 :23 键随文档序移位至 :41）	2026-11-11
 child	anon-child@esml-canonical-basic.xsd:sequence	reassign	lang-wins	canonical 唯一拼写是 <reset>，语言仓 89039d7 已裁决、负例 L5-instance/reassign-probe.esml 断言 XSD 拒收；引擎 XSD 仍声明 reassign = 引擎债（W67 盲区修复后现形）	2026-11-11
 child	anon-child@esml-canonical-basic.xsd:locals	local	lang-wins	语言仓声明 <local>（FunctionLocalType）；引擎侧 <locals> 内为 <xs:any processContents="skip"> 无具名子元素 = 引擎债（W67 盲区修复后现形）	2026-11-11
-child	anon-child@esml-canonical-basic.xsd:members	component	engine-wins	语言仓 <members> 仅声明 <instance>（规范 §2 收紧词法，legacy <component> 不声明）；引擎侧多声明 <component> = 引擎侧 legacy 残留（W67 盲区修复后现形）	2026-11-11
+child	anon-child@esml-canonical-basic.xsd:members	component	lang-wins	语言仓 89039d7 单轨裁决：<members> 只认 <instance>（规范 §2 收紧词法），引擎侧多声明 <component> = 引擎侧 legacy 残留（W67 盲区修复后现形）	2026-11-11
 child	anon-child@esml-canonical-basic.xsd:outputs	output	lang-wins	语言仓 <outputs> 声明 <output>；引擎侧无具名子元素 = 引擎债（W67 盲区修复后现形）	2026-11-11
 child	anon-child@esml-canonical-basic.xsd:scope	preset	lang-wins	语言仓 <scope> 声明 <preset>（SPEC §6.10）；引擎侧改声明 <equation> = 两侧不同义拼写分歧（W67 盲区修复后现形）	2026-11-11
-child	anon-child@esml-canonical-basic.xsd:scope	equation	engine-wins	引擎侧 <scope> 声明 <equation>；语言仓改声明 <preset> = 两侧不同义拼写分歧（W67 盲区修复后现形）	2026-11-11
+child	anon-child@esml-canonical-basic.xsd:scope	equation	lang-wins	canonical 以语言仓为准：<scope> 声明 <preset>；引擎侧多声明 <equation> = 引擎侧分歧（W67 盲区修复后现形）	2026-11-11
