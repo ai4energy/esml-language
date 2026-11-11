@@ -618,8 +618,10 @@ except Exception as e:
 
 W52 普查（2026-11-11，158 件非负例逐件 `esml solve` + 双红件再 `esml simulate`；
 W55 已把其中 7 件端口示例修到 solve 通过，台账回填后口径为
-**158 件 / 134 ok / 6 ok-simulate / 4 na / 14 fail**）。
-14 件 fail 按「在哪一层被拒」分型如下，本节是这些债务的**制度化索引**——
+**158 件 / 134 ok / 6 ok-simulate / 6 na（4 na-no-system + 2 na-artifact）/
+12 fail（fail-check-debt 5 / fail-engine-debt 6 / 示例侧待修 1）**）。
+14 件求解面未通过 = 12 fail + 2 na-artifact。
+按「在哪一层被拒」分型如下，本节是这些债务的**制度化索引**——
 只登记与跟踪，**本仓不修引擎**。
 
 **W55 已修、不再属本节债务的 7 件**（`L4-port/flow-potential`、
@@ -639,30 +641,33 @@ solve 已真跑通，从 fail 移入 ok；`port-carrier` 经 W55 探针证实为
 
 | 型 | 件数 | 代表文件 | 机制 | `solve-smoke.tsv` 行指针 | `engine-example-debt.tsv` 行指针 |
 |---|---:|---|---|---|---|
-| **flatten 未声明符号** | 3 | `axis-reduce.esml`（`m__x`）、`builtins-math.esml` / `ifelse.esml`（`time`） | flatten 阶段引用了求解层才注入的符号（`time` / `m__x` 等），在 bound scope 里解析不到 ⇒ `undeclared symbol(s) referenced during flatten` | 见台账 `status=fail` 且 evidence 含 `undeclared symbol(s) referenced during flatten` 的行（3 行） | 见台账 `stage=solve` 行（W56 正在补） |
+| **flatten 未声明符号** | 3 | `axis-reduce.esml`（`m__x`）、`builtins-math.esml` / `ifelse.esml`（`time`） | flatten 阶段引用了求解层才注入的符号（`time` / `m__x` 等），在 bound scope 里解析不到 ⇒ `undeclared symbol(s) referenced during flatten` | 见台账 `status=fail-engine-debt` 且 evidence 含 `undeclared symbol(s) referenced during flatten` 的行（3 行） | 见台账 `stage=solve` 行（`L1-expr-equation/axis-reduce.esml` / `builtins-math.esml` / `ifelse.esml`，W56a 登记） |
 | **Pantelides 结构误判** | 1 | `port-array.esml` | 引擎 Pantelides 差分扩展对 port-array 结构误判为 `structurally singular: 4 unmatched unknown(s)`（`s.p.v_1/v_2`、`d.p.v_1/v_2`）；残差 `f[2]=s.p.v_1-d.p.v_1`、`f[3]=s.p.v_2-d.p.v_2` **反证**逐元素连接等式已建，DOF 少计 + unmatched 误判（W46 实测） | 见台账 `L6-connect/port-array.esml`（`status=fail`，evidence 含 `pantelides: structurally singular`） | 见台账 `stage=solve` 行（`L6-connect/port-array.esml`） |
-| **引擎不消费（connectRules）** | 1 | `connect-rules.esml` | `<connectRules>` 被 `check` 收（`errors=0`）但 `solve` 路径不消费 ⇒ 求解层报错（`SolveError`）；与 §5.3 登记的「收但零效果」同源 | 见台账 `L6-connect/connect-rules.esml`（`status=fail`，evidence 含 `SolveError`） | 见台账 `stage=solve` 行（`L6-connect/connect-rules.esml`） |
-| **外部产物缺失** | 2 | `extern-cabi.esml`、`derivative-analytic.esml` | 求解路径要求外部产物（C ABI 符号链接 / analytic Jacobian 产物）在盘上，本仓示例未附 ⇒ `SolveError`（`na-artifact` 类） | 见台账 `status=fail` 且 evidence 含 `SolveError` 的 `extern-cabi` / `derivative-analytic` 行（2 行） | 见台账 `stage=solve` 行（`L8-function/extern-cabi.esml` / `L1-expr-equation/derivative-analytic.esml`） |
+| **引擎不消费（connectRules）** | 1 | `connect-rules.esml` | `<connectRules>` 被 `check` 收（`errors=0`）但 `solve` 路径不消费 ⇒ 求解层报错（`SolveError`）；与 §5.3 登记的「收但零效果」同源 | 见台账 `L6-connect/connect-rules.esml`（`status=fail-engine-debt`，evidence 含 `SolveError`） | 见台账 `stage=solve` 行（`L6-connect/connect-rules.esml`，W56a 登记） |
+| **外部产物缺失** | 2 | `extern-cabi.esml`、`derivative-analytic.esml` | 求解路径要求外部产物（C ABI 符号链接 / analytic Jacobian 产物）在盘上，本仓示例未附 ⇒ `SolveError`（`na-artifact` 类） | 见台账 `status=na-artifact` 的 `extern-cabi` / `derivative-analytic` 行（2 行） | 不登记（census status=na-artifact，需 `libesml_extern_testlib.so`，非引擎债） |
 | **F7 check 债的 solve 投影** | 5 | `literal-enum.esml`、`algorithm-while.esml`、`continue-until.esml`、`method-vary.esml`、`hyperparams.esml` | `check` 层已有 F7 拒（§5.11 登记的四处 + `tasks` 属性），`solve` 在 check 之前/同时被同一条 F7 拦截 ⇒ solve 面的 fail 是 check 面 fail 的**投影**，不是独立的求解层问题 | 见台账 `status=fail` 且 evidence 含 `error[F7]` 的行（5 行） | 已在台账 `stage=check` 行登记（`literal-enum` / `algorithm-while` / `continue-until` / `method-vary` / `hyperparams`），solve 面不另立行 |
-| **其余 `SolveError`（稳态求解失败）** | 2 | `port-carrier.esml`、`free.esml` | `check` 绿（`errors=0`）但 `solve_steady` 返回 `SolveError`（牛顿不收敛 / 结构奇异 / 方程组欠定等），`simulate` 亦双红 ⇒ 求解层真实能力缺口，需引擎侧修。`port-carrier` 经 W55 探针（14 变体）证实为引擎侧两 flow 端口闭合缺口，示例侧不可修，留引擎侧处置 | 见台账 `status=fail` 且 evidence 含 `SolveError` 的 `port-carrier` / `free` 行（2 行） | 见台账 `stage=solve` 行（`L4-port/port-carrier.esml` / `L9-method-schedule/free.esml`） |
+| **其余 `SolveError`（稳态求解失败）** | 2 | `port-carrier.esml`（fail-engine-debt）、`free.esml`（fail，示例侧待修，另单） | `check` 绿（`errors=0`）但 `solve_steady` 返回 `SolveError`（牛顿不收敛 / 结构奇异 / 方程组欠定等），`simulate` 亦双红 ⇒ 求解层真实能力缺口。`port-carrier` 经 W55 探针（14 变体）证实为引擎侧两 flow 端口闭合缺口，示例侧不可修，W56b 已登记 `stage=solve`；`free` 为例示侧待修（另单），不在引擎债台账登记 | 见台账 `port-carrier`（`status=fail-engine-debt`）与 `free`（`status=fail`）行（2 行） | `L4-port/port-carrier.esml` 已有 `stage=solve` 行（W56b 登记）；`free.esml` 不登记（示例侧待修，另单） |
 | **合计** | **14** | — | — | 14 行 | — |
 
 #### 5.13.2 台账指针
 
-- **`tools/solve-smoke.tsv`**：14 件 fail 全部在台账里，`status=fail`。
+- **`tools/solve-smoke.tsv`**：14 件求解面未通过全部在台账里
+  （12 行 fail 子类 + 2 行 na-artifact）。
   按上表五型（+ 其余 SolveError 型）在 evidence 列区分。
-  W52 普查口径（W55 回填后）：158 件 / 134 ok / 6 ok-simulate / 4 na / **14 fail**。
-- **`tools/engine-example-debt.tsv`**（W56a 落地后 13 行，check 8 / solve 5）：
+  W52 普查口径（W55 回填后）：158 件 / 134 ok / 6 ok-simulate / 6 na
+  （4 na-no-system + 2 na-artifact）/ **12 fail**
+  （fail-check-debt 5 / fail-engine-debt 6 / 示例侧待修 1）。
+- **`tools/engine-example-debt.tsv`**（W56b 落地后 14 行，check 8 / solve 6）：
   - `stage=check` 行：5 件 F7 check 债（`literal-enum` / `algorithm-while` /
     `continue-until` / `method-vary` / `hyperparams`）——已在台账里，solve 面不另立行。
-  - `stage=solve` 行（5 行）：
+  - `stage=solve` 行（6 行）：
     `L6-connect/port-array.esml`（Pantelides 结构误判）、
     `L1-expr-equation/axis-reduce.esml` / `builtins-math.esml` / `ifelse.esml`
-    （flatten 未声明符号）、`L6-connect/connect-rules.esml`（引擎不消费）。
-    外部产物缺失 2 件（`extern-cabi` / `derivative-analytic`）与其余 SolveError
-    2 件（`port-carrier` / `free`）尚未在 `engine-example-debt.tsv` 登记
-    `stage=solve` 行——W56 后续批次补；当前以 `solve-smoke.tsv` 的
-    `status=fail` 行为唯一跟踪落点。
+    （flatten 未声明符号）、`L6-connect/connect-rules.esml`（引擎不消费）、
+    `L4-port/port-carrier.esml`（两 flow 端口闭合缺口，W56b 登记）。
+    外部产物缺失 2 件（`extern-cabi` / `derivative-analytic`）不登记
+    （census status=na-artifact，非引擎债）；`free.esml` 不登记
+    （示例侧待修，另单）。
 
 #### 5.13.3 处置声明
 
