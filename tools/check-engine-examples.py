@@ -82,11 +82,15 @@ def load_tsv(path):
 
 # --------------------------------------------------------------------------- 负例识别
 def is_negative(path, text):
-    """照抄 docs/validate_examples.py 的 is_negative：文件名含 probe、或头部注明「负例」⇒ 预期失败。"""
+    """照抄 docs/validate_examples.py 的 is_negative：文件名含 probe、或头部注明「负例」⇒ 预期失败。
+
+    判据收紧（W47b）：`(?<!非)负例`——「负例」前一字符是「非」时是「非负例」自述，
+    不算自述负例（旧子串会把「非负例示例」整件静默跳过）。
+    """
     if "probe" in path.name:
         return True
     head = "\n".join(text.splitlines()[:25])
-    return "负例" in head
+    return bool(re.search(r"(?<!非)负例", head))
 
 
 def enumerate_examples(repo):
@@ -262,10 +266,14 @@ def self_test(stream):
         # 负例识别自证：probe 必须被跳过（不在对账输入里）
         probe_txt = NEG
         neg_ok = is_negative(Path("probe.esml"), probe_txt)
-        # 头部「负例」注明也识别
-        head_neg_ok = "负例" in "\n".join(NEG.splitlines()[:25])
+        # 头部「负例」注明也识别（收紧后判据）
+        head_neg_ok = bool(re.search(r"(?<!非)负例", "\n".join(NEG.splitlines()[:25])))
+        # 收紧判据：头部注「非负例」不算自述负例
+        non_neg = "<?xml version='1.0'?><!-- 非负例：预期通过 --><esml xmlns=\"u\" name=\"N\"/>"
+        non_neg_ok = not is_negative(Path("non-neg.esml"), non_neg)
         for label, ok in (("负例识别：文件名含 probe", neg_ok),
-                          ("负例识别：头部注明「负例」", head_neg_ok)):
+                          ("负例识别：头部注明「负例」", head_neg_ok),
+                          ("非负例不算负例（W47b）", non_neg_ok)):
             w("  [%s] %s\n" % ("PASS" if ok else "BROKEN", label))
             failures += 0 if ok else 1
 

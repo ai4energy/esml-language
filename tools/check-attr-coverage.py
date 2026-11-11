@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""ESML 规范仓 · XSD 属性覆盖双向闸门（W29）——W24 元素闸的姊妹闸。
+"""ESML 规范仓 · XSD 属性覆盖双向闸门（W29）+ 方向 C（W47）——W24 元素闸的姊妹闸。
 
 【两张台账的职责（订单要求写死在这里）】
   attr-acceptance.tsv = 「零使用属性的引擎裁决」：`check-attr-acceptance.py`（W5）逐行
@@ -24,14 +24,16 @@
 
 门做什么（与元素闸 check-element-coverage.py 同形、同口径）：
   1. **头部计数当场重算**：台账头部「共 N 行」「pending：N 行」必须等于正文实际 ⇒ 红（rc=1）。
-  2. **方向 A（声明 → 示例）**：`xsd/*.xsd` 里每一个**命名** `xs:attribute`（含嵌套局部声明，
-     同名去重）必须在 `**/*.esml`（跳过注释、跳过 `tools/negatives.tsv` 里**所有**负例）里
-     至少被写过一次；没有 ⇒ 必须被「兜住」，兜法三选一：
+  2. **方向 A（声明 → 示例，按属性名）**：`xsd/*.xsd` 里每一个**命名** `xs:attribute`（含嵌套
+     局部声明，同名去重）必须在 `**/*.esml`（跳过注释、跳过 `tools/negatives.tsv` 里**所有**
+     负例）里至少被写过一次；没有 ⇒ 必须被「兜住」，兜法三选一：
        (i)  台账有一行 `attribute/@name` 且 verdict ∈ {pending, by-design}（语义同元素闸：
             pending 且 owner ∈ {W1,W3,W4} ⇒ 警告；owner=engine-debt ⇒ 红；by-design ⇒ 警告）；
        (ii) 台账有一行 `attribute/@name` 且 verdict=covered（已登记进 attr-acceptance）⇒ 不算缺；
        (iii) attr-acceptance.tsv 里已有该 attr 的行（**读**它当登记来源，不重复建台账）⇒ 不算缺。
      三选一都不满足 ⇒ 红（「声明了没人用、也没人登记 ⇒ 漏了」）。
+     **方向 A 只问「属性名出现过没有」**——同名属性落在别的宿主上也不算落地（例：
+     `port` 上的 `category=` 不能替 `portVariable` 上的 `category=` 落地）。
   3. **方向 B（示例 → 声明，按宿主判）**：每个**非负例**示例里写的属性名，要么在 XSD 里
      声明过，要么**落在声明了 `xs:anyAttribute` 的宿主上**（宽松放行，by-design），要么台账
      有一行 `example/@name` 且 verdict=by-design。缺任一 ⇒ 红。
@@ -43,14 +45,25 @@
          有歧义时，**宁松勿错**——判「宽松放行」只豁免方向 B 的红，不会漏判真未声明属性（因为
          未声明属性无论宿主是否 anyAttribute，只要**不在** anyAttribute 宿主上且无 by-design 行，仍红）。
        · `xmlns` 是 XML 命名空间属性，**从不**是 xs:attribute ⇒ 方向 B 里单独按 by-design 放行。
+  3.5 **方向 C（accepted → 示例，按宿主+属性，W47 新增）**：`attr-acceptance.tsv` 里每一行
+     verdict=accepted（引擎收下、应当有示例）必须在**非负例**示例里找到 `host 元素名` 与
+     `attr 名` **同时**出现（跳过注释、跳过 `negatives.tsv` 全部负例）；未落地 ⇒ 必须被
+     `attr-coverage.tsv` 一行 `attribute/@attr` 且 verdict=pending 兜住（owner ∈ {W1,W3,W4}
+     ⇒ 警告；其它 ⇒ 红，口径照方向 A）。
+     **与方向 A 的区别**：A 管「声明 → 示例」（按**属性名**，同名落别处也算落地），C 管
+     「accepted → 示例」（按 **(宿主元素名, 属性名)**，同名落别处**不**算）。误差范围：
+     宿主按**元素名**匹配，不做类型解析——`<port>` 有两个类型（PortInstanceType 与
+     PortMarkType）共用元素名，故 `(port, x)` 落地与否只按元素名判；attr-acceptance 行
+     的 host 列即宿主元素名，两表同维度。
   4. **台账行与实测差集必须闭合**：台账登记的每个 @name，必须真落在当天重算的差集里
      （方向 A 的 attribute 行 verdict∈{pending,by-design} 必须「声明且无示例」；covered 行必须
      「声明且无示例且 attr-acceptance 覆盖」；方向 B 的 example 行必须「示例用且未声明且不在
      anyAttribute 宿主」）；反过来差集的每个属性也必须有行或 attr-acceptance 兜着。差集变了台账
      没跟上 ⇒ 红（「首版台账如实登记」的机判锁）。
-  5. **`--self-test`**：临时目录造两棵小树——好树（声明属性都有示例或 covered、示例属性都在
-     声明/anyAttribute 内）⇒ 零违规；坏树（删一个示例属性 + 加一个未声明属性，台账没跟上）⇒
-     必须红。任一翻转 = 自证失败 ⇒ rc=2。照抄元素闸的 self_test 结构。
+  5. **`--self-test`**：临时目录造小树——好树（声明属性都有示例或 covered、示例属性都在
+     声明/anyAttribute 内、accepted 行已落地）⇒ 零违规；坏树（删一个示例属性 + 加一个未声明
+     属性，台账没跟上）⇒ 必须红；方向 C 坏树（accepted 行未落地且台账没兜）⇒ 必须红；
+     计数锚错 ⇒ 必须红。任一翻转 = 自证失败 ⇒ rc=2。照抄元素闸的 self_test 结构。
   6. 脚本自身错误（缺表、列数不对、evidence 为空、name 缺 @ 前缀）⇒ rc=2。
 
 用法
@@ -160,6 +173,25 @@ def load_attr_acceptance(path):
     return out
 
 
+def load_accepted_rows(path):
+    """读 attr-acceptance.tsv → verdict=accepted 的行 [(attr, host, lineno)]。
+
+    方向 C 的登记来源：accepted 表示「引擎收下、**应当有示例**」（attr-acceptance.tsv
+    头部注释），落地与否本闸方向 C 当场核。列序：kind(0) name(1) attr(2) host(3)
+    verdict(4) owner(5) evidence(6)。
+    """
+    out = []
+    if not path.exists():
+        return out
+    for lineno, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        if line.startswith("#") or not line.strip():
+            continue
+        parts = line.split("\t")
+        if len(parts) >= 7 and parts[4] == "accepted" and parts[2].strip():
+            out.append((parts[2], parts[3].strip(), lineno))
+    return out
+
+
 # --------------------------------------------------------------------------- 语料
 def strip_comment(text):
     """剥 XML 注释。注释里写的属性名不算「用了」（照抄 check-attr-acceptance / check-examples 口径）。"""
@@ -230,6 +262,30 @@ def host_of_attr(repo, attr, negative_files):
             if re.search(r'[\s"/]%s="' % re.escape(attr), attrs):
                 hosts.add(tagname)
     return hosts
+
+
+def attr_hosts_map(repo, negative_files, attrs):
+    """扫**非负例**示例 → {attr 名: 实际出现的宿主元素名集合}（只关心 `attrs` 里的）。
+
+    方向 C 的落地判据用：(host, attr) 是否真在示例里同时出现。宿主 = 该 `attr="` 所在
+    标签的标签名——与 attr-acceptance.tsv 的 host 列同维度（都是元素名，不做类型解析）。
+    """
+    out = {a: set() for a in attrs}
+    tag_open = re.compile(r"<([A-Za-z_][\w.\-]*)([^>]*)>")
+    for f in glob.glob(os.path.join(str(repo), "**", "*.esml"), recursive=True):
+        if "/.git/" in f:
+            continue
+        rel = os.path.relpath(f, repo)
+        if rel in negative_files:
+            continue
+        text = strip_comment(Path(f).read_text(encoding="utf-8", errors="replace"))
+        for tm in tag_open.finditer(text):
+            tagname, attrs = tm.group(1), tm.group(2)
+            for m in ATTR_USE.finditer(attrs):
+                a = m.group(1)
+                if a in out:
+                    out[a].add(tagname)
+    return out
 
 
 # --------------------------------------------------------------------------- 检查
@@ -351,6 +407,37 @@ def check_direction_b(rows, declared, used, anyattr_hosts, repo, negative_files)
     return red, warn, undecl
 
 
+def check_direction_c(rows, accepted, attr_hosts):
+    """方向 C（W47）：attr-acceptance 的 accepted 行（引擎收下 ⇒ 应当有示例）必须真落地——
+    非负例示例里 (host 元素名, attr) 同时出现。未落地 ⇒ 须被 attr-coverage 一行
+    `attribute/@attr` 且 verdict=pending 兜住（owner ∈ WARN_OWNERS ⇒ 警告；其它 ⇒ 红，
+    口径照方向 A）；无兜 ⇒ 红。→ (red, warn)
+    """
+    red, warn = [], []
+    reg = {r["item"]: r for r in rows if r["kind"] == "attribute"}
+    for attr, host, src in sorted(accepted):
+        if host in attr_hosts.get(attr, ()):
+            continue  # (host, attr) 真在示例里同时出现 ⇒ 已落地
+        where = f"attr-acceptance.tsv:{src}"
+        r = reg.get(f"@{attr}")
+        if r is None:
+            red.append(("direction-C",
+                         f"accepted @{attr} on <{host}> 在非负例示例里未落地（(host,attr) 没同时出现），"
+                         f"attr-coverage 也没登记 —— 补 <{host}> 上的 @{attr} 示例 / 在本台账记一行 pending"))
+        elif r["verdict"] == "pending":
+            if r["owner"] in WARN_OWNERS:
+                warn.append((f"{TSV.name}:{r['lineno']}",
+                             f"方向 C 待落地：@{attr} on <{host}> owner={r['owner']}（追债中，警告不红）"))
+            else:
+                red.append((f"{TSV.name}:{r['lineno']}",
+                             f"方向 C：@{attr} on <{host}> verdict=pending owner={r['owner']} —— 必须落地却没记债主 ⇒ 红"))
+        else:
+            red.append((f"{TSV.name}:{r['lineno']}",
+                        f"方向 C：@{attr} on <{host}> 未落地，台账 verdict={r['verdict']!r} —— "
+                        f"accepted 行要么补示例、要么记 pending ⇒ 红"))
+    return red, warn
+
+
 def check_ledger_closure(rows, missing_a, undecl_b, acceptance):
     """台账与当天差集闭合：登记的 @name 必须真在差集里；差集的 @name 必须有行（或 acceptance）兜着。
 
@@ -386,8 +473,14 @@ def check_ledger_closure(rows, missing_a, undecl_b, acceptance):
 
 
 # --------------------------------------------------------------------------- 主检查
-def run_gate(repo, tsv, xsd_dir, negative_files, acceptance, stream):
-    """对一棵树跑全套检查 → (red, warn, stats)。repo/tsv/xsd_dir 可指向合成树（自证用）。"""
+def run_gate(repo, tsv, xsd_dir, negative_files, acceptance, stream,
+             accepted_rows=None, attr_hosts=None):
+    """对一棵树跑全套检查 → (red, warn, stats)。repo/tsv/xsd_dir 可指向合成树（自证用）。
+
+    方向 C 的两个入参默认 None（合成树自证走 A/B 时不跑方向 C）：
+      accepted_rows = [(attr, host, lineno), …]（attr-acceptance.tsv 的 accepted 行）
+      attr_hosts    = {attr: 非负例示例里实际出现的宿主元素名集合}（attr_hosts_map 的产出）
+    """
     rows, total, pending = load_tsv(tsv)
     declared = declared_attrs(xsd_dir)
     used = used_attrs(repo, negative_files)
@@ -401,15 +494,20 @@ def run_gate(repo, tsv, xsd_dir, negative_files, acceptance, stream):
     rb, wb, undecl_b = check_direction_b(rows, declared, used, anyattr, repo, negative_files)
     red += rb
     warn += wb
+    if accepted_rows is not None and attr_hosts is not None:
+        rc_red, rc_warn = check_direction_c(rows, accepted_rows, attr_hosts)
+        red += rc_red
+        warn += rc_warn
     red += check_ledger_closure(rows, missing_a, undecl_b, acceptance)
     return red, warn, (declared, used, missing_a, undecl_b)
 
 
 # --------------------------------------------------------------------------- 自证
 def self_test(stream):
-    """临时目录造三棵小树：好树（声明属性都 covered/有示例、示例属性都在声明/anyAttribute 内）
-    ⇒ 零违规；坏树（删一个示例属性 + 加一个未声明属性，台账没跟上）⇒ 必须红；计数锚错 ⇒ 必须红。
-    任一翻转 = 自证失败。"""
+    """临时目录造小树：好树（声明属性都 covered/有示例、示例属性都在声明/anyAttribute 内）
+    ⇒ 零违规；坏树（删一个示例属性 + 加一个未声明属性，台账没跟上）⇒ 必须红；计数锚错 ⇒
+    必须红；方向 C 坏树（accepted 行未落地且台账没兜）⇒ 必须红；方向 C 好（accepted 行已
+    落地）⇒ 不红。任一翻转 = 自证失败。"""
     w = stream.write
     failures = 0
     NEG = "N-neg/probe.esml"
@@ -440,14 +538,22 @@ def self_test(stream):
             p.write_text(text, encoding="utf-8")
         (tdir / "negatives.tsv").write_text(neg, encoding="utf-8")
         (tdir / "attr-coverage.tsv").write_text(tsv_rows, encoding="utf-8")
+        n_acc = 0 if not acceptance_rows else len(
+            [l for l in acceptance_rows.splitlines() if l.strip() and not l.startswith("#")])
         (tdir / "attr-acceptance.tsv").write_text(
-            ("# 共 1 行\n" + acceptance_rows) if acceptance_rows else "# 共 0 行\n",
+            f"# 共 {n_acc} 行\n" + acceptance_rows if acceptance_rows else "# 共 0 行\n",
             encoding="utf-8")
         return tdir / "attr-coverage.tsv"
 
-    def run_on(tree):
+    def run_on(tree, direction_c=False):
         acc = load_attr_acceptance(tree / "attr-acceptance.tsv")
-        return run_gate(tree, tree / "attr-coverage.tsv", tree / "xsd", {NEG}, acc, stream)
+        kwargs = {}
+        if direction_c:
+            accepted = load_accepted_rows(tree / "attr-acceptance.tsv")
+            kwargs = {"accepted_rows": accepted,
+                       "attr_hosts": attr_hosts_map(tree, {NEG}, {a for a, _, _ in accepted})}
+        return run_gate(tree, tree / "attr-coverage.tsv", tree / "xsd", {NEG}, acc,
+                        stream, **kwargs)
 
     with tempfile.TemporaryDirectory() as td:
         root = Path(td)
@@ -503,6 +609,38 @@ def self_test(stream):
         for where, msg in red:
             w(f"        {where}: {msg}\n")
         failures += 0 if ok else 1
+
+        # —— 方向 C（W47）：accepted 行必须真落地——(host, attr) 在非负例示例里同时出现。
+        #    坏树：attr-acceptance 登 HostB 的 beta 为 accepted，但示例里 beta 没落过 HostB
+        #    （HostB 上零属性）且 attr-coverage 台账没兜 ⇒ 必须红（且红源必须是 direction-C）。
+        c_bad = write_tree(
+            root / "c-bad", DECL,
+            {"g/a.esml": '<esml><HostA alpha="x"/></esml>'},
+            "# 共 0 行\n#\n# pending：0 行\n",
+            "attribute\tXType\tbeta\tHostB\taccepted\tW4\t自证：方向 C 坏树（beta 未落地）\n")
+        red, _, _ = run_on(root / "c-bad", direction_c=True)
+        ok = bool(red) and any("direction-C" in where or "未落地" in msg
+                               for where, msg in red)
+        w(f"  [{'PASS' if ok else 'BROKEN'}] 方向 C 坏树：accepted 行（HostB, beta）未落地且台账没兜 "
+          f"⇒ 期望判红，实际 {len(red)} 红\n")
+        for where, msg in red:
+            w(f"        {where}: {msg}\n")
+        failures += 0 if ok else 1
+
+        # —— 方向 C 好树：同一行 accepted，但示例里 <HostB beta="y"/> 真落地 ⇒ 零违规
+        #    （alpha 在 HostA 上有示例、beta 有裁决且已落地、无未声明属性）。
+        c_good = write_tree(
+            root / "c-good", DECL,
+            {"g/a.esml": '<esml><HostA alpha="x"/><HostB beta="y"/></esml>'},
+            "# 共 0 行\n#\n# pending：0 行\n",
+            "attribute\tXType\tbeta\tHostB\taccepted\tW4\t自证：方向 C 好树（beta 已落地）\n")
+        red, _, _ = run_on(root / "c-good", direction_c=True)
+        ok = not red
+        w(f"  [{'PASS' if ok else 'BROKEN'}] 方向 C 好树：accepted 行（HostB, beta）已在示例里落地 "
+          f"⇒ 期望零违规，实际 {len(red)} 红\n")
+        for where, msg in red:
+            w(f"        {where}: {msg}\n")
+        failures += 0 if ok else 1
     return failures
 
 
@@ -526,7 +664,11 @@ def main(argv=None):
         return 2
     negatives = load_negatives(NEGATIVES_TSV)
     acceptance = load_attr_acceptance(ATTR_ACCEPTANCE_TSV)
-    red, warn, stats = run_gate(REPO, TSV, REPO / "xsd", negatives, acceptance, sys.stdout)
+    accepted_rows = load_accepted_rows(ATTR_ACCEPTANCE_TSV)
+    attr_hosts = (attr_hosts_map(REPO, negatives, {a for a, _, _ in accepted_rows})
+                  if accepted_rows else None)
+    red, warn, stats = run_gate(REPO, TSV, REPO / "xsd", negatives, acceptance, sys.stdout,
+                                accepted_rows=accepted_rows, attr_hosts=attr_hosts)
     declared, used, missing_a, undecl_b = stats
 
     for where, msg in warn:
@@ -539,8 +681,11 @@ def main(argv=None):
     n_pend = sum(1 for r in rows if r["verdict"] == "pending")
     n_bydes = sum(1 for r in rows if r["verdict"] == "by-design")
     n_covered = sum(1 for r in rows if r["verdict"] == "covered")
+    n_c_unlanded = sum(1 for a, h, _ in accepted_rows
+                       if attr_hosts is not None and h not in attr_hosts.get(a, ()))
     print(f"[check-attr-coverage] 声明 {len(declared)} 个命名属性 · 非负例示例用到 {len(used)} 个 · "
           f"方向 A 零示例 {len(missing_a)} · 方向 B 未声明 {len(undecl_b)} · "
+          f"方向 C accepted 未落地 {n_c_unlanded}（accepted 共 {len(accepted_rows)} 行）· "
           f"台账 {len(rows)} 行（pending {n_pend} / by-design {n_bydes} / covered {n_covered}）· "
           f"attr-acceptance 登记 {len(acceptance)} 属性 · "
           f"违规 {len(red)}（警告 {len(warn)}）")

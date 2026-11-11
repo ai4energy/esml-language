@@ -9,18 +9,24 @@
 #   rejected-legacy 引擎 F1[] 响亮拒收旧拼写（count/side 报 unknown attribute 并指路；domain 报 legacy spelling）
 #   rejected-ie     引擎 IE8[] 未实现响亮拒收（synchronize）
 #   no-example      宿主元素在仓内示例零出现，无基线可注入
-# 共 47 行
-# 待落地：5 行（accepted 且示例还没进 **/*.esml；rejected-* / no-example 不在此列。
+# 共 46 行
+# 待落地：0 行（accepted 且示例还没进 **/*.esml；rejected-* / no-example 不在此列。
 #   闸门对 owner=W3/W4 的 accepted 行只警告不红，对 W5/engine-debt 才红。
 #   W17 2026-11-11：domain 按宿主拆 3 行（<instance>/<modelType>/<system>，实测语义无效 ⇒ no-example，
 #   docs/coverage.md §5.3 记账）+ side 拆 PortMarkType 行（<annotation><port>，语义无效 ⇒ no-example）；
-#   4 条 no-example 不计待落地，待落地 0→5 系 union 线既有 accepted 无示例行，本单只新增 no-example。）
+#   4 条 no-example 不计待落地，待落地 0→5 系 union 线既有 accepted 无示例行，本单只新增 no-example。
+#   W47 2026-11-11：29 行 accepted 里 28 行早已落地（W21–W31 诸单），仅剩 category on portVariable。
+#   W47b 裁决（2026-11-11）：删 `PortVariableType  category  portVariable  accepted  W4` 幻影行——
+#     依据：① XSD 未声明 category 于 PortVariableType（name="category" 仅在 PortInstanceType）；
+#           ② SPEC §5 定 category 为 port 级语法，<portVariable> 允许属性清单无之；
+#           ③ 引擎 v1.9.3 F1 拒收。
+#     对应假示例 L4-portvar/portvar-category.esml 同删；共 47→46 行。
+#   现 28 行 accepted 全部已落地（W21–W31 诸单），待落地 0。
 attribute	MpcType	a	mpc	accepted	W4	注入 T-tasks/control-vars.esml 的 <mpc> 后 errors=0
 attribute	ConnectType	aPart	connection	rejected-f7	engine-debt	error: F7[]: unknown attribute `aPart` on `<connection>` at <probe> — remove or rename; canonical attributes are in `unknown::KNOWN_ATTRS`
 attribute	MpcType	b	mpc	accepted	W4	注入 T-tasks/control-vars.esml 的 <mpc> 后 errors=0
 attribute	ConnectType	bPart	connection	rejected-f7	engine-debt	error: F7[]: unknown attribute `bPart` on `<connection>` at <probe> — remove or rename; canonical attributes are in `unknown::KNOWN_ATTRS`
 attribute	MpcType	c	mpc	accepted	W4	注入 T-tasks/control-vars.esml 的 <mpc> 后 errors=0
-attribute	PortVariableType	category	portVariable	accepted	W4	注入 D-skeleton/skeleton-full.esml 的 <portVariable> 后 errors=0
 attribute	PortInstanceType	count	port	rejected-legacy	W5	error: F1[]: parser rejected the document: unknown attribute `count` on <port 'p'> at <col>:<row> — canonical attributes are ["name", "portType", "category", "connectClass", "size", "portSet", "description"] (c
 attribute	PerturbType	distribution	perturb	accepted	W4	注入 T-tasks/task-sensitivity.esml 的 <perturb> 后 errors=0
 attribute	PortTypeDef	domain	portType	rejected-legacy	W5	error: F1[]: parser rejected the document: legacy spelling `<domain=>` at L4-port/porttype-electrical.esml:9 — use `<connectorFamily=>` (compatibility expressions are no longer accepted)（W17 2026-11-11 实测注 `<portType domain="thermal">` 复现；domain 在 <instance>/<modelType>/<system> 三宿主 errors=0 ⇒ 见新增 InstRefType/ModelType/SystemType 三行 no-example，本行 verdict 只对 <portType> 宿主成立）
