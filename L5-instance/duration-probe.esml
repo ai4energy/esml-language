@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- duration-probe: 调度段用 legacy 元素形 `<duration>`（`<continueFor>` 的旧时长拼法，
+     写成调度序列步）。它是 legacy 拼法，XSD 拒收（`<sequence>` 内容模型 choice 只声明
+     call/continueFor/continueUntil/reset/stop，无 `duration`）。canonical 用
+     `<continueFor time="…"/>`，见 `L5-instance/` 调度正例。非零退出是预期行为。
+     规范条文：§6.8 工程包装容器（`<computeTasks>` 调度段：段长用 `<tspan from to/>`，没有 `<duration>` 这种元素；`<continueFor>` 只认 `time=`）。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L5_DurationProbe">
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
+  <modelTypes><modelType name="M" discipline="generic">
+    <variables><variable name="y" type="real" role="algebraic"/></variables>
+    <equations><equation>y = 1.0</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="a" type="M"/></instances>
+    <schedule><sequence><duration value="5"/></sequence></schedule>
+  </system></systems>
+</esml>

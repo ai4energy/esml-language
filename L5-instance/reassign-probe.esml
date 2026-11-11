@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- reassign-probe: 调度序列用 legacy `<reassign>` 步。它是旧调度序列别名，XSD 拒收
+     （`<sequence>` 内容模型 choice 只声明 call/continueFor/continueUntil/reset/stop，
+     无 `reassign`）。canonical 用 `<reset>`，见 `L5-instance/` 调度正例。
+     非零退出是预期行为。
+     规范条文：附录 C 修订史（删三个同义元素：`<reassign>` 留 `<reset>`）。 -->
+ -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L5_ReassignProbe">
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
+  <modelTypes><modelType name="M" discipline="generic">
+    <variables><variable name="y" type="real" role="algebraic"/></variables>
+    <equations><equation>y = 1.0</equation></equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="a" type="M"/></instances>
+        <schedule><sequence><reassign path="a.y" value="1.0"/></sequence></schedule>
+  </system></systems>
+</esml>
