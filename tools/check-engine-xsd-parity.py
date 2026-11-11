@@ -205,8 +205,44 @@ def anon_singletons(doc, fname):
     return out
 
 
+def anon_children(doc, fname):
+    """同名单一元素的匿名内联**子元素集**：`anon-child@文件名:元素名`。
+
+    与 `anon_singletons`（比**属性集**、键含 `nth`）互补：这里比**子元素集**，
+    且键用**元素名**（`file:name`）而非 `nth`——因为 `nth` 是文档序计数，两侧
+    文件排版不同时会**错位**（如 `<sequence>` 本仓 `#21` / 引擎 `#16`），拿
+    `nth` 作跨仓键会把「同元素」对不上、把「不同元素」错配上，child 分歧因此
+    既漏报（错位键对不上）又可能误报（不同元素错配到同键）。元素名在两侧语义
+    一致，才是稳定跨仓键。属性集继续走 `anon_singletons`（其 `nth` 键维持既有
+    「已裁决」口径，本次不动）。
+
+    范围：本文件里**同父下只出现一次**的、带匿名内联 complexType 的命名元素。
+    ⚠ 计数按**父元素**而非整文件——若按整文件数，`<value>`/`<branch>` 这类在
+    不同父下各自唯一、但同名跨父复用的元素会被误判「非唯一」而漏入本表，导致
+    其父的子元素集缺成员、比出假分歧（实测 26 条误红）。同父下重名（如
+    `<sequence>` 在 `<schedule>` 与别处各一次、父不同）按各自父键分别比。"""
+    out = {}
+    root = doc.getroot()
+    # 按父收集每个命名元素在其父下的出现次数。
+    per_parent = {}
+    for e in root.iter(XS + "element"):
+        n = e.get("name")
+        if n:
+            p = e.getparent()
+            per_parent[(p, n)] = per_parent.get((p, n), 0) + 1
+    for e in root.iter(XS + "element"):
+        n = e.get("name")
+        if not n or per_parent[(e.getparent(), n)] != 1:
+            continue
+        anon = e.find(XS + "complexType")
+        if anon is None:
+            continue
+        out["anon-child@%s:%s" % (fname, n)] = child_names(e)
+    return out
+
+
 def load_side(root_dir):
-    hosts, anons, roots = {}, {}, set()
+    hosts, anons, anonchild, roots = {}, {}, {}, set()
     for f in schema_files(root_dir):
         doc = etree.parse(str(f))
         h = hosts_of(doc)
@@ -221,16 +257,21 @@ def load_side(root_dir):
                 anons[k] |= v
             else:
                 anons[k] = v
+        for k, v in anon_children(doc, f.name).items():
+            if k in anonchild:
+                anonchild[k] |= v
+            else:
+                anonchild[k] = v
         for el in doc.getroot():
             if el.tag == XS + "element" and el.get("name"):
                 roots.add(el.get("name"))
-    return hosts, anons, roots
+    return hosts, anons, anonchild, roots
 
 
 def diff_sides(lang, eng, norm_index, report):
     """对两侧结构做三张比对，返回 (未裁决, 已消解, 实测表)。"""
-    l_hosts, l_anons, l_roots = lang
-    e_hosts, e_anons, e_roots = eng
+    l_hosts, l_anons, l_anonchild, l_roots = lang
+    e_hosts, e_anons, e_anonchild, e_roots = eng
     undetected, resolved = [], []
     tables = {"attr": {}, "child": {}, "root": {}}
 
@@ -260,6 +301,40 @@ def diff_sides(lang, eng, norm_index, report):
     for host in sorted(set(l_anons) | set(e_anons)):
         check("attr", host, l_anons.get(host, set()),
               e_anons.get(host, set()), ("lang", "engine"))
+    # ②续2 同名单一元素匿名内联**子元素集**（稳定键 anon-child@文件:元素名，
+    #      补 `anon_singletons` 只比属性、漏子元素集的盲区：匿名 <sequence> 的
+    #      成员差异（如引擎侧多一个 <reassign>）必须在此现形）。
+    #      范围护栏（只加严、不炸既有口径）：
+    #       (a) 去重——该元素名若在**命名宿主**层（命名 complexType / 全局元素，
+    #           如 <if>↔EquationIfType）两侧子元素集**相同**，说明该分歧（若有）
+    #           已在命名宿主键裁决，此键不重判，避免同一分歧双重判红；
+    #       (b) 双有——只在**两侧都**声明了该孤儿匿名类型时比成员。若仅一侧声明
+    #           （另一侧 `xs:anyType` / 无内联类型，如 <if>/<for> 引擎侧 anyType、
+    #           语言侧富声明），那是**既存的跨仓结构缺口**（语言仓富声明、引擎侧
+    #           anyType 放行），非本单目标，不在此新增判红——本键只为「两侧都
+    #           声明同一匿名类型、成员却不同」的真漂移（如 <sequence> 的 reassign）
+    #           而设。
+    for host in sorted(set(l_anonchild) | set(e_anonchild)):
+        if host not in l_anonchild or host not in e_anonchild:
+            continue  # 仅一侧声明：既有结构缺口，不新增判红
+        ls, es = l_anonchild[host], e_anonchild[host]
+        if ls == es:
+            continue
+        # 去重护栏：命名宿主层（<el> 作为命名 complexType / 全局元素）若已把
+        # **每一项**分歧成员都收在两侧**同名**里（该成员在命名宿主 lang 集 ⇔
+        # 在命名宿主 eng 集，且两侧至少一侧有 ⇒ 已在命名宿主键裁决），此键不重判。
+        # 反之某分歧成员**不在**命名宿主层任一侧（如 <sequence> 的 reassign 藏在
+        # 其匿名 complexType 内、命名宿主层两侧都只见 5 个步骤成员、reassign 无），
+        # 则命名宿主层够不到它，须在此键判——这正是本键要补的盲区。
+        el = host.split(":", 1)[1]
+        lc = l_hosts.get(el, (set(), set()))[1]
+        ec = e_hosts.get(el, (set(), set()))[1]
+        items = [x for x in (ls | es) if (x in ls) != (x in es)]
+        covered = all((x in lc) == (x in ec) and (x in lc or x in ec)
+                      for x in items)
+        if covered:
+            continue
+        check("child", host, ls, es, ("lang", "engine"))
     # ③ 全局根元素集
     check("root", "—", l_roots, e_roots, ("lang", "engine"))
 
@@ -333,11 +408,12 @@ def self_test():
         (eng).mkdir(exist_ok=True)
         write_schema(lang, body_l)
         write_schema(eng, body_e)
-        l_hosts, l_anons, l_roots = load_side(lang)
-        e_hosts, e_anons, e_roots = load_side(eng)
+        l_hosts, l_anons, l_ac, l_roots = load_side(lang)
+        e_hosts, e_anons, e_ac, e_roots = load_side(eng)
         tsv_good = {("attr", "T", "gone"): ("lang-wins", "自证", "2026-01-01")}
         und, res, _ = diff_sides(
-            (l_hosts, l_anons, l_roots), (e_hosts, e_anons, e_roots), tsv_good, None)
+            (l_hosts, l_anons, l_ac, l_roots),
+            (e_hosts, e_anons, e_ac, e_roots), tsv_good, None)
         if und:
             die_selftest("好树出现未裁决分歧：%s" % und)
         if not res:
@@ -348,9 +424,10 @@ def self_test():
                    '<xs:sequence><xs:element name="c" type="xs:string"/>'
                    '</xs:sequence></xs:complexType>')
         write_schema(eng, body_e2)
-        e_hosts2, _, _ = load_side(eng)
+        e_hosts2, e_anons2, e_ac2, e_roots2 = load_side(eng)
         und2, _, _ = diff_sides(
-            (l_hosts, l_anons, l_roots), (e_hosts2, e_anons, e_roots), tsv_good, None)
+            (l_hosts, l_anons, l_ac, l_roots),
+            (e_hosts2, e_anons2, e_ac2, e_roots2), tsv_good, None)
         if not any("T" in u and "z" in u for u in und2):
             die_selftest("坏树未红：未登记分歧未被检出（%s）" % und2)
         # —— 假阳性护栏：台账记 `a-part`，两侧分别是 `aPart` / `a-part`
@@ -366,13 +443,13 @@ def self_test():
                      '<xs:complexType name="T"><xs:attribute name="aPart" type="xs:string"/>'
                      '<xs:sequence><xs:element name="c" type="xs:string"/></xs:sequence>'
                      '</xs:complexType>')  # 语言侧 T 含 aPart
-        e_hosts3, e_anons3, e_roots3 = load_side(eng)
-        l_hosts3, l_anons3, l_roots3 = load_side(lang)
+        e_hosts3, e_anons3, e_ac3, e_roots3 = load_side(eng)
+        l_hosts3, l_anons3, l_ac3, l_roots3 = load_side(lang)
         tsv_a = {("attr", "T", "a-part"): ("lang-wins", "自证", "2026-01-01")}
         norm_a = {("attr", "T", "apart"): tsv_a[("attr", "T", "a-part")]}
         und3, res3, _ = diff_sides(
-            (l_hosts3, l_anons3, l_roots3),
-            (e_hosts3, e_anons3, e_roots3), norm_a, None)
+            (l_hosts3, l_anons3, l_ac3, l_roots3),
+            (e_hosts3, e_anons3, e_ac3, e_roots3), norm_a, None)
         # aPart / a-part 两侧各一个、norm 后同键 apart ⇒ 台账记录 a-part 匹配上：
         # 分歧「已裁决」（不红）。旧实现里 a-part 侧不叫 aPart ⇒ 未裁决红（假漏红
         # 的反面：把已裁决的活分歧报成未裁决）——断言必须 0 未裁决。
@@ -381,8 +458,30 @@ def self_test():
         # 同时绝不能把它报成「已消解」——分歧实测仍在，折叠不得吞掉它。
         if any(r[2] == "apart" for r in res3):
             die_selftest("norm 折叠假阳性：aPart/a-part 活分歧被误判为已消解（%s）" % res3)
+        # —— 匿名类型子元素集盲区护栏（W67）：两侧各有一个同名单一元素，
+        #    其匿名内联 <sequence> 成员不同（引擎侧多一个子元素），台账未登记
+        #    ⇒ 必红。这是本闸「匿名 complexType 子元素集」新增比对的自证：
+        #    若 anon_children 未接入 diff_sides，此处会漏红（正是原盲区）。
+        #    注意：两侧该元素名均只出现一次（同名单一），且带匿名内联 complexType，
+        #    故都会进入 anon-child@文件:元素名 键；属性集完全相同（只比子元素集）。
+        anon_l = ('<xs:element name="seq"><xs:complexType>'
+                  '<xs:sequence><xs:element name="c1" type="xs:string"/>'
+                  '</xs:sequence></xs:complexType></xs:element>')
+        anon_e = ('<xs:element name="seq"><xs:complexType>'
+                  '<xs:sequence><xs:element name="c1" type="xs:string"/>'
+                  '<xs:element name="c2" type="xs:string"/>'
+                  '</xs:sequence></xs:complexType></xs:element>')
+        write_schema(lang, anon_l)
+        write_schema(eng, anon_e)
+        l_hosts4, l_anons4, l_ac4, l_roots4 = load_side(lang)
+        e_hosts4, e_anons4, e_ac4, e_roots4 = load_side(eng)
+        und4, _, _ = diff_sides(
+            (l_hosts4, l_anons4, l_ac4, l_roots4),
+            (e_hosts4, e_anons4, e_ac4, e_roots4), {}, None)
+        if not any("c2" in u and "anon-child@" in u for u in und4):
+            die_selftest("匿名类型子元素集分歧未红：盲区未修复（%s）" % und4)
     print("[self-test] 好树 0 红 / 坏树（未登记分歧）必红 / 已消解记录不红 / "
-          "norm 折叠不吞 kebab-camel 分歧：PASS")
+          "norm 折叠不吞 kebab-camel 分歧 / 匿名类型子元素集必红：PASS")
 
 
 def main():
