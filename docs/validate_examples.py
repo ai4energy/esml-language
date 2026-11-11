@@ -83,11 +83,15 @@ def root_of(text):
 
 
 def is_negative(path, text):
-    """README 的规矩：文件名含 probe、或头部注明为负例 ⇒ 预期失败。"""
+    """README 的规矩：文件名含 probe、或头部注明为负例 ⇒ 预期失败。
+
+    判据收紧（W47b）：`(?<!非)负例`——「负例」前一字符是「非」时是「非负例」自述，
+    不算自述负例（旧子串「负例」in head 会把「非负例示例」整件静默跳过）。
+    """
     if "probe" in path.name:
         return True
     head = "\n".join(text.splitlines()[:25])
-    return "负例" in head
+    return bool(re.search(r"(?<!非)负例", head))
 
 
 def check_xsd(quiet):

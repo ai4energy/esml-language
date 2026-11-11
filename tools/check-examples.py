@@ -605,7 +605,9 @@ def main(argv=None):
         if rel in seen:
             continue
         raw_head = p.read_text(encoding="utf-8", errors="replace")[:4000]
-        if re.search(r"负例|预期失败|预期报错", raw_head):
+        # W47b 收紧：「非负例」自述不算自述负例（「负例」前一字符是「非」⇒ 跳过）；
+        # 预期失败|预期报错 不动。
+        if re.search(r"(?<!非)负例|预期失败|预期报错", raw_head):
             red.append((rel, "manifest", "文件头自称负例，却不在 tools/negatives.tsv 里（「未判定」不合法）"))
 
     # ---- 词法别名闸：legacy 名不得被 schema 声明、不得出现在示例里 ----
