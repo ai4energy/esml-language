@@ -11,6 +11,7 @@ ESML 是一种声明式、基于方程的物理系统建模语言，文档即 XM
 | [`SPEC.md`](SPEC.md) | 语言规范：词法、类型系统、组件、端口、系统、方程、展开与求解约定 |
 | [`xsd/`](xsd/) | XML Schema：入口 schema 一份，canonical 子集四份（共享 primitive / 模型体系 / 计算体系 / 项目容器） |
 | [`docs/`](docs/) | 机验对账：[`validate_roots.py`](docs/validate_roots.py)（入口层根清单 ⇄ canonical 全局元素）与 [`validate_examples.py`](docs/validate_examples.py)（规范 ⇄ 示例，五道检查）、[`coverage.md`](docs/coverage.md)（对账表与逐条裁决）、[`design/`](docs/design/)（裁决记录） |
+| [`tools/`](tools/) | 台账闸：[`element-coverage.tsv`](tools/element-coverage.tsv)（元素覆盖双向台账）、[`attr-acceptance.tsv`](tools/attr-acceptance.tsv)（属性验收台账）、[`engine-drift.tsv`](tools/engine-drift.tsv)（跨仓 schema 漂移裁决）、[`aliases.tsv`](tools/aliases.tsv)（legacy 拼法清单）、[`negatives.tsv`](tools/negatives.tsv) / [`neg-debt.tsv`](tools/neg-debt.tsv)（负例清单与债务处置） |
 | `D-skeleton/` … `X-use/` | 每个语法点一份可运行文档，按语言层次分目录（见下表） |
 
 canonical XML 是正统语法；XML Schema 描述 canonical XML，是可机验的基准。
@@ -46,21 +47,34 @@ canonical XML 是正统语法；XML Schema 描述 canonical XML，是可机验�
 
 ## 校验与运行
 
-仓内两道**常驻机判**，`make check` 一起跑（任一失败即非零退出）：
+仓内四道**常驻机判**，`make check` 一起跑（任一失败即非零退出）：
 
 | 脚本 | 查什么 | 依赖 |
 |---|---|---|
 | [`docs/validate_roots.py`](docs/validate_roots.py) | **根矩阵**：入口层 `esml-v1.xsd` 的根集合 ⇄ canonical 层的全局元素集合；入口层注释里的根清单由脚本生成、逐字复核；SPEC §13 的 XSD 分层表逐行对账 | 仅标准库 |
-| [`docs/validate_examples.py`](docs/validate_examples.py) | 规范 ⇄ 示例 五道检查（XSD 机验 / 路径 / 章节引用 / 稀有元素 / SPEC 代码块） | `xmlschema` |
+| [`docs/validate_examples.py`](docs/validate_examples.py) | 规范 ⇄ 示例 五道检查（XSD 机验 / 路径 / 章节引用 / 稀有元素 / SPEC 代码块）；`--strict` 追加第六道「撤通配判别力闸」，与 `docs/audit/strict-baseline.txt` 基线比较 | `xmlschema` |
+| [`tools/check-engine-xsd-parity.py`](tools/check-engine-xsd-parity.py) | **跨仓 schema 漂移**：本仓 `xsd/` ⇄ 引擎仓 `$ESML_ENGINE_DIR/schema/` 的属性集 / 子元素集 / 全局根三项对账，每组分歧须在 [`tools/engine-drift.tsv`](tools/engine-drift.tsv) 有裁决行 | `lxml` |
+| [`tools/check-element-coverage.py`](tools/check-element-coverage.py) | **元素覆盖双向闸**：方向 A「每个 XSD 命名元素必须有非负例示例或在台账登记」，方向 B「示例用到的每个元素必须已声明或登记 by-design」；台账 [`tools/element-coverage.tsv`](tools/element-coverage.tsv)，头部计数当场重算 | 仅标准库 |
 
 ```sh
-make check                                  # 两道都跑
-python3 docs/validate_roots.py             # 只跑根矩阵
-python3 docs/validate_roots.py selftest    # 根矩阵的自证（好例 / 坏例）
+make check                                   # 四道都跑
+make roots                                   # 只跑根矩阵
+make strict                                  # 只跑撤通配判别力闸
+python3 docs/validate_roots.py selftest      # 根矩阵的自证（好例 / 坏例）
+python3 tools/check-element-coverage.py      # 只跑元素覆盖闸
+python3 tools/check-element-coverage.py --self-test  # 自证：好树零违规、坏树必红
 ```
 
+属性面另有台账闸 [`tools/check-attr-acceptance.py`](tools/check-attr-acceptance.py)：
+逐行核对 [`tools/attr-acceptance.tsv`](tools/attr-acceptance.tsv) 的 verdict，
+`--engine-check` 把每个属性注入真实示例实跑引擎复算，`--self-test` 自证。
+依赖引擎二进制（`ESML_ENGINE_DIR` 指向 `target/release`；缺引擎时打印「跳过」）。
+`docs/coverage.md` 汇总所有**规范有、实现无**与 **by-design** 的登记项。
+
 改了 schema 之后，先 `python3 docs/validate_roots.py sync` 重生成入口层注释里的
-根矩阵清单（**清单不手工转述**），再跑 `make check`。
+根矩阵清单（**清单不手工转述**），再跑 `make check`。`make check` 第三道
+（跨仓漂移）在缺引擎仓时打印「跳过」并放行——它只在能读到 `$ESML_ENGINE_DIR/schema/`
+时才是硬闸。
 
 任意 XML Schema 校验器均可。入口 schema 校验良构性与命名空间，canonical schema
 校验文档结构：
@@ -91,9 +105,9 @@ esml simulate path/to/example.esml -L path/to/library
   作者标识符中禁止出现。
 - 实例路径用 `.` 书写。
 
-## 机验
+## 机验（进阶工具）
 
-示例与 XSD 的一致性由 [`tools/check-examples.py`](tools/check-examples.py) 把关：
+示例与 XSD 的一致性另由 [`tools/check-examples.py`](tools/check-examples.py) 把关：
 
 ```sh
 python3 -m venv .venv && .venv/bin/pip install lxml   # 只需一次

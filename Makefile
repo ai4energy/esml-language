@@ -1,17 +1,18 @@
-# 仓内闸门（gate）：两道常驻机判。
+# 仓内闸门（gate）：四道常驻机判。
 #
-#   make check     两道都跑，任一失败即非零退出
+#   make check     四道都跑，任一失败即非零退出（漂移闸缺引擎仓时跳过）
 #   make roots     只跑根矩阵对账（仅标准库，无外部依赖）
 #   make examples  只跑示例 ⇄ 规范对账（需要 xmlschema）
 #   make selftest  根矩阵的自证（好例 / 坏例）
 #   make strict    只跑示例 ⇄ 规范的撤通配判别力闸（--strict，需 xmlschema）
+#   make elements  只跑元素覆盖双向闸（仅标准库）
 #
 # 改完 schema 后先 `python3 docs/validate_roots.py sync` 重生成入口层注释里的
 # 根矩阵清单，再 `make check`。
 
 PY ?= python3
 
-.PHONY: check roots examples selftest strict
+.PHONY: check roots examples selftest strict elements
 
 check:
 	@rc=0; \
@@ -33,3 +34,6 @@ selftest:
 
 strict:
 	$(PY) docs/validate_examples.py --strict
+
+elements:
+	$(PY) tools/check-element-coverage.py
