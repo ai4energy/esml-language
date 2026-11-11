@@ -496,22 +496,14 @@ grep -oP 'xs:anyAttribute[^/>]*' xsd/*.xsd | grep -oP 'processContents="[^"]*"' 
 **aliases.tsv 属性行 XSD 可拒比例**（2026-11-11，逐条探针实测）：
 
 `tools/aliases.tsv` 属性行共 **26 条**；逐条在 canonical 宿主上写探针、
-`xmlschema` 校验，**XSD 可拒的 0 条**（0%）——全部 **26 条**（100%）
-因宿主顶层有 lax anyAttribute 而被放行。
-
-> **W53 复核更正**：W42 原判「可拒 3 条（`max-time`/`model-type`/`component`）」
-> 是**假 REJECT 工件**——W42 探针漏给宿主/根的必备 required 属性（`<system>` 的
-> `name=`、`<continueUntil>` 的 `maxTime=`、`<instance>` 的 `type=`/`name=`、
-> `<task>` 的 `name=`+`kind=`），探针因「缺 required 属性」而 REJECT，并非
-> legacy 拼法顶不上。W53 探针给齐所有 required 属性后逐条复跑：**26/26 全部
-> ACCEPT**（lax anyAttribute 放行），XSD 对属性面 0 判别力。下表中该 3 条
-> 原判 REJECT 改标 ACCEPT，机制改为「W53 更正」。
+`xmlschema` 校验，**XSD 可拒的只有 3 条**（11.5%）；其余 **23 条**（88.5%）
+全部因 lax anyAttribute 放行：
 
 | 拼法 | 宿主 | XSD 判定 | 机制 |
 |---|---|---|---|
-| `max-time` | `<continueUntil>` | **ACCEPT**（lax） | W53 更正：`maxTime` 虽 `use="required"`，但探针给齐 `maxTime=` 后 `max-time` 仍经 lax anyAttribute 放行（W42 漏给 `maxTime` 致假 REJECT） |
-| `model-type` | `<instance>` | **ACCEPT**（lax） | W53 更正：`type` 虽 `use="required"`，但探针给齐 `type=` 后 `model-type` 仍经 lax anyAttribute 放行（W42 漏给 `type` 致假 REJECT） |
-| `component` | `<instance>` | **ACCEPT**（lax） | W53 更正：同上（W42 漏给 `type` 致假 REJECT） |
+| `max-time` | `<continueUntil>` | **REJECT** | `maxTime` `use="required"`，`max-time` 顶不上 |
+| `model-type` | `<instance>` | **REJECT** | `type` `use="required"`，`model-type` 顶不上 |
+| `component` | `<instance>` | **REJECT** | 同上（`type` 是 required，`component` 顶不上） |
 | `time-layer` / `time_layer` | `<partition>` | ACCEPT（lax） | `timeLayer` 是 `use="optional"`，通配放行 |
 | `upper-bound` / `upper_bound` | `<variable>` | ACCEPT（lax） | 同上 |
 | `lower-bound` / `lower_bound` | `<variable>` | ACCEPT（lax） | 同上 |
@@ -537,21 +529,21 @@ XSD 和引擎都该拒但只有引擎拒得到（语言层比引擎层宽）。
 |---|---|---|
 | 集合性质 | **闭集**：未声明的 `<component>` 直接拒 | **开集**：未声明的 `a-part` 在 lax 通配下放行 |
 | 拒收机制 | XSD 结构性拒（未知子元素） | 只有 canonical 属性 `use="required"` 时才能拒 legacy 拼法 |
-| 可拒比例（aliases 实测） | 100%（element 行全部 XSD 拒） | **0%**（0/26，W53 复核） |
+| 可拒比例（aliases 实测） | 100%（element 行全部 XSD 拒） | **11.5%**（3/26） |
 | 引擎层兜底 | F7 unknown element | F7 unknown attribute / F1 legacy spelling |
 
 **影响**：
 
-- legacy 拼法里 **26/26 条**（100%，W53 复核）在语言层（canonical XSD）能通过，
+- legacy 拼法里 **23/26 条**（88.5%）在语言层（canonical XSD）能通过，
   只有引擎层 F7/F1 能兜住；
 - 「拼写单轨」在属性面的执行力完全依赖引擎层，XSD 层形同虚设；
-- 这 26 条 legacy 拼法如果出现在第三方工具链（不走 `esml check`），
+- 这 23 条 legacy 拼法如果出现在第三方工具链（不走 `esml check`），
   会**静默通过** XSD 校验、且无任何警告。
 
 **候选处置**（三选一，owner 裁决，本单不推荐、不实现）：
 
 1. **不改 XSD，只记账**（现状）——代价：第三方工具链对 legacy 属性拼法
-   零判别力；本仓 XSD 对「拼写单轨」的执行力停留在 0%（W53 复核）。
+   零判别力；本仓 XSD 对「拼写单轨」的执行力停留在 11.5%。
 2. **逐宿主收紧**：把 canonical 属性从 `use="optional"` 改为 `use="required"`、
    删除对应 `xs:anyAttribute`——代价：每处改动需逐宿主评估，201 处 anyAttribute
    里有多少该撤、多少该留是逐案裁决；改动量大、回归面广。
@@ -559,34 +551,60 @@ XSD 和引擎都该拒但只有引擎拒得到（语言层比引擎层宽）。
    SPEC 或 README）——代价：文档承诺与 XSD 实际能力有落差，读者可能误以为
    XSD 已拒收。
 
-**探针方法**（2026-11-11 初测 W42；2026-11-11 W53 复核修正）：
+**探针方法**（2026-11-11，`xmlschema` + 本仓 XSD，26 条属性 alias 逐条实跑）：
 将每条 legacy 拼法写进真实 canonical 宿主（`<system>`/`<modelType>`/`<portType>`
-等），以真实全局根元素（`<system>`/`<modelTypes>`/`<portTypes>`/`<computeTasks>`）
-为文档根、挂 ESML 命名空间，`xmlschema.XMLSchema('xsd/esml-canonical-basic.xsd')`
-校验；判 ACCEPT / REJECT 并取失败原因。
-
-> **W53 复核要点**：探针必须给齐宿主及其祖先根的**所有 required 属性**
-> （`<system>` 的 `name=`、`<continueUntil>` 的 `maxTime=`、`<instance>` 的
-> `name=`+`type=`、`<task>` 的 `name=`+`kind=` 等），否则探针因「缺 required
-> 属性」而 REJECT，会把 legacy 拼法误判成「顶不上」。W42 初测正是漏给这些
-> required 属性，才得出 3 条假 REJECT；W53 给齐后 26/26 全 ACCEPT。
+等），以 `<esml>` 为根，`xmlschema.XMLSchema('xsd/esml-canonical-basic.xsd')`
+校验；拒收原因取 `str(e)` 首行。命令可复算（见下）。
 
 ```python
-# 复算示例（单条，W53 给齐 required 属性的正确探针）
+# 复算示例（单条）
 import xmlschema as xs, xml.etree.ElementTree as ET
 NS='https://www.ai4energy.cn/esml/v1'
 x = xs.XMLSchema('xsd/esml-canonical-basic.xsd')
-# 给齐 <system> 的 name= 与 <continueUntil> 的 required maxTime=，
-# 再把 legacy 拼法 max-time 注到 <continueUntil> 上：
-frag = f'<system xmlns="{NS}" name="S">' \
-       f'<schedule><sequence><continueUntil condition="c" maxTime="1" max-time="1"/></sequence></schedule>' \
-       f'</system>'
+frag = f'<esml xmlns="{NS}" schema="esml/v1" name="p"><systems><system name="S">' \
+       f'<schedule><sequence><continueUntil condition="c" max-time="1"/></sequence></schedule>' \
+       f'</system></systems></esml>'
 try:
     x.validate(ET.fromstring(frag))
-    print("ACCEPT  ← lax 放行（max-time 经 anyAttribute 通配收）")
+    print("ACCEPT  ← lax 放行")
 except Exception as e:
-    print("REJECT  ←", str(e).splitlines()[0])
+    print("REJECT  ← required 机制顶不上")
 ```
+
+> **两种探针口径（W53 复核补注，2026-11-11）**——本节 3/26 走的是**替代式**：
+>
+> - **替代式**（§5.12 的口径）：legacy **替换** canonical，探针上**不写**被
+>   替代的那个 canonical 属性。例：`<continueUntil … max-time="1"/>`（**不写**
+>   `maxTime=`）。此时若 canonical 的该属性 `use="required"`，探针因**缺
+>   required** 而 REJECT——拒收原因是「替代后 required 落空」，即 XSD 对这条
+>   legacy 拼法有判别力。`max-time`/`model-type`/`component` 三条正是此口径下
+>   可拒，余 23 条因 canonical 对应属性 `use="optional"`（或本仓未声明）而
+>   缺了也过 → ACCEPT（lax 放行）。**3/26 就是这个口径。**
+> - **叠加式**：canonical 的 required 属性**保留**，另加一个 legacy 拼法。
+>   例：`<continueUntil … maxTime="1" max-time="1"/>`（`maxTime` 与 `max-time`
+>   同写）。此式下任何宿主都 ACCEPT——lax anyAttribute 对未声明的额外属性一律
+>   放行，这是 anyAttribute 的定义性行为，**与 legacy 拼法是否可替代无关**。
+>   故叠加式**不构成判别力证据**（W53 曾误把叠加式的 26/26 ACCEPT 当结论，
+>   已否）；本节不采用此口径。
+>
+> 复算替代式 3 条（W53 独立复现，逐条 REJECT）：
+>
+> ```python
+> # 替代式：只写 legacy，不写被替代的 canonical required
+> sub = [
+>   ('<system name="S"><schedule><sequence><continueUntil condition="c" max-time="1"/>'
+>    '</sequence></schedule></system>'),
+>   ('<system name="S"><instances><instance name="i" model-type="M"/></instances></system>'),
+>   ('<system name="S"><instances><instance name="i" component="M"/></instances></system>'),
+> ]
+> for f in sub:
+>     f = f.replace('<system', '<system xmlns="%s"'%NS, 1)
+>     try:
+>         x.validate(ET.fromstring(f)); print('ACCEPT')
+>     except Exception as e:
+>         print('REJECT  ←', [l for l in str(e).splitlines() if 'Reason:' in l][:1])
+> # 三条均 REJECT：missing required 'maxTime' / 'type' / 'type'
+> ```
 
 **引用链**（证据行，本单不改台账）：
 
