@@ -11,14 +11,14 @@ ESML 是一种声明式、基于方程的物理系统建模语言，文档即 XM
 | [`SPEC.md`](SPEC.md) | 语言规范：词法、类型系统、组件、端口、系统、方程、展开与求解约定 |
 | [`xsd/`](xsd/) | XML Schema：入口 schema 一份，canonical 子集四份（共享 primitive / 模型体系 / 计算体系 / 项目容器） |
 | [`docs/`](docs/) | 机验对账：[`validate_roots.py`](docs/validate_roots.py)（入口层根清单 ⇄ canonical 全局元素）与 [`validate_examples.py`](docs/validate_examples.py)（规范 ⇄ 示例，五道检查）、[`coverage.md`](docs/coverage.md)（对账表与逐条裁决）、[`design/`](docs/design/)（裁决记录）、[`audit/`](docs/audit/)（strict 基线等审计件） |
-| [`tools/`](tools/) | 台账闸：[`element-coverage.tsv`](tools/element-coverage.tsv)（元素覆盖双向台账）、[`attr-acceptance.tsv`](tools/attr-acceptance.tsv)（属性验收台账）、[`engine-drift.tsv`](tools/engine-drift.tsv)（跨仓 schema 漂移裁决）、[`aliases.tsv`](tools/aliases.tsv)（legacy 拼法清单）、[`negatives.tsv`](tools/negatives.tsv) / [`neg-debt.tsv`](tools/neg-debt.tsv)（负例清单与债务处置） |
+| [`tools/`](tools/) | 台账闸：[`element-coverage.tsv`](tools/element-coverage.tsv)（元素覆盖双向台账）、[`attr-acceptance.tsv`](tools/attr-acceptance.tsv)（属性验收台账：引擎裁决）、[`attr-coverage.tsv`](tools/attr-coverage.tsv)（属性覆盖双向台账：完整性）、[`engine-example-debt.tsv`](tools/engine-example-debt.tsv)（引擎 × 示例可运行性台账）、[`engine-drift.tsv`](tools/engine-drift.tsv)（跨仓 schema 漂移裁决）、[`aliases.tsv`](tools/aliases.tsv)（legacy 拼法清单）、[`negatives.tsv`](tools/negatives.tsv) / [`neg-debt.tsv`](tools/neg-debt.tsv)（负例清单与债务处置） |
 | `D-skeleton/` … `X-use/` | 每个语法点一份可运行文档，按语言层次分目录（见下表） |
 
 canonical XML 是正统语法；XML Schema 描述 canonical XML，是可机验的基准。
 文字与 schema 出现分歧时，以 schema 为准。
 
 ```sh
-python3 -m venv .venv && .venv/bin/pip install xmlschema lxml   # 一次装齐四道闸的依赖
+python3 -m venv .venv && .venv/bin/pip install xmlschema lxml   # 一次装齐六道闸的依赖
 PY=.venv/bin/python make check                                  # 全绿 = 可以提交
 ```
 
@@ -52,7 +52,7 @@ PY=.venv/bin/python make check                                  # 全绿 = 可�
 
 ## 校验与运行
 
-仓内四道**常驻机判**，`make check` 一起跑（任一失败即非零退出）：
+仓内六道**常驻机判**，`make check` 一起跑（任一失败即非零退出）：
 
 | 脚本 | 查什么 | 依赖 |
 |---|---|---|
@@ -60,14 +60,18 @@ PY=.venv/bin/python make check                                  # 全绿 = 可�
 | [`docs/validate_examples.py`](docs/validate_examples.py) | 规范 ⇄ 示例 五道检查（XSD 机验 / 路径 / 章节引用 / 稀有元素 / SPEC 代码块）；`--strict` 追加第六道「撤通配判别力闸」，与 `docs/audit/strict-baseline.txt` 基线比较 | `xmlschema` |
 | [`tools/check-engine-xsd-parity.py`](tools/check-engine-xsd-parity.py) | **跨仓 schema 漂移**：本仓 `xsd/` ⇄ 引擎仓 `$ESML_ENGINE_DIR/schema/` 的属性集 / 子元素集 / 全局根三项对账，每组分歧须在 [`tools/engine-drift.tsv`](tools/engine-drift.tsv) 有裁决行 | `lxml` |
 | [`tools/check-element-coverage.py`](tools/check-element-coverage.py) | **元素覆盖双向闸**：方向 A「每个 XSD 命名元素必须有非负例示例或在台账登记」，方向 B「示例用到的每个元素必须已声明或登记 by-design」；台账 [`tools/element-coverage.tsv`](tools/element-coverage.tsv)，头部计数当场重算 | 仅标准库 |
+| [`tools/check-attr-coverage.py`](tools/check-attr-coverage.py) | **属性覆盖双向闸**：声明→示例（每个 XSD 声明的属性必须有非负例示例或在台账登记）与示例→声明（示例用到的每个属性必须已声明或登记 by-design）；台账 [`tools/attr-coverage.tsv`](tools/attr-coverage.tsv)，头部计数当场重算。与 `attr-acceptance.tsv` 分工：后者记**引擎裁决**（收 / 拒 / 零效果），本闸查**完整性**（声明 ⇄ 示例闭合） | 仅标准库 |
+| [`tools/check-engine-examples.py`](tools/check-engine-examples.py) | **示例 × 引擎可运行性闸**：每个非负例示例（负例识别照抄 `validate_examples.py`）要么 `esml check` 绿（`errors=0`）、要么在 [`tools/engine-example-debt.tsv`](tools/engine-example-debt.tsv) 登记引擎债；台账数字与实测不符即「台账过时」判红；缺引擎跳过（同跨仓漂移闸） | `lxml` 无；逐件实跑引擎，缺引擎仓跳过 rc=0 |
 
 ```sh
-make check                                   # 四道都跑
+make check                                   # 六道都跑
 make roots                                   # 只跑根矩阵
 make strict                                  # 只跑撤通配判别力闸
 python3 docs/validate_roots.py selftest      # 根矩阵的自证（好例 / 坏例）
 python3 tools/check-element-coverage.py      # 只跑元素覆盖闸
 python3 tools/check-element-coverage.py --self-test  # 自证：好树零违规、坏树必红
+python3 tools/check-attr-coverage.py --self-test      # 自证：好树零违规、坏树必红
+python3 tools/check-engine-examples.py --self-test   # 自证：台账逻辑（负例识别 / 对账 / 计数）
 ```
 
 属性面另有台账闸 [`tools/check-attr-acceptance.py`](tools/check-attr-acceptance.py)：
@@ -79,7 +83,8 @@ python3 tools/check-element-coverage.py --self-test  # 自证：好树零违规�
 改了 schema 之后，先 `python3 docs/validate_roots.py sync` 重生成入口层注释里的
 根矩阵清单（**清单不手工转述**），再跑 `make check`。`make check` 第三道
 （跨仓漂移）在缺引擎仓时打印「跳过」并放行——它只在能读到 `$ESML_ENGINE_DIR/schema/`
-时才是硬闸。
+时才是硬闸；第六道（示例 × 引擎可运行性）同款「缺引擎跳过」：逐件实跑引擎不可用时
+不静默、不误红，头部台账计数检查照常做。
 
 任意 XML Schema 校验器均可。入口 schema 校验良构性与命名空间，canonical schema
 校验文档结构：
