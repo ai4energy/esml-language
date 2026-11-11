@@ -473,6 +473,111 @@ W20 新增的 19 处声明里，`check` 层面**无新增拒收**——唯一拒
 探针件：`/tmp/w14-probes/w19_four.py`（W9 四处拒收）、`/tmp/w28-probes/`
 （W28 逐元素复核；引擎 `~/esml-engine-user3/target/release/esml`，2026-11-11）。
 
+### 5.12 属性面判别力：lax anyAttribute 的结构性放行（2026-11-11，W42 实测）
+
+W4 做属性负例时发现：「拼写单轨」在**属性面**的执行力远低于**元素面**，
+原因是本仓 XSD 大量使用 `xs:anyAttribute processContents="lax"`——
+未声明的属性名在 lax 通配下**全部放行**，元素是闭集（未声明的
+`<component>` 直接拒），属性却是开集（未声明的 `a-part` 收）。
+
+**量化实测**（2026-11-11，本仓 HEAD `baf37b6`，命令见下）：
+
+```sh
+# anyAttribute 总数与 processContents 分布
+grep -oP '<xs:anyAttribute\b' xsd/*.xsd | wc -l                # 201
+grep -oP 'xs:anyAttribute[^/>]*' xsd/*.xsd | grep -oP 'processContents="[^"]*"' | sort | uniq -c
+#   201 processContents="lax"    （100% lax，0 处 skip，0 处无值）
+
+# 命名 complexTypes 里只靠 anyAttribute、无一条显式属性声明的宿主
+#   17 / 106（16%）——这 17 个类型的任何属性都靠通配放行
+```
+
+**aliases.tsv 属性行 XSD 可拒比例**（2026-11-11，逐条探针实测）：
+
+`tools/aliases.tsv` 属性行共 **26 条**；逐条在 canonical 宿主上写探针、
+`xmlschema` 校验，**XSD 可拒的只有 3 条**（11.5%）；其余 **23 条**（88.5%）
+全部因 lax anyAttribute 放行：
+
+| 拼法 | 宿主 | XSD 判定 | 机制 |
+|---|---|---|---|
+| `max-time` | `<continueUntil>` | **REJECT** | `maxTime` `use="required"`，`max-time` 顶不上 |
+| `model-type` | `<instance>` | **REJECT** | `type` `use="required"`，`model-type` 顶不上 |
+| `component` | `<instance>` | **REJECT** | 同上（`type` 是 required，`component` 顶不上） |
+| `time-layer` / `time_layer` | `<partition>` | ACCEPT（lax） | `timeLayer` 是 `use="optional"`，通配放行 |
+| `upper-bound` / `upper_bound` | `<variable>` | ACCEPT（lax） | 同上 |
+| `lower-bound` / `lower_bound` | `<variable>` | ACCEPT（lax） | 同上 |
+| `a-part` / `b-part` | `<connection>` | ACCEPT（lax） | `aPart`/`bPart` 是 `use="optional"` |
+| `porttype` | `<portType>` | ACCEPT（lax） | `portType` 是 `use="optional"` |
+| `interface` | `<portType>` | ACCEPT（lax） | 同上 |
+| `dir` | `<portType>` | ACCEPT（lax） | `category` 是 `use="optional"` |
+| `port-set` | `<portType>` | ACCEPT（lax） | `portSet` 是 `use="optional"` |
+| `desc` | `<equation>` | ACCEPT（lax） | `description` 是 `use="optional"` |
+| `extends` / `extends-from` | `<instance>` | ACCEPT（lax） | 待入，XSD 未声明，通配放行 |
+| `sample-time` / `control-horizon` | `<controller>`（compute.xsd） | ACCEPT（lax） | 宿主有 lax anyAttribute |
+| `from_state`/`out_state`/`out_kind`/`out_system`/`to_state`/`tolerance_pct` 等 snake 拼法（共 7 条，均「待入」） | `<instance>`/`<transition>` 等 | ACCEPT（lax） | 宿主有 lax anyAttribute，XSD 未声明 |
+
+**与 §5.11 的区别**（一句话）：§5.11 登记的属性是「XSD 真声明 + 引擎拒」——
+XSD 收了但引擎不收（`phase`/`aPart`/`bPart`/`nominal`/`quantity`/`synchronize`
+等，引擎比 XSD 窄）；§5.12 登记的是「XSD 本就不拒 + 引擎拒」——
+XSD 和引擎都该拒但只有引擎拒得到（语言层比引擎层宽）。
+两节方向相反，不能混。
+
+**与元素面的对比**：
+
+| 维度 | 元素面 | 属性面 |
+|---|---|---|
+| 集合性质 | **闭集**：未声明的 `<component>` 直接拒 | **开集**：未声明的 `a-part` 在 lax 通配下放行 |
+| 拒收机制 | XSD 结构性拒（未知子元素） | 只有 canonical 属性 `use="required"` 时才能拒 legacy 拼法 |
+| 可拒比例（aliases 实测） | 100%（element 行全部 XSD 拒） | **11.5%**（3/26） |
+| 引擎层兜底 | F7 unknown element | F7 unknown attribute / F1 legacy spelling |
+
+**影响**：
+
+- legacy 拼法里 **23/26 条**（88.5%）在语言层（canonical XSD）能通过，
+  只有引擎层 F7/F1 能兜住；
+- 「拼写单轨」在属性面的执行力完全依赖引擎层，XSD 层形同虚设；
+- 这 23 条 legacy 拼法如果出现在第三方工具链（不走 `esml check`），
+  会**静默通过** XSD 校验、且无任何警告。
+
+**候选处置**（三选一，owner 裁决，本单不推荐、不实现）：
+
+1. **不改 XSD，只记账**（现状）——代价：第三方工具链对 legacy 属性拼法
+   零判别力；本仓 XSD 对「拼写单轨」的执行力停留在 11.5%。
+2. **逐宿主收紧**：把 canonical 属性从 `use="optional"` 改为 `use="required"`、
+   删除对应 `xs:anyAttribute`——代价：每处改动需逐宿主评估，201 处 anyAttribute
+   里有多少该撤、多少该留是逐案裁决；改动量大、回归面广。
+3. **维持现状，靠引擎兜底**（同 1，但明确把「引擎层是属性面唯一防线」写进
+   SPEC 或 README）——代价：文档承诺与 XSD 实际能力有落差，读者可能误以为
+   XSD 已拒收。
+
+**探针方法**（2026-11-11，`xmlschema` + 本仓 XSD，26 条属性 alias 逐条实跑）：
+将每条 legacy 拼法写进真实 canonical 宿主（`<system>`/`<modelType>`/`<portType>`
+等），以 `<esml>` 为根，`xmlschema.XMLSchema('xsd/esml-canonical-basic.xsd')`
+校验；拒收原因取 `str(e)` 首行。命令可复算（见下）。
+
+```python
+# 复算示例（单条）
+import xmlschema as xs, xml.etree.ElementTree as ET
+NS='https://www.ai4energy.cn/esml/v1'
+x = xs.XMLSchema('xsd/esml-canonical-basic.xsd')
+frag = f'<esml xmlns="{NS}" schema="esml/v1" name="p"><systems><system name="S">' \
+       f'<schedule><sequence><continueUntil condition="c" max-time="1"/></sequence></schedule>' \
+       f'</system></systems></esml>'
+try:
+    x.validate(ET.fromstring(frag))
+    print("ACCEPT  ← lax 放行")
+except Exception as e:
+    print("REJECT  ← required 机制顶不上")
+```
+
+**引用链**（证据行，本单不改台账）：
+
+- `tools/attr-acceptance.tsv`：`aPart`/`bPart`（`rejected-f7`）+ `maxTime`
+  （`rejected-f7`）+ `phase`（`rejected-f7`）+ `quantity`（`rejected-f7`）
+  等行——「XSD 声明 + 引擎拒」（§5.11 方向）；与 §5.12 方向相反，不可互引。
+- `tools/engine-example-debt.tsv`：`L9-method-schedule/continue-until.esml`
+  （`maxTime` F7 引擎拒）——引擎层唯一防线在本例的具体落点。
+
 ---
 
 ## 6. 本分支的提交
