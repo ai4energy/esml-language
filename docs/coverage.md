@@ -294,6 +294,7 @@ schema**；要落地「顶层 `SET`」须先做一次规范修订（`SPEC.md` + 
 | `<param>` 元素（`compute.xsd:181` / `:387`） | 141 份示例 0 命中；`compute.xsd` 两处声明，引擎 F7 unknown element + F1 legacy spelling 双拒 | 规范有、实现无（孤儿声明）→ 台账 `param` 行记 `no-example`，不补示例 |
 | `domain` 属性（`<instance>` / `<modelType>` / `<system>` 宿主） | W17 2026-11-11 实测三宿主 `esml check` 均 `errors=0`，但 `esml solve` 取值与无 `domain` 同（`domain` 零读点，写与不写同解）；`<portType>` 宿主是 `F1 legacy spelling` 响亮拒收（台账 `PortTypeDef/domain` 行 `rejected-legacy`） | 引擎收但语义无效 → 按 §5.2 顶层 `SET` 先例**不补示例**，台账三宿主行记 `no-example` |
 | `side` 属性（`<annotation><port>` 宿主，`PortMarkType`） | W17 2026-11-11 实测 `esml check` `errors=0`，但 `side` 只属标注侧图形标记，引擎 `check` 不消费其值（写 `left`/`right` 与不写同）；模型侧 `<modelType><ports><port>` 是 `F1 unknown attribute` 响亮拒收（台账 `PortInstanceType/side` 行 `rejected-legacy`） | 引擎收但语义无效 → 按 §5.2 先例**不补示例**，台账 `PortMarkType/side` 行记 `no-example` |
+| `MetadataType` `xs:any` 兜底（`##targetNamespace` + `##other`） | SPEC:65「子结构不固定（schema 放行任意子元素）」是规范意图；XSD 1.0 UPA 禁止同一内容模型内命名元素与 `##targetNamespace` 通配并存（W23 2026-11-11 实测 sequence/choice 两种拼法均 `UPA violation`），故只能 lax | **by-design**，非缺口；strict 基线 3/3（`D-skeleton/metadata.esml` / `provenance.esml` / `doc-ref.esml`）不变 |
 
 ### 5.4 章节编号 `§6.2` 缺失
 

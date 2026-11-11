@@ -142,7 +142,16 @@
        撤掉通配即推翻条文，故这 3 件是规范债（条文欠账），非示例错、
        非 schema 欠账，基线 `docs/audit/strict-baseline.txt` 即其口径。
        这四个自由文本子元素 + `<doc>` **不是文档根**，只在 `<metadata>` 下
-       经本容器 `xs:any` 通配放行，故不在全局元素层声明（见「独立根 `<metadata>`」注释）。 -->
+       经本容器 `xs:any` 通配放行，故不在全局元素层声明（见「独立根 `<metadata>`」注释）。
+       W23（2026-11-11）UPA 实测：试图在保留 `xs:any namespace="##targetNamespace"`
+       的前提下逐一声明 author/license/description/provenance 四个命名元素，
+       两种拼法（sequence 直下 / choice 组内）均被 xmlschema 以
+       UPA violation 拒绝——
+         "Unique Particle Attribution violation between XsdElement(name='esml:author',
+          occurs=[0, None]) and XsdAnyElement(namespace=['https://www.ai4energy.cn/esml/v1']…)"
+         （choice 拼法报错同型，仅 occurs 变为 [1, 1]）。
+       故「逐一声明 + 保留通配」在 XSD 1.0 里不可同时满足；本容器只能保持 lax，
+       strict 基线 3 件（metadata / provenance / doc-ref）即此 by-design 的代价。 -->
   <xs:complexType name="MetadataType" mixed="true">
     <xs:sequence>
       <xs:any namespace="##targetNamespace" processContents="lax"
