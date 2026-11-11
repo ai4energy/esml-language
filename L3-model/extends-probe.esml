@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 负例（预期 XSD 失败）：`<modelType><extends>Base</extends>` 用 legacy 元素拼法。
+     XSD 拒收：`ModelType` 的子元素 choice 只声明 canonical `<extendsFrom>`，
+     `<extends>` 未声明 ⇒ `Unexpected child with tag '…extends'`（schema 级负例）。
+     【双向事实，务必分清】canonical 拼法是 `<extendsFrom>`（§4.0 类级继承），`<extends>`
+     属附录 C 已删旧拼法；但引擎收它 `errors=0`——引擎残留旧拼写、未拒收，这是**引擎债**
+     （见 tools/engine-drift.tsv `child ModelType extends` 行，方向 lang-wins：语义已裁定
+     `<extendsFrom>` 唯一 canonical，引擎收=引擎债）。读者注意：本例红在 XSD 这层，引擎不红。
+     canonical 用 `<extendsFrom>`，见 `L3-model/extends.esml` 正例。
+     规范条文：§4.0（`<extendsFrom>` 是唯一 canonical 拼写）＋ 附录 C（`<extends>` 已删）。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L3_ExtendsProbe">
+<variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
+<modelTypes>
+<modelType name="Base" discipline="generic"><parameters><parameter name="k" type="real" default="1.0"/></parameters><variables><variable name="x" type="real" role="state" initial="1.0"/></variables><equations><equation>Der(x) = -k * x</equation></equations></modelType>
+<modelType name="Derived" discipline="generic">
+<extends>Base</extends>
+</modelType>
+</modelTypes>
+<systems><system name="S"><instances><instance name="d" type="Derived"/></instances></system></systems>
+</esml>
