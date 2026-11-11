@@ -30,15 +30,15 @@
 
 | 指标 | BEFORE `58d2c0a` | AFTER（预期，W4 合入后） | 判据 |
 |---|---:|---:|---|
-| 示例件数 | 136 | **163** | `find . -name '*.esml'` |
+| 示例件数 | 136 | **164** | `find . -name '*.esml'` |
 | XSD 机验 · PASS | 130 | **153** | 检查 1 |
 | XSD 机验 · 负例按预期失败 | 5 | 5 | 检查 1 |
 | XSD 机验 · **非负例失败** | **1** | **0** | 检查 1 |
 | SPEC → 示例：点名且存在的路径 | 0 | **70** | 检查 2 |
 | SPEC → 示例：悬空路径 | 0 | **0** | 检查 2 |
-| 示例头部指名规范条文 | 0 / 136 | **163 / 163** | 检查 3 |
+| 示例头部指名规范条文 | 0 / 136 | **161 / 164** | 检查 3 |
 | 被指名的编号数 | 0 | **37** | 检查 3 |
-| **无 SPEC 依据的示例** | **54 / 136** | **2 / 163** | 检查 4 |
+| **无 SPEC 依据的示例** | **54 / 136** | **2 / 164** | 检查 4 |
 | `SPEC.md` 的 ```xml 段 · 自足文档级 | 0 段（`§6.8` 那段 **FAIL**） | **2 段全过** | 检查 5 |
 | `SPEC.md` 的 ```xml 段 · 子元素片段 | 15 段 | 15 段 | 检查 5 |
 | 引擎 `esml check -L <库根>` | — | rc0=**135** / 负例 6 / 非负例失败 **0** | 引擎 |
@@ -83,7 +83,7 @@
 ## 3. 反向对账：每个编号的「应当有示例」清单
 
 机验口径：示例头部「规范条文：…」一行点名的**全部**编号（以 `＋` 分隔的
-多条逐条计入）。共 **37 个编号 / 163 份示例**。
+多条逐条计入）。共 **37 个编号 / 164 份示例**。
 
 | 编号 · 条文 | 件数 | 示例（仓内路径） |
 |---|---:|---|
@@ -110,7 +110,7 @@
 | §7 §7（分段表达式） ／ §7（向量归约内建） ／ §7（数组下标与切片） ／ §7（方程类别与语义） ／ §7（算法段） ／ §7（表达式内建） | 13 | `L1-expr-equation/{array-index-probe.esml,array-index.esml,axis-reduce-probe.esml,axis-reduce.esml,builtins-complex.esml,builtins-delay.esml,builtins-expr.esml,builtins-math.esml,equation-basic.esml,ifelse.esml,oob-probe.esml,shape-mismatch-probe.esml}` `T-tasks/algorithm.esml` |
 | §7.1 §7.1（状态机与时钟） | 5 | `L2-discrete/{clock-functions.esml,clock-sample.esml,reset-transition.esml,state-machine.esml,transition-attrs.esml}` |
 | §8 §8（连接语义） | 2 | `L6-connect/{connect-basic.esml,connect-canonical.esml}` |
-| 附录B（续） 附录 B（续）— CASE 多分支 ／ 附录 B（续）— FOR 循环 ／ 附录 B（续）— ORDERED_SET 序集 ／ 附录 B（续）— SELECTOR ／ 附录 B（续）— 模型级 IF | 6 | `L0-type-unit/ordered-set.esml` `L1-expr-equation/for-in.esml` `L2-discrete/case-branch.esml` `L3-model/{if.esml,selector-values.esml}` `L7-partition/orderedsets.esml` |
+| 附录B（续） 附录 B（续）— CASE 多分支 ／ 附录 B（续）— FOR 循环 ／ 附录 B（续）— FOR 按序集迭代 ／ 附录 B（续）— ORDERED_SET 序集 ／ 附录 B（续）— SELECTOR ／ 附录 B（续）— 模型级 IF | 7 | `L0-type-unit/ordered-set.esml` `L1-expr-equation/{for-in.esml,for-over-orderedset.esml}` `L2-discrete/case-branch.esml` `L3-model/{if.esml,selector-values.esml}` `L7-partition/orderedsets.esml` |
 | 附录F1 附录 F1（stream 流股） | 2 | `L4-port/{port-stream.esml,stream.esml}` |
 | 附录F2 附录 F2（信号 causal 连接护栏） | 1 | `L4-port/signal-causal.esml` |
 | 附录F3 附录 F3（事件语义糖） | 4 | `L2-discrete/{elsewhen.esml,when-assign.esml,when-multiple.esml,when-reinit.esml}` |
@@ -130,12 +130,12 @@
 |---|---:|---|---:|
 | `D-skeleton/` | 10 | `L6-connect/` | 3 |
 | `L0-type-unit/` | 14 | `L7-partition/` | 5 |
-| `L1-expr-equation/` | 23 | `L8-function/` | 4 |
+| `L1-expr-equation/` | 24 | `L8-function/` | 4 |
 | `L2-discrete/` | 13 | `L9-method-schedule/` | 9 |
 | `L3-model/` | 10 | `T-tasks/` | 45 |
 | `L4-port/` | 12 | `X-use/` | 4 |
 | `L4-portvar/` | 2 | `L5-instance/` | 9 |
-| | | **合计** | **163** |
+| | | **合计** | **164** |
 
 ### 3.2 仍然**没有示例**的条款（留缺口，不补）
 
@@ -158,7 +158,7 @@
 | §14.5 可验性 | 散文 | 不覆盖 |
 | 附录 A 术语 / 附录 C 修订史 / 附录 D 旧版边界 | 散文 | 不覆盖 |
 | 附录 B（续）· process 级全局默认参数传播（顶层 `SET`） | 真条款 | **缺口**：schema 的 `<sets>` 只许 `<scope>` 子元素，裸 `<set>` 不可机验；引擎接受但**不生效** ⇒ 不补示例，见 §5.2 |
-| 附录 B（续）· FOR 按序集迭代 | 真条款 | **缺口**：`for-in.esml` 的 `in="1..3"` 是**字面整数范围**，不是 `in="Species"` 序集迭代 ⇒ 不补示例，见 §5.5 |
+| 附录 B（续）· FOR 按序集迭代 | 真条款 | **已补**：`for-over-orderedset.esml`（`in="Species"` 序集迭代，`array="Species"` 变量，`S=sum(C[1:3])=6`） |
 | 附录 F9 高指标 DAE（Pantelides） | 真条款 | **缺口**：`pantelides` 在 141 份示例里 0 命中 ⇒ 见 §5.1 |
 | 附录 F10 外部 I/O 经信号口 / 端口壳 | 真条款 | **缺口**：`signal` / `外部 I/O` 在示例里 0 命中（`signal-causal.esml` 是附录 F2 的**信号 causal 连接**，不是 F10 的外部 I/O）⇒ 见 §5.1 |
 | 附录 G 能力概览 / 附录 G·序集运算（编译期） | 散文 | 不覆盖 |
@@ -302,8 +302,9 @@ schema**；要落地「顶层 `SET`」须先做一次规范修订（`SPEC.md` + 
 
 `L1-expr-equation/for-in.esml` 的 `in="1..3"` 是**字面整数范围**
 （附录 B（续）· FOR 循环）；「FOR 按序集迭代」指的是 `in="Species"`
-（`in` 取已声明序集名，按成员 label 迭代）。仓内无第二份 FOR 示例，
-序集迭代形态**无示例** ⇒ 留缺口。
+（`in` 取已声明序集名，`k` 绑成员**序位** 1 起，非 label 字符串）。
+序集迭代形态已有示例 `L1-expr-equation/for-over-orderedset.esml`
+（`array="Species"` 变量 + `for var="k" in="Species"` + `S=sum(C[1:3])=6`）。
 
 ### 5.6 `<body>` 与 `<derivative>` 互斥：schema 拒、实现放行
 

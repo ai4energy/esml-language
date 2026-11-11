@@ -1295,9 +1295,24 @@ CASE/多区/滞回：配 SELECTOR + `<events><when>`(STN)，方程用 `ifelse(se
 - 参数 `array="Sp"`（实例参数数组）按序集定维，展开为 `name_1..name_n`。
 
 ### FOR 按序集迭代
-- `<for var="k" in="Species"><body>…</body></for>`：in 为已声明序集名时按成员 label 迭代，
-  与成员 label 下标/成员常量配合（body 里 k → H2O/CO2/CH4 等，随后 C(k)→C_1…）。
-  测试 test_for_over_set。
+`<for var="k" in="…">` 两种形态，`<body>` 包裹与不包裹等价（同解）。
+
+- **in="Species"（已声明序集名）**：`k` 绑成员**序位**（1 起），非 label 字符串。
+  例：序集 Species={H2O,CO2,CH4}，`k` 依次取 1,2,3；body 里 `C(k)` 展开为
+  `C_1, C_2, C_3`（元素名由 `array="Species"` 展开时按序位生成）。
+  - **变量必须 `array="Species"`**（或与成员数一致的数字）：否则变量退成标量
+    （默认 `array="1"`），check 仍 `errors=0` 而 solve 报 pantelides 结构化诊断
+    ——unmatched unknown 点名 `m.C`（无方程引用）、3 条 redundant 方程
+    `(C(1)-(1*0.5))` 等，即"FOR 展开出的元素名超出变量实际元素数"。
+  - 若 `array=` 正确、body 里**直接写裸元素名**（`C_1`/`C_2`/`C_3`，不用 `C(k)`），
+    check 仍 `errors=0`（3 条 I7 unresolved-reference 警告），solve 报
+    `undeclared symbol(s) referenced during flatten: C_1, C_2, C_3`——
+    独立机理：名字不解析（非"没展开"），与上一条"删 `array=`"是**不同的坑**。
+
+- **in="1..n"（字面整数范围）**：`n` 必须为整数**字面量**，展开为
+  `k=1,2,…,n`。`in="1..n"`（参数作上界）当前不支持：check 绿（`errors=0`）而
+  solve 报 `range "1..n": upper bound must be an integer literal
+  (parameterised bounds are not expanded yet)`——引擎欠账，非合法用法。
 
 ### CASE 多分支
 `<case on="sel"><branch value="k"><body><equation>lhs = rhs</equation>*</body></branch>*</case>`
