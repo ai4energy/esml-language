@@ -182,9 +182,11 @@
   （枚举类型放在 `<typesDimensionless>` 内）。
 - **记录类型**：顶层 `<recordTypes>` 目录内写 `<recordType name>`，其下用
   `<field name type default role unit/>` 逐字段声明。示例：`L0-type-unit/record-type.esml`。
-- **单位表分组**：`<units>` 的 `<unitsDerived>` 内可直接放 `<unit>`，也可先放
-  `<group name>` 再在组内放 `<unit>`；组内 `<unit>` 与组外平级可用（分组只是组织形式，
-  不改变单位语义——见附录 J）。示例：`L0-type-unit/units-group.esml`。
+- **单位表分组**：`<units>` 内可选 `<unitsBase>`（基本单位区，`<unit>` 的 `base=`
+  写定义式）与 `<unitsDerived>`（导出单位区，`<unit>` 的 `base=` 引已声明单位）；
+  两区各自内可直接放 `<unit>`，也可先放 `<group name>` 再在组内放 `<unit>`；
+  组内 `<unit>` 与组外平级可用（分组只是组织形式，不改变单位语义——见附录 J）。
+  示例：`L0-type-unit/units-group.esml`。
 
 ## 4. 组件（modelType）
 
@@ -1099,8 +1101,9 @@ modelType、systems、sets、initial、connections、fixed/free、schedule）。
 | `fd` | 实现前向差分（`<fd step relative>`，默认 `1e-6` 相对） | 自动差分，**报告标注"该函数用 FD"** |
 | `opaque` | 无导数信息 | 符号层保持 `RExpr::OpaqueDeriv`（响亮）；仅无需解析 Jacobian 的路径可用，否则报错或降 FD 并**标注** |
 
-`zeroDerivative`/`noDerivative wrt` 声明某输入偏导恒 0（省 Jacobian 项、省调用）；高阶用
-`<derivativeSymbol order="2" …>`。
+`zeroDerivative` 声明某输入偏导恒 0（省 Jacobian 项、省调用）；
+`noDerivative` 声明某输入**无**偏导（连 FD 也不做，Jacobian 对应项留 0）；
+高阶用 `<derivativeSymbol order="2" …>`。
 
 ### 14.3 C ABI 类型映射（写死）
 

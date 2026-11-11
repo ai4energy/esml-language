@@ -1,0 +1,9 @@
+# 共 0 行
+#
+# pending：0 行
+#
+# W37 首版台账（2026-11-11）。
+# 判据：xsd/*.xsd 命名 xs:element 必须在 SPEC.md 以 <name>（含带属性开标签）
+# 或 `name` 形式出现 ≥1 次。宽松判据（元素名后跟空白/`/>`/`>` 即算点名）下，
+# 183 个声明元素全部已在 SPEC 正文点名，差集 = 0，无需登记。
+# 列：element  verdict  owner  evidence
