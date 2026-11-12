@@ -3,14 +3,14 @@
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 任务级超参容器 `<hyperParams><param name=>…</param></hyperParams>`
      （canonical camelCase；kebab 拼法会被拒绝）。
-     `<param name value/>` 是 `<hyperParams>` 的 vendor 超参数子元素（SPEC:781 —
+     `<param name value/>` 是 `<hyperParams>` 的 vendor 超参数子元素（SPEC:785 —
      VendorHyperParamsType 允许 `<param>` 0..unbounded）。
      引擎 F7+F1 双拒（引擎债，详见 docs/coverage.md §5.11）。
      `esml check` 实测（W21 2026-11-11）：
        error: F7[]: unknown element `<param>` at T-tasks/hyperparams.esml:30:22 — use a canonical element name (see `unknown::KNOWN_SUB_TAGS`)
        error: F1[]: parser rejected the document: legacy spelling `<param>` at 2093:2124 — use `<parameter>` (compatibility expressions are no longer accepted) at T-tasks/hyperparams.esml:30:22
      本例保留 canonical 写法 `<hyperParams><param name="lr" value="0.01"/></hyperParams>`。
-     规范条文：§6.9（计算任务表）+ SPEC:781（VendorHyperParamsType 允许 `<param>` 0..unbounded）。
+     规范条文：§6.9（计算任务表）+ SPEC:785（VendorHyperParamsType 允许 `<param>` 0..unbounded）。
      XSD 校验 PASS（compute.xsd VendorHyperParamsType）；引擎 parser 无 `<param>` 读点 ⇒ 引擎债。 -->
   <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="T_HyperParams">
     <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>

@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- 语法点：vector 归约内建（SPEC 附录 F8，SPEC:1427-1433；§7，SPEC:860-861）：
+     `sum(X)` / `mean(X)` / `min(X)` / `max(X)` / `size(X)`，X 为声明的 array
+     变量或 array 参数；单参 canonical 形态，物化展开为逐元素 X_1..X_N。
+     本件为 T-LANG-SMOKE（2026-11-12）对 axis-reduce.esml 的改写：
+       · 旧件演示两参 axis 形态 `sum(X, k)` 与 `prod(M, 0)`——SPEC 无此拼写
+         （F8 仅单参，明文「不支持：多维数组归约、嵌套调用」），`prod` 亦非
+         F8 内建；
+       · 两参形态属引擎非 SPEC 扩展、半实现：越界 axis 求解期报 I25b（探针
+         L1-expr-equation/axis-reduce-probe.esml），但**在界**输入 flatten 层
+         崩溃（undeclared symbol，1D `sum(x, 0)` / 2D `sum(M, 1)` 最小复现均
+         失败）——引擎侧缺口，登记见 T-LANG-SMOKE 报告，本单不修引擎；
+     本件只用 F8 单参 canonical，可解。
+     规范条文：附录 F8（vector 归约内建 size/sum/mean/min/max 一等）＋ §7（数组变量求和/极值）。 -->
+<esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L1_VectorReduce">
+  <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
+  <modelTypes><modelType name="Reduce1D" discipline="generic">
+    <variables>
+      <variable name="x" type="real" array="3" role="algebraic"/>
+      <variable name="s" type="real" role="algebraic"/>
+      <variable name="m" type="real" role="algebraic"/>
+      <variable name="lo" type="real" role="algebraic"/>
+      <variable name="hi" type="real" role="algebraic"/>
+      <variable name="sz" type="real" role="algebraic"/>
+    </variables>
+    <equations>
+      <equation>x[1] = 1.0</equation>
+      <equation>x[2] = 2.0</equation>
+      <equation>x[3] = 3.0</equation>
+      <equation>s = sum(x)</equation>
+      <equation>m = mean(x)</equation>
+      <equation>lo = min(x)</equation>
+      <equation>hi = max(x)</equation>
+      <equation>sz = size(x)</equation>
+    </equations>
+  </modelType></modelTypes>
+  <systems><system name="S">
+    <instances><instance name="m" type="Reduce1D"/></instances>
+  </system></systems>
+</esml>

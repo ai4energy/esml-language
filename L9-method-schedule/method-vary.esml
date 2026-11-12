@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
-<!-- W21 语法点 `<methods><vary name=>…</vary></methods>`（METHOD VARY，SPEC:1518）。
+<!-- W21 语法点 `<methods><vary name=>…</vary></methods>`（METHOD VARY，SPEC:1535）。
      XSD 已声明（MethodsType 允许 `<vary>` 子元素），但引擎
      `unknown::KNOWN_SUB_TAGS` 无 `vary`，`esml check` F7 拒收（引擎债，
      详见 docs/coverage.md §5.11）。本例保留 canonical 写法。
      本例**不写** `<onLoad><vary>`（那是 W20/w3 在改的 onLoad 扩展，非本单范围）。
      `esml check` 实测（W21 2026-11-11）：
        error: F7[]: unknown element `<vary>` at L9-method-schedule/method-vary.esml:23:9 — use a canonical element name (see `unknown::KNOWN_SUB_TAGS`)
-     规范条文：附录 F7b（METHOD VARY 子过程）— `<vary name=>` 将变量标为可变。 -->
+     规范条文：附录 K / METHOD FIX/VARY（SPEC:1535）— `<vary name=>` 将变量标为可变。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L9_MethodVary">
   <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="Calc" discipline="generic">
