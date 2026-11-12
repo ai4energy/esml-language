@@ -1,8 +1,8 @@
-# 逐件求解冒烟台账（W52，2026-11-11 当场重算；W52 续件同日复测 simulate；T-LANG-SMOKE 2026-11-12：axis-reduce.esml 改写为 vector-reduce.esml（fail→ok）、计数重算；引擎：ESML v1.9.3 · Energy System Modeling Language · Ai4Energy · 商业版（深圳鼎拓智控科技有限公司专有软件，无规模限制） · 深圳鼎拓智控科技有限公司专有软件 · 学术版/商业版 · mingtao.li@gmail.com）
+# 逐件求解冒烟台账（W52，2026-11-11 当场重算；W52 续件同日复测 simulate；T-LANG-SMOKE 2026-11-12：axis-reduce.esml 改写为 vector-reduce.esml（fail→ok）、计数重算；T-LANG-CENSUS 2026-11-12：引擎 v1.9.4（release 22:24 构建）重跑全部 158 件非负例——5 件 F7 check 层债闭合（3 件 ok / continue-until ok-simulate / hyperparams fail-engine-debt）、port-carrier 闭式化 ok、builtins-math 未知量 4→6（v1.9.4 DOF 口径），计数重算；引擎：ESML v1.9.4 · Energy System Modeling Language · Ai4Energy · 商业版（深圳鼎拓智控科技有限公司专有软件，无规模限制） · 深圳鼎拓智控科技有限公司专有软件 · 学术版/商业版 · mingtao.li@gmail.com）
 # 列：path  has_system(1/0,lxml 判定)  solve_rc  simulate_rc(N/A=未跑)  unknowns(解出未知量数)  status  evidence(错误首行,≤200 字)
 # 普查口径：负例判据照 tools/check-engine-examples.py（is_negative，W47b 收紧版）；158 件非负例逐件 `ESML_PROPS=off esml solve <file>`（X-use/ 库件加 -L ~/esml-engine-user3/library），120 s/件超时；solve 面的 fail 件 W52 续件逐件再跑 `ESML_PROPS=off esml simulate <file>`（X-use/ 加 -L，120 s），simulate 成功者记 ok-simulate（solve 稳态不适用），fail 只留 solve 与 simulate 双红件
 # status 值域：ok / ok-simulate（simulate 成功、solve 稳态不适用）/ na-no-system / na-artifact（需外部工件，如 libesml_extern_testlib.so，缺失时 solve 走 SolveError）/ fail / fail-check-debt（F7 check 层已知债，已登记 engine-example-debt.tsv）/ fail-engine-debt（引擎侧求解层缺口，已登记 engine-example-debt.tsv stage=solve）/ fail（未归因或示例侧待修）/ timeout
-# 共 158 行 / ok 138 / ok-simulate 7 / na 6 / fail 7（fail 内分：fail-check-debt 5 / fail-engine-debt 2 / 示例侧待修 0）
+# 共 158 行 / ok 142 / ok-simulate 8 / na 6 / fail 2（fail 内分：fail-check-debt 0 / fail-engine-debt 2 / 示例侧待修 0）
 D-skeleton/data-scenario.esml	0	N/A	N/A	N/A	na-no-system	 
 D-skeleton/doc-ref.esml	1	0	N/A	1	ok	 
 D-skeleton/esml-coordinate.esml	1	0	N/A	1	ok	 
@@ -13,7 +13,7 @@ D-skeleton/skeleton-doc.esml	1	0	N/A	1	ok
 D-skeleton/skeleton-full.esml	1	0	N/A	1	ok	 
 D-skeleton/skeleton-minimal.esml	1	0	N/A	1	ok	 
 D-skeleton/solutionparameters.esml	1	0	N/A	1	ok	 
-L0-type-unit/literal-enum.esml	1	1	1	0	fail-check-debt	[known check-debt] error[F7]: L0-type-unit/literal-enum.esml:16:7 — unknown element `<literal>` ｜ simulate rc=1 双红：error[F7]: L0-type-unit/literal-enum.esml:16:7 — unknown element `<literal>` 1 ｜ simulate rc=1 双红（错误同 solve 首行）
+L0-type-unit/literal-enum.esml	1	0	N/A	1	ok	（T-LANG-CENSUS 2026-11-12，v1.9.4）F7/F1 闭合：esml check 实测 errors=0，solve rc=0（1 未知）
 L0-type-unit/observe-list.esml	1	0	N/A	2	ok	 
 L0-type-unit/ordered-set.esml	1	0	N/A	1	ok	 
 L0-type-unit/record-type.esml	0	N/A	N/A	N/A	na-no-system	 
@@ -32,7 +32,7 @@ L1-expr-equation/vector-reduce.esml	1	0	N/A	8	ok	T-LANG-SMOKE（2026-11-12）自
 L1-expr-equation/builtins-complex.esml	1	0	N/A	8	ok	 
 L1-expr-equation/builtins-delay.esml	1	0	N/A	2	ok	 
 L1-expr-equation/builtins-expr.esml	1	0	N/A	28	ok	 
-L1-expr-equation/builtins-math.esml	1	0	N/A	4	ok	W66 修复（O-15：time→t）；solve rc=0，m.s1=1.0 m.s2=6.7320508076 m.s3=7.0 m.s4=1.0
+L1-expr-equation/builtins-math.esml	1	0	N/A	6	ok	W66 修复（O-15：time→t）；solve rc=0，m.s1=1.0 m.s2=6.7320508076 m.s3=7.0 m.s4=1.0（v1.9.4 未知量 4→6，DOF 口径）
 L1-expr-equation/derivative-analytic.esml	1	1	1	0	na-artifact	需 libesml_extern_testlib.so（extern 测试库）；该 .so 非仓内工件，缺失时 solve 走 SolveError。示例侧 canonical 不动，留待引擎仓补库或 CI 注入 .so。
 L1-expr-equation/equation-basic.esml	1	0	N/A	2	ok	 
 L1-expr-equation/expr.esml	1	0	N/A	1	ok	 
@@ -65,7 +65,7 @@ L3-model/selector-values.esml	1	0	N/A	2	ok
 L4-port/conservation.esml	1	0	N/A	6	ok	 
 L4-port/flow-potential.esml	1	0	0	1	ok	solve 通过：m.q = 1.0（flow-potential 端口闭合）。｜ W55 复测（ESML_PROPS=off esml solve rc=0）
 L4-port/flow.esml	1	0	N/A	8	ok	 
-L4-port/port-carrier.esml	1	1	1	0	fail-engine-debt	[registered stage=solve] error: solve (during L7 steady solve) — pantelides: structurally singular (unmatched i.a.h/i.b.h/j.a.h/j.b.h + redundant i.a.q)。W55 探针（14 变体）证实：两 flow 变量端口连接时引擎对第二个 flow 变量（q）不发守恒残差，模型侧无法闭合。｜ 引擎侧两 flow 端口闭合缺口，示例侧不可修，留引擎侧处置。
+L4-port/port-carrier.esml	1	0	N/A	18	ok	（T-ENGINE-2FLOW + T-LANG-CENSUS，v1.9.4）根因纠正：引擎对每个 flow 各发一条 Σflow=0 守恒（flat dump 证 Σm/Σq 都在，W55 假设不成立）；奇异在模型侧未定 stream。示例改写为闭式（ADR-87：模型自定 stream），18 未知 = 18 方程，solve 通过（k.T≈300，carrier q 加权）
 L4-port/port-category-size.esml	1	0	0	4	ok	solve 通过：f.port_a.T = f.port_b.T = 3.0e2（Tset）、Q_flow = 0.0。｜ W55 复测（rc=0）
 L4-port/port-roles-io.esml	1	0	N/A	2	ok	 
 L4-port/port-stream.esml	1	0	0	2	ok	solve 通过：m.in.c = m.out.c = 5.0e-1（组分直通）。｜ W55 复测（rc=0）
@@ -98,16 +98,16 @@ L7-partition/subsystem-crosslink.esml	1	0	N/A	1	ok
 L8-function/algorithm-for.esml	1	0	N/A	1	ok	 
 L8-function/algorithm-if.esml	1	0	N/A	1	ok	 
 L8-function/algorithm-return.esml	1	0	N/A	1	ok	 
-L8-function/algorithm-while.esml	1	1	1	0	fail-check-debt	[known check-debt] error[F7]: L8-function/algorithm-while.esml:20:9 — unknown element `<while>` ｜ simulate rc=1 双红：error[F7]: L8-function/algorithm-while.esml:20:9 — unknown element `<while>` 1 ｜ simulate rc=1 双红（错误同 solve 首行）
+L8-function/algorithm-while.esml	1	0	N/A	1	ok	（T-LANG-CENSUS 2026-11-12，v1.9.4）F7 闭合：esml check 实测 errors=0，solve rc=0（1 未知）
 L8-function/extern-cabi.esml	1	1	1	0	na-artifact	需 libesml_extern_testlib.so（extern 测试库）；该 .so 非仓内工件，缺失时 solve 走 SolveError。示例侧 canonical 不动，留待引擎仓补库或 CI 注入 .so。
 L8-function/foreign-object.esml	1	0	N/A	1	ok	 
 L8-function/function-expr.esml	1	0	N/A	3	ok	 
 L8-function/locals.esml	1	0	N/A	1	ok	 
 L9-method-schedule/call-method-body.esml	1	0	N/A	1	ok	 
-L9-method-schedule/continue-until.esml	1	1	1	0	fail-check-debt	[known check-debt] error[F7]: L9-method-schedule/continue-until.esml:20:7 — unknown attribute `maxTime` on `<continueUntil>` ｜ simulate rc=1 双红：error[F7]: L9-method-schedule/continue-until.esml:20:7 — unknown attribute `maxT 1 ｜ simulate rc=1 双红（错误同
+L9-method-schedule/continue-until.esml	1	1	0	0	ok-simulate	（T-LANG-CENSUS 2026-11-12，v1.9.4）F7 闭合（check errors=0）；模型是瞬态积分器（Der(x)=1 至 maxTime）无稳态——solve 正确报 no steady state（|F|≡1，建议用 simulate），simulate rc=0（末行 x=10.0，1000 步）⇒ ok-simulate
 L9-method-schedule/fixed-preset.esml	1	0	N/A	1	ok	 
 L9-method-schedule/free.esml	1	0	0	2	ok	W63 闭合：补观测方程 y_obs=k（y_obs 参数=2.0）⇒ DOF 2（x,k）⇄ 方程 2，solve rc=0，k=2.0，x(0)=1.0，t=1 x=exp(-2)=0.135335（simulate 末行核对）
-L9-method-schedule/method-vary.esml	1	1	1	0	fail-check-debt	[known check-debt] error[F7]: L9-method-schedule/method-vary.esml:23:9 — unknown element `<vary>` ｜ simulate rc=1 双红：error[F7]: L9-method-schedule/method-vary.esml:23:9 — unknown element `<vary>` 1 ｜ simulate rc=1 双红（错误同 solve 首行）
+L9-method-schedule/method-vary.esml	1	0	N/A	1	ok	（T-LANG-CENSUS 2026-11-12，v1.9.4）F7 闭合：esml check 实测 errors=0，solve rc=0（1 未知）
 L9-method-schedule/methods-run.esml	1	0	N/A	1	ok	 
 L9-method-schedule/onload.esml	1	0	N/A	3	ok	 
 L9-method-schedule/reset.esml	1	0	N/A	1	ok	 
@@ -129,7 +129,7 @@ T-tasks/design-vars.esml	1	0	N/A	1	ok
 T-tasks/feature.esml	1	0	N/A	1	ok	 
 T-tasks/features.esml	1	0	N/A	1	ok	 
 T-tasks/gains.esml	1	0	N/A	1	ok	 
-T-tasks/hyperparams.esml	1	1	1	0	fail-check-debt	[known check-debt] error[F7]: T-tasks/hyperparams.esml:30:22 — unknown element `<param>` ｜ simulate rc=1 双红：error[F7]: T-tasks/hyperparams.esml:30:22 — unknown element `<param>` 1 ｜ simulate rc=1 双红（错误同 solve 首行）
+T-tasks/hyperparams.esml	1	1	1	0	fail-engine-debt	（T-LANG-CENSUS 2026-11-12，v1.9.4）check 层已收 <param>（errors=0）但 solve/simulate 仍双红：verify_src[I3]: deprecated alias <param> … use the canonical spelling <parameter>。示例 canonical 依据 SPEC:785 + XSD compute.xsd:387（<param> 是 <hyperParams> 的 vendor 超参子元素 0..unbounded），非示例侧问题 ⇒ 引擎 check/solve 不一致，登记 stage=solve
 T-tasks/method-tuning.esml	1	0	N/A	1	ok	 
 T-tasks/metric-tolerancepct.esml	1	0	N/A	1	ok	 
 T-tasks/mpc-matrices.esml	1	0	N/A	1	ok	 

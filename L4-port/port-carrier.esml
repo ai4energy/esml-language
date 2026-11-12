@@ -3,7 +3,11 @@
 <!-- SPDX-License-Identifier: MIT -->
 <!-- 语法点 流股载量 `carrier="q"`（端口变量属性）：一个端口有多个 flow 变量时，
      由 stream 变量点名**哪一个 flow** 承载它（流股加权/混流用）。
-     规范条文：§6.8 六轴表（carrier）；解析期校验「必须是同端口的 flow 变量」。 -->
+     规范条文：§6.8 六轴表（carrier）；解析期校验「必须是同端口的 flow 变量」。
+     模型按 ADR-87 闭合：每个 stream 变量由模型自己定（源 a.h=hset、
+     内部 a.h=0 + b.h=inStream(a.h)、汇 a.h=999 + T=actualStream(a.h)），
+     引擎只给节点混流值；两个 flow 各自有节点守恒（Σm=0、Σq=0）。
+     18 未知 = 18 方程，可解。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L4_PortCarrier">
   <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <portTypes><portType name="TwoFlowPort">
@@ -14,18 +18,52 @@
       <portVariable name="h" portRole="stream" carrier="q" type="real"/>
     </variables>
   </portType></portTypes>
-  <modelTypes><modelType name="Pass">
-    <ports><port name="a" portType="TwoFlowPort"/><port name="b" portType="TwoFlowPort"/></ports>
-    <variables><variable name="x" type="real" role="algebraic"/></variables>
-    <equations>
-      <equation>x = a.p</equation>
-      <equation>a.m = x</equation>
-      <equation>a.q = x</equation>
-      <equation>b.p = x</equation>
-    </equations>
-  </modelType></modelTypes>
+  <modelTypes>
+    <modelType name="Src">
+      <ports><port name="a" portType="TwoFlowPort"/></ports>
+      <parameters>
+        <parameter name="Pset" type="real" default="1.0"/>
+        <parameter name="mdot" type="real" default="1.0"/>
+        <parameter name="qdot" type="real" default="2.0"/>
+        <parameter name="hset" type="real" default="300.0"/>
+      </parameters>
+      <equations>
+        <equation>a.p = Pset</equation>
+        <equation>a.m = -mdot</equation>
+        <equation>a.q = -qdot</equation>
+        <equation>a.h = hset</equation>
+      </equations>
+    </modelType>
+    <modelType name="Pass">
+      <ports><port name="a" portType="TwoFlowPort"/><port name="b" portType="TwoFlowPort"/></ports>
+      <variables><variable name="x" type="real" role="algebraic"/></variables>
+      <equations>
+        <equation>x = a.p</equation>
+        <equation>b.p = x</equation>
+        <equation>b.m = -a.m</equation>
+        <equation>b.q = -a.q</equation>
+        <equation>a.h = 0.0</equation>
+        <equation>b.h = inStream(a.h)</equation>
+      </equations>
+    </modelType>
+    <modelType name="Snk">
+      <ports><port name="a" portType="TwoFlowPort"/></ports>
+      <variables><variable name="T" type="real" initial="0.0" role="algebraic"/></variables>
+      <equations>
+        <equation>a.h = 999.0</equation>
+        <equation>T = actualStream(a.h)</equation>
+      </equations>
+    </modelType>
+  </modelTypes>
   <systems><system name="S">
-    <instances><instance name="i" type="Pass"/><instance name="j" type="Pass"/></instances>
-    <connections><connection from="i.b" to="j.a"/></connections>
+    <instances>
+      <instance name="s" type="Src"/>
+      <instance name="p" type="Pass"/>
+      <instance name="k" type="Snk"/>
+    </instances>
+    <connections>
+      <connection from="s.a" to="p.a"/>
+      <connection from="p.b" to="k.a"/>
+    </connections>
   </system></systems>
 </esml>
