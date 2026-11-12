@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
-<!-- W21 语法点 `<literal name=>` in `<type>` (SPEC:158 — 枚举类型显式列出字面量)。
+<!-- W21 语法点 `<literal name=>` in `<type>` (SPEC:159 — 枚举类型显式列出字面量)。
      XSD 已声明 (basic.xsd VariableType allows `<literal>` as child)，但引擎
      `unknown::KNOWN_SUB_TAGS` 无 `literal`，`esml check` F7 拒收（引擎债，
      详见 docs/coverage.md §5.11）。本例保留 canonical 写法。

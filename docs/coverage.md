@@ -117,7 +117,7 @@
 | §6.7 §6.7（系统初始化过程） | 2 | `L2-discrete/{initialisationprocedure-advance.esml,initialisationprocedures.esml}` |
 | §6.8 §6.8（工程包装容器） | 1 | `T-tasks/tasks.esml` |
 | §6.9 §6.9（计算任务表） ／ §6.9（顶层 `<solutionParameters>` 段） | 46 | `D-skeleton/solutionparameters.esml` `L1-expr-equation/{expr.esml,reference.esml}` `L5-instance/setpoint.esml` `T-tasks/{actuator.esml,benchmarks.esml,check.esml,checks.esml,constraint-expr.esml,control-vars.esml,controlled-control-vars.esml,controlled.esml,controller-gains.esml,controller.esml,dataset.esml,design-vars.esml,feature.esml,features.esml,gains.esml,hyperparams.esml,method-tuning.esml,metric-tolerancepct.esml,mpc-matrices.esml,outputlist.esml,perturb-distribution.esml,reference.esml,sampling.esml,sensor.esml,setpoint.esml,solutionparameters.esml,status.esml,surrogate-model.esml,target.esml,targets.esml,task-constraint.esml,task-control.esml,task-estimation.esml,task-optimize.esml,task-sensitivity.esml,task-simulate.esml,task-surrogate.esml,task-validation.esml,task-vendor-text.esml,tasks-seven.esml,tasks-auxiliary.esml,test-data.esml,tolerance.esml}` |
-| §7 §7（分段表达式） ／ §7（向量归约内建） ／ §7（数组下标与切片） ／ §7（方程类别与语义） ／ §7（算法段） ／ §7（表达式内建） | 13 | `L1-expr-equation/{array-index-probe.esml,array-index.esml,axis-reduce-probe.esml,axis-reduce.esml,builtins-complex.esml,builtins-delay.esml,builtins-expr.esml,builtins-math.esml,equation-basic.esml,ifelse.esml,oob-probe.esml,shape-mismatch-probe.esml}` `T-tasks/algorithm.esml` |
+| §7 §7（分段表达式） ／ §7（向量归约内建） ／ §7（数组下标与切片） ／ §7（方程类别与语义） ／ §7（算法段） ／ §7（表达式内建） | 13 | `L1-expr-equation/{array-index-probe.esml,array-index.esml,axis-reduce-probe.esml,builtins-complex.esml,builtins-delay.esml,builtins-expr.esml,builtins-math.esml,equation-basic.esml,ifelse.esml,oob-probe.esml,shape-mismatch-probe.esml,vector-reduce.esml}` `T-tasks/algorithm.esml` |
 | §7.1 §7.1（状态机与时钟） | 5 | `L2-discrete/{clock-functions.esml,clock-sample.esml,reset-transition.esml,state-machine.esml,transition-attrs.esml}` |
 | §8 §8（连接语义） | 2 | `L6-connect/{connect-basic.esml,connect-canonical.esml}` |
 | 附录B（续） 附录 B（续）— CASE 多分支 ／ 附录 B（续）— FOR 循环 ／ 附录 B（续）— FOR 按序集迭代 ／ 附录 B（续）— ORDERED_SET 序集 ／ 附录 B（续）— SELECTOR ／ 附录 B（续）— 模型级 IF | 7 | `L0-type-unit/ordered-set.esml` `L1-expr-equation/{for-in.esml,for-over-orderedset.esml}` `L2-discrete/case-branch.esml` `L3-model/{if.esml,selector-values.esml}` `L7-partition/orderedsets.esml` |
@@ -129,7 +129,7 @@
 | 附录F6 附录 F6（自由度 FIX） | 1 | `L9-method-schedule/fixed-preset.esml` |
 | 附录F7 附录 F7（自由度 FREE） | 1 | `L9-method-schedule/methods-run.esml` |
 | 附录F7b 附录 F7b（METHOD RUN 子过程） | 1 | `L9-method-schedule/methods-run.esml` |
-| 附录F8 附录 F8（vector 归约内建） | 3 | `L1-expr-equation/{array-index.esml,axis-reduce.esml,builtins-expr.esml}` |
+| 附录F8 附录 F8（vector 归约内建） | 3 | `L1-expr-equation/{array-index.esml,builtins-expr.esml,vector-reduce.esml}` |
 | 附录I 附录 I（用户函数与黑盒） | 3 | `L8-function/{foreign-object.esml,function-expr.esml,locals.esml}` |
 | 附录J 附录 J（单位语义） | 6 | `L0-type-unit/{units-anchoring.esml,units-base-offset.esml,units-base.esml,units-contradiction.esml,units-derived-scale.esml,units-derived.esml}` |
 | 附录K 附录 K（METHOD × Schedule 编排） | 5 | `L9-method-schedule/{call-method-body.esml,continue-until.esml,free.esml,schedule-call.esml,stop.esml}` |
@@ -445,17 +445,20 @@ canonical 声明处）＋ 至少一份演示该语法的示例，外加实现侧
 `in` 是 canonical 拼写（方程级 `<for>` 读 `in`，SPEC:241/1282/1298），但
 算法段引擎只认 `range`（`components.rs:345`）。
 
-### 5.11 XSD 已声明、引擎**拒绝**的四处（登记，本仓不裁）
+### 5.11 XSD 已声明、引擎**拒绝**的五处（登记，本仓不裁）
 
-`xsd/esml-canonical-basic.xsd` 已声明以下元素/属性，但引擎 `esml check`
-**明确拒绝**（`F7[]: unknown element`）。W9 真声明时记为 `lang-wins`
+本仓 `xsd/`（`esml-canonical-basic.xsd` / `esml-canonical-compute.xsd`）已声明
+以下元素/属性，但引擎 `esml check`
+**明确拒绝**（`F7[]: unknown element`，`<param>` 件另有 `F1[]` legacy spelling 双拒）。
+W9 真声明时记为 `lang-wins`
 （方向判断），此处登记**引擎当前不收**的事实本身，不隐藏于 `lang-wins` 之后。
 
 | 条目 | XSD 声明处 | 示例文件（W27 2026-11-11 补列） | 引擎实测（verbatim） |
 |---|---|---|---|
-| `<literal name="a"/>` 在 `<variable>` 内 | `VariableType` / `LiteralType` | `L0-type-unit/literal-enum.esml` | `error: F7[]: unknown element <literal> at L0-type-unit/literal-enum.esml:16:7`（×3，`errors=3`；W27 2026-11-11 引擎 `~/esml-engine-user3/target/release/esml` 重跑） |
-| `<vary name="m.x"/>` 在 `<methods><onLoad>` 内 | `MethodVaryType` / `MethodsType` | `L9-method-schedule/method-vary.esml` | `error: F7[]: unknown element <vary>`（该件引擎 `errors=1`；W27 2026-11-11 重跑） |
-| `<while condition="…">` 在 `<algorithm>` 内 | `AlgorithmType`（`WhileType`） | `L8-function/algorithm-while.esml` | `error: F7[]: unknown element <while> at …:12:7` ＋ `F1[]: parser rejected…`，`errors=2`，`five_level=BAD` |
+| `<literal name="a"/>` 在 `<type>` 内 | `VariableType` / `LiteralType`（basic.xsd:398-409） | `L0-type-unit/literal-enum.esml` | `error: F7[]: unknown element <literal> at L0-type-unit/literal-enum.esml:16:7`（×3，`errors=3`；W27 2026-11-11 首测，T-LANG-SMOKE 2026-11-12 复测同值） |
+| `<vary name="u.y"/>` 在 `<methods>` 内（含 `<onLoad>` 宿主） | `MethodVaryType` / `MethodsType` / `MethodOnLoadType`（basic.xsd:303/314/345） | `L9-method-schedule/method-vary.esml` | `error: F7[]: unknown element <vary> at L9-method-schedule/method-vary.esml:23:9`（该件引擎 `errors=1`；W27 2026-11-11 首测，T-LANG-SMOKE 2026-11-12 复测同值） |
+| `<while condition="…">` 在 `<algorithm>` 内 | `AlgorithmType`（`WhileType`，basic.xsd:1529） | `L8-function/algorithm-while.esml` | `error: F7[]: unknown element <while> at L8-function/algorithm-while.esml:20:9`（`errors=1`，`five_level=ok`；T-LANG-SMOKE 2026-11-12 复测，替代 W27 旧 verbatim `…:12:7`＋`F1` `errors=2`） |
+| `<param name value/>` 在 `<hyperParams>` 内 | `VendorHyperParamsType` 0..unbounded（compute.xsd:387） | `T-tasks/hyperparams.esml` | `error: F7[]: unknown element <param> at T-tasks/hyperparams.esml:30:22` ＋ `F1[]: parser rejected the document: legacy spelling <param> … use <parameter>`，`errors=2`，`five_level=BAD`（T-LANG-SMOKE 2026-11-12 复测；注：本仓 XSD 声明 `<param>` 为 `<hyperParams>` 的 canonical 子元素，与 `<parameters><parameter>` 是不同容器——引擎 F1 的 legacy 判定与本仓 XSD 冲突） |
 | `<connectionTypes>` 在文档根 | 顶层元素 | **仍无示例**（189 份示例里 `connectionTypes` 0 命中，W51 2026-11-11 重算）——根级元素无宿主可落，探针只能写 `/tmp`，不入库 | `error: F7[]: unknown element <connectionTypes>`（两处）｜`errors=2` |
 
 **对照组**：`<fix name="m.x" value="2.0"/>` 在 `<methods><onLoad>` 内
@@ -473,6 +476,13 @@ W20 新增的 19 处声明里，`check` 层面**无新增拒收**——唯一拒
 
 探针件：`/tmp/w14-probes/w19_four.py`（W9 四处拒收）、`/tmp/w28-probes/`
 （W28 逐元素复核；引擎 `~/esml-engine-user3/target/release/esml`，2026-11-11）。
+
+**T-LANG-SMOKE 复核**（2026-11-12，引擎同 release 二进制，`ESML_PROPS=off`，
+`esml check` 逐件复测）：上表五件拒收全部仍在，`errors` 计数与
+`tools/engine-example-debt.tsv` 的 `stage=check` 行一致（3/1/1/2）；
+`<param>` 行原已登记于 `engine-example-debt.tsv`（W21）与 §5.3（「登记于
+§5.11，不另裁」），本次并入本表，「四处」计数因此改为「五处」（W28 段「四处
+计数因此不变」是 W28 当时的历史记录，不动）。
 
 ### 5.12 属性面判别力：lax anyAttribute 的结构性放行（2026-11-11，W42 实测）
 
@@ -619,10 +629,11 @@ except Exception as e:
 W52 普查（2026-11-11，158 件非负例逐件 `esml solve` + 双红件再 `esml simulate`；
 W55 已把其中 7 件端口示例修到 solve 通过，W63 已把 `free.esml` 修好，
 W66 已把 `builtins-math.esml` / `ifelse.esml` 修好（O-15：`time`→`t`），
-台账回填后口径为
-**158 件 / 137 ok / 7 ok-simulate / 6 na（4 na-no-system + 2 na-artifact）/
-8 fail（fail-check-debt 5 / fail-engine-debt 2 / 示例侧待修 1）**）。
-10 件求解面未通过 = 8 fail + 2 na-artifact。
+T-LANG-SMOKE（2026-11-12）已把 `axis-reduce.esml` 改写为 `vector-reduce.esml`
+（F8 单参 canonical，solve 通过，fail→ok），台账回填后口径为
+**158 件 / 138 ok / 7 ok-simulate / 6 na（4 na-no-system + 2 na-artifact）/
+7 fail（fail-check-debt 5 / fail-engine-debt 2 / 示例侧待修 0）**）。
+9 件求解面未通过 = 7 fail + 2 na-artifact。
 按「在哪一层被拒」分型如下，本节是这些债务的**制度化索引**——
 只登记与跟踪，**本仓不修引擎**。
 
@@ -643,33 +654,44 @@ solve 已真跑通，从 fail 移入 ok；`port-carrier` 经 W55 探针证实为
 
 | 型 | 件数 | 代表文件 | 机制 | `solve-smoke.tsv` 行指针 | `engine-example-debt.tsv` 行指针 |
 |---|---:|---|---|---|---|
-| **spec backlog（F8 多维轴归约未实现）** | 1 | `axis-reduce.esml` | SPEC 附录 F8 明文「不支持：多维数组归约」；本件演示 check 层 axis 范围校验（I25b），`errors=0`，不宣称可 solve。solve 失败（flatten 层 undeclared symbol `m__x`）属预期行为，非引擎 bug | 见台账 `L1-expr-equation/axis-reduce.esml`（`status=fail`，evidence 前缀 `[spec-backlog F8]`） | 不登记（spec backlog，非引擎债） |
 | **引擎不消费（connectRules）** | 1 | `connect-rules.esml` | `<connectRules>` 被 `check` 收（`errors=0`）但 `solve` 路径不消费 ⇒ 求解层报错（`SolveError`）；与 §5.3 登记的「收但零效果」同源 | 见台账 `L6-connect/connect-rules.esml`（`status=fail-engine-debt`，evidence 含 `SolveError`） | 见台账 `stage=solve` 行（`L6-connect/connect-rules.esml`，W56a 登记） |
 | **外部产物缺失** | 2 | `extern-cabi.esml`、`derivative-analytic.esml` | 求解路径要求外部产物（C ABI 符号链接 / analytic Jacobian 产物）在盘上，本仓示例未附 ⇒ `SolveError`（`na-artifact` 类） | 见台账 `status=na-artifact` 的 `extern-cabi` / `derivative-analytic` 行（2 行） | 不登记（census status=na-artifact，需 `libesml_extern_testlib.so`，非引擎债） |
 | **F7 check 债的 solve 投影** | 5 | `literal-enum.esml`、`algorithm-while.esml`、`continue-until.esml`、`method-vary.esml`、`hyperparams.esml` | `check` 层已有 F7 拒（§5.11 登记的四处 + `tasks` 属性），`solve` 在 check 之前/同时被同一条 F7 拦截 ⇒ solve 面的 fail 是 check 面 fail 的**投影**，不是独立的求解层问题 | 见台账 `status=fail` 且 evidence 含 `error[F7]` 的行（5 行） | 已在台账 `stage=check` 行登记（`literal-enum` / `algorithm-while` / `continue-until` / `method-vary` / `hyperparams`），solve 面不另立行 |
 | **其余 `SolveError`（稳态求解失败）** | 1 | `port-carrier.esml`（fail-engine-debt） | `check` 绿（`errors=0`）但 `solve_steady` 返回 `SolveError`（牛顿不收敛 / 结构奇异 / 方程组欠定等），`simulate` 亦双红 ⇒ 求解层真实能力缺口。`port-carrier` 经 W55 探针（14 变体）证实为引擎侧两 flow 端口闭合缺口，示例侧不可修，W56b 已登记 `stage=solve`；`free.esml` 已由 W63 修好（补观测方程 `y_obs = k`，`status=ok`） | 见台账 `port-carrier`（`status=fail-engine-debt`）行（1 行） | `L4-port/port-carrier.esml` 已有 `stage=solve` 行（W56b 登记）；`free.esml` 已由 W63 修好（`status=ok`），不登记 |
-| **合计** | **10** | — | — | 10 行 | — |
+| **合计** | **9** | — | — | 9 行 | — |
+
+> 原「spec backlog（F8 多维轴归约未实现）」一行（`axis-reduce.esml`，1 件）已闭合
+> （T-LANG-SMOKE 2026-11-12）：旧件演示的两参 axis 形 `sum(X, k)` / `prod(M, 0)`
+> 无 SPEC 拼写（F8 仅单参 `sum(X)/mean(X)/min(X)/max(X)/size(X)`，SPEC:1427-1433；
+> `prod` 亦非 F8 内建），且**在界**输入在引擎 flatten 层崩溃（undeclared symbol，
+> 1D `sum(x, 0)` 与 2D `sum(M, 1)` 最小复现均失败）——两参形态属引擎非 SPEC 扩展、
+> 半实现（越界 axis 求解期报 I25b，负例 `axis-reduce-probe.esml` 仍有效），引擎侧
+> 缺口登记见 T-LANG-SMOKE 报告（本单不修引擎）。示例改写为
+> `L1-expr-equation/vector-reduce.esml`（仅 F8 单参 canonical，solve rc=0，
+> `status=ok`，unknowns=8），本行按「已修好 ⇒ 删行」移除。
 
 #### 5.13.2 台账指针
 
-- **`tools/solve-smoke.tsv`**：10 件求解面未通过全部在台账里
-  （9 行 fail 子类 + 2 行 na-artifact）。
+- **`tools/solve-smoke.tsv`**：9 件求解面未通过全部在台账里
+  （7 行 fail 子类 + 2 行 na-artifact）。
   按上表五型（+ 其余 SolveError 型）在 evidence 列区分。
-  W52 普查口径（W55/W63/W66/W71 回填后）：158 件 / 137 ok / 7 ok-simulate / 6 na
-  （4 na-no-system + 2 na-artifact）/ **8 fail**
-  （fail-check-debt 5 / fail-engine-debt 3 / fail 1）。
-- **`tools/engine-example-debt.tsv`**（W66 落地后 11 行，check 8 / solve 3）：
+  W52 普查口径（W55/W63/W66/W71 回填、T-LANG-SMOKE 2026-11-12 重算后）：
+  158 件 / 138 ok / 7 ok-simulate / 6 na
+  （4 na-no-system + 2 na-artifact）/ **7 fail**
+  （fail-check-debt 5 / fail-engine-debt 2 / 示例侧待修 0）。
+- **`tools/engine-example-debt.tsv`**（10 行，check 8 / solve 2）：
   - `stage=check` 行：5 件 F7 check 债（`literal-enum` / `algorithm-while` /
     `continue-until` / `method-vary` / `hyperparams`）——已在台账里，solve 面不另立行。
-  - `stage=solve` 行（3 行）：
-    `L6-connect/port-array.esml`（Pantelides 结构误判）、
+  - `stage=solve` 行（2 行）：
     `L6-connect/connect-rules.esml`（引擎不消费）、
     `L4-port/port-carrier.esml`（两 flow 端口闭合缺口，W56b 登记）。
+    `L6-connect/port-array.esml` 已由引擎侧修好（J2 数组臂 pvar 守卫），移出台账。
     外部产物缺失 2 件（`extern-cabi` / `derivative-analytic`）不登记
     （census status=na-artifact，非引擎债）；`free.esml` 已由 W63 修好
     （`status=ok`），不登记；`builtins-math.esml` / `ifelse.esml` 已由 W66 修好
-    （`time`→`t`，O-15），不登记；`axis-reduce.esml` 为 spec backlog（F8 多维归约），
-    非引擎债，不登记。
+    （`time`→`t`，O-15），不登记；`axis-reduce.esml` 已由 T-LANG-SMOKE
+    （2026-11-12）改写为 `vector-reduce.esml`（F8 单参 canonical，solve 通过，
+    `status=ok`），不登记。
 
 #### 5.13.3 处置声明
 
