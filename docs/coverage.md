@@ -674,9 +674,21 @@ flow 无残差」假设不成立），奇异在模型侧未给 stream 变量写�
 |---|---:|---|---|---|---|
 | **引擎不消费（connectRules）** | 1 | `connect-rules.esml` | `<connectRules>` 被 `check` 收（`errors=0`）但 `solve` 路径不消费 ⇒ 求解层报错（`SolveError`）；与 §5.3 登记的「收但零效果」同源 | 见台账 `L6-connect/connect-rules.esml`（`status=fail-engine-debt`，evidence 含 `SolveError`） | 见台账 `stage=solve` 行（`L6-connect/connect-rules.esml`，W56a 登记） |
 | **外部产物缺失** | 2 | `extern-cabi.esml`、`derivative-analytic.esml` | 求解路径要求外部产物（C ABI 符号链接 / analytic Jacobian 产物）在盘上，本仓示例未附 ⇒ `SolveError`（`na-artifact` 类） | 见台账 `status=na-artifact` 的 `extern-cabi` / `derivative-analytic` 行（2 行） | 不登记（census status=na-artifact，需 `libesml_extern_testlib.so`，非引擎债） |
-| **F7 check 债的 solve 投影** | 5 | `literal-enum.esml`、`algorithm-while.esml`、`continue-until.esml`、`method-vary.esml`、`hyperparams.esml` | `check` 层已有 F7 拒（§5.11 登记的四处 + `tasks` 属性），`solve` 在 check 之前/同时被同一条 F7 拦截 ⇒ solve 面的 fail 是 check 面 fail 的**投影**，不是独立的求解层问题 | 见台账 `status=fail` 且 evidence 含 `error[F7]` 的行（5 行） | 已在台账 `stage=check` 行登记（`literal-enum` / `algorithm-while` / `continue-until` / `method-vary` / `hyperparams`），solve 面不另立行 |
-| **其余 `SolveError`（稳态求解失败）** | 1 | `port-carrier.esml`（fail-engine-debt） | `check` 绿（`errors=0`）但 `solve_steady` 返回 `SolveError`（牛顿不收敛 / 结构奇异 / 方程组欠定等），`simulate` 亦双红 ⇒ 求解层真实能力缺口。`port-carrier` 经 W55 探针（14 变体）证实为引擎侧两 flow 端口闭合缺口，示例侧不可修，W56b 已登记 `stage=solve`；`free.esml` 已由 W63 修好（补观测方程 `y_obs = k`，`status=ok`） | 见台账 `port-carrier`（`status=fail-engine-debt`）行（1 行） | `L4-port/port-carrier.esml` 已有 `stage=solve` 行（W56b 登记）；`free.esml` 已由 W63 修好（`status=ok`），不登记 |
-| **合计** | **9** | — | — | 9 行 | — |
+| **check/solve 不一致（`<param>` I3 拒）** | 1 | `T-tasks/hyperparams.esml` | v1.9.4 `check` 层已收 `<param>`（`errors=0`，F7/F1 闭合），但 `solve`/`simulate` 双红 `verify_src[I3]: deprecated alias <param>`——引擎 check/solve 不一致；示例按 SPEC:785 + 本仓 XSD `compute.xsd:387`（`<param>` 是 `<hyperParams>` 的 canonical 子元素 0..unbounded）写的是 canonical，非示例侧问题 | 见台账 `T-tasks/hyperparams.esml`（`status=fail-engine-debt`）行（1 行） | 台账 `stage=solve` 行（T-LANG-CENSUS 2026-11-12 登记） |
+| **合计** | **4** | — | — | 4 行（2 fail + 2 na-artifact） | — |
+
+> 原「F7 check 债的 solve 投影（5 件）」与「其余 `SolveError`（`port-carrier.esml`，1 件）」
+> 两行已闭合（T-LANG-CENSUS 2026-11-12，引擎 v1.9.4），按「已修好 ⇒ 删行」移除：
+> - 5 件 F7：v1.9.4 `check` 层闭合 F7 拒收（逐件实测 `esml check` `errors=0`）——
+>   `literal-enum` / `algorithm-while` / `method-vary` 直转 ok（solve rc=0），
+>   `continue-until` 转 ok-simulate（瞬态积分器无稳态，solve 正确报 no steady state，
+>   simulate 到 x=10.0）；`hyperparams` 不再是 check 投影——转登记为上文
+>   「check/solve 不一致」行的纯求解层债（check 收、solve/simulate 拒 I3）。
+> - `port-carrier`（T-ENGINE-2FLOW）：根因纠正——引擎对每个 flow 各发一条
+>   Σflow=0 守恒残差（flat dump 证 Σm=0 与 Σq=0 都在，W55「第二 flow 无残差」
+>   假设不成立），奇异在模型侧未给 stream 变量写方程（ADR-87：模型自定 stream）；
+>   示例改写为闭式（18 未知 = 18 方程），solve 通过（k.T≈300），本节债务销。
+> - `free.esml` 此前已由 W63 修好（`status=ok`），不登记。
 
 > 原「spec backlog（F8 多维轴归约未实现）」一行（`axis-reduce.esml`，1 件）已闭合
 > （T-LANG-SMOKE 2026-11-12）：旧件演示的两参 axis 形 `sum(X, k)` / `prod(M, 0)`
@@ -690,19 +702,22 @@ flow 无残差」假设不成立），奇异在模型侧未给 stream 变量写�
 
 #### 5.13.2 台账指针
 
-- **`tools/solve-smoke.tsv`**：9 件求解面未通过全部在台账里
-  （7 行 fail 子类 + 2 行 na-artifact）。
-  按上表五型（+ 其余 SolveError 型）在 evidence 列区分。
-  W52 普查口径（W55/W63/W66/W71 回填、T-LANG-SMOKE 2026-11-12 重算后）：
-  158 件 / 138 ok / 7 ok-simulate / 6 na
-  （4 na-no-system + 2 na-artifact）/ **7 fail**
-  （fail-check-debt 5 / fail-engine-debt 2 / 示例侧待修 0）。
-- **`tools/engine-example-debt.tsv`**（10 行，check 8 / solve 2）：
-  - `stage=check` 行：5 件 F7 check 债（`literal-enum` / `algorithm-while` /
-    `continue-until` / `method-vary` / `hyperparams`）——已在台账里，solve 面不另立行。
+- **`tools/solve-smoke.tsv`**：4 件求解面未通过全部在台账里
+  （2 行 fail-engine-debt + 2 行 na-artifact）。
+  按上表三型在 evidence 列区分。
+  W52 普查口径（W55/W63/W66/W71 回填、T-LANG-SMOKE 2026-11-12 重算、
+  T-LANG-CENSUS 2026-11-12 引擎 v1.9.4 重算后）：
+  158 件 / 142 ok / 8 ok-simulate / 6 na
+  （4 na-no-system + 2 na-artifact）/ **2 fail**
+  （fail-check-debt 0 / fail-engine-debt 2 / 示例侧待修 0）。
+- **`tools/engine-example-debt.tsv`**（5 行，check 3 / solve 2）：
+  - `stage=check` 行（3 行）：`D-skeleton/data-scenario.esml`（`tasks` 属性，W21）、
+    `X-use/use-library.esml` / `X-use/use-multi-library.esml`（不带 `-L` 库模型不可解析，
+    设计行为见文件头注）。5 件 F7 check 债行已随 v1.9.4 闭合删行（T-LANG-CENSUS）。
   - `stage=solve` 行（2 行）：
     `L6-connect/connect-rules.esml`（引擎不消费）、
-    `L4-port/port-carrier.esml`（两 flow 端口闭合缺口，W56b 登记）。
+    `T-tasks/hyperparams.esml`（check/solve 不一致 `<param>` I3，T-LANG-CENSUS 登记）。
+    `L4-port/port-carrier.esml` 已随示例闭式化改写销账删行（T-LANG-CENSUS，solve 通过）；
     `L6-connect/port-array.esml` 已由引擎侧修好（J2 数组臂 pvar 守卫），移出台账。
     外部产物缺失 2 件（`extern-cabi` / `derivative-analytic`）不登记
     （census status=na-artifact，非引擎债）；`free.esml` 已由 W63 修好
@@ -720,7 +735,9 @@ flow 无残差」假设不成立），奇异在模型侧未给 stream 变量写�
 `connectRules` 消费路径、外部产物附带）不在本仓范围内，不在本节给候选处置。
 W55 已修 7 件端口示例（`flow-potential` / `port-category-size` / `port-stream` /
 `signal-causal` / `stream` / `L4-portvar/flow` / `L4-portvar/potential`）已移出
-本节债务，`port-carrier` 经探针证实为引擎侧缺口仍留本节。
+本节债务；`port-carrier` 示例闭式化改写后债务已销（T-LANG-CENSUS 2026-11-12：
+根因在模型侧未定 stream，ADR-87；solve 通过）。本节现余 2 件：
+`connect-rules`（引擎不消费）与 `hyperparams`（check/solve 不一致）。
 
 ---
 
