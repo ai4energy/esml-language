@@ -1,14 +1,12 @@
 <?xml version="1.0"?>
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
-<!-- switch-to-probe: 状态机旧容器拼法 `<stateMachine><state name=…><switch-to>…</switch-to></state></stateMachine>`。
+<!-- 负例（预期失败）：switch-to-probe: 状态机旧容器拼法 `<stateMachine><state name=…><switch-to>…</switch-to></state></stateMachine>`。
      `<switch-to>`/`<discretes>` 是旧状态机容器的 legacy 拼法，XSD 拒收（`StateMachineType`
      内容模型只收 `<state>`；`<state>` 内 `##targetNamespace` lax 通配在 xmlschema/strict
      口径下不放行未知元素）。canonical 状态迁移用 `<next>` 内 `<jumpTo>`/`<moveTo>`，见
      `L2-discrete/` 正例。非零退出是预期行为。
      规范条文：附录 D 旧版文档边界（带 MathML 或混合状态机结构 `<discretes>`/`<switch-to>` 为旧文档特性，一律拒收）。 -->
-     `<discretes>`/`<switch-to>` 结构为旧文档特性，v1.3.4 删）。
- -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L3_SwitchToProbe">
   <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="M" discipline="generic">

@@ -1,12 +1,11 @@
 <?xml version="1.0"?>
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
-<!-- constant-probe: 端口变量用旧元素形 `<constant>`。它是 legacy 拼法，XSD 拒收
+<!-- 负例（预期失败）：constant-probe: 端口变量用旧元素形 `<constant>`。它是 legacy 拼法，XSD 拒收
      （`<portType>` 内容模型 choice 只收 `<doc>`/`<variables>`/`<portVariable>`，元素名给
      角色的 7 种拼法已删）。canonical 用 `<portVariable portRole=…/>`，见 `L3-model/`
      端口正例。非零退出是预期行为。
      规范条文：§2 词法（收紧集）（端口变量元素形（`<flow>`/`<potential>`/`<stream>`/`<constant>`/`<discrete>`/`<var>`/`<variable>`）解析期报错，canonical 只收 `<portVariable>`）。 -->
-     `<constant>`/`<discrete>`/`<var>`/`<variable>`）删除，解析期报错）。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L3_ConstantProbe">
   <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <portTypes><portType name="P"><constant name="c" portRole="const"/></portType></portTypes>

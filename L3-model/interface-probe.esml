@@ -1,12 +1,11 @@
 <?xml version="1.0"?>
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
-<!-- interface-probe: 端口协议位用 legacy `<interface>` 元素。它是 legacy 拼法，XSD 拒收
+<!-- 负例（预期失败）：interface-probe: 端口协议位用 legacy `<interface>` 元素。它是 legacy 拼法，XSD 拒收
      （`<portTypes>` 内容模型只收 `<portType>`，`<interface>`/`<connector>` 均为旧拼写）。
      canonical 用 `<portType name connectorFamily conservation>`，见 `L3-model/` 端口正例。
      非零退出是预期行为。
      规范条文：§2 词法（收紧集）（端口协议表：`<interface>` / `<connector>` / `domain=` 旧拼写**报错**，canonical 只收 `<portType>`）。 -->
- -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L3_InterfaceProbe">
   <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="M" discipline="generic">
