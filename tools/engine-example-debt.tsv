@@ -11,16 +11,11 @@
 #   stage=solve 行：跑 `esml check` 必须 errors=0，再跑 `esml solve <file>` 必须**非零退出**（仍失败）；
 #                   solve 成功(退出 0) ⇒ 引擎修好了 ⇒「台账过时，删行」。
 # 台账行必须与当天重算闭合：示例修好了 ⇒ 删行；errors 计数变了 ⇒ 改数字。
-# 共 10 行（check 8 / solve 2）
+# 共 5 行（check 3 / solve 2）
 #
-# —— 8 件 check 层引擎债 + 3 件 solve 层引擎债（2026-11-11，ESML_PROPS=off，逐个非负例实跑 `esml check`/`esml solve`；port-carrier 为 W56b 补登记 stage=solve）。
+# —— 3 件 check 层引擎债 + 2 件 solve 层引擎债（2026-11-11，ESML_PROPS=off，逐个非负例实跑 `esml check`/`esml solve`；T-LANG-CENSUS 2026-11-12 v1.9.4 重跑：5 件 F7 check 行闭合删行、port-carrier solve 行闭合删行、hyperparams 新登记 stage=solve——check/solve 对 <param> 不一致）。
 D-skeleton/data-scenario.esml	1	engine-debt	check	error: F7[]: unknown attribute `tasks` on `<scenario>` at D-skeleton/data-scenario.esml:18:5 — remove or rename; canonical attributes are in `unknown::KNOWN_ATTRS`（tasks 属性 W21 登记）
-L0-type-unit/literal-enum.esml	3	engine-debt	check	error: F7[]: unknown element `<literal>` at L0-type-unit/literal-enum.esml:16:7 — use a canonical element name (see `unknown::KNOWN_SUB_TAGS`)（×3，行 16/17/18 各一；W21 登记 §5.11）
-L8-function/algorithm-while.esml	1	engine-debt	check	error: F7[]: unknown element `<while>` at L8-function/algorithm-while.esml:20:9 — use a canonical element name (see `unknown::KNOWN_SUB_TAGS`)（W19 登记 §5.11）
-L9-method-schedule/continue-until.esml	1	engine-debt	check	error: F7[]: unknown attribute `maxTime` on `<continueUntil>` at L9-method-schedule/continue-until.esml:20:7 — remove or rename; canonical attributes are in `unknown::KNOWN_ATTRS`（更早登记）
-L9-method-schedule/method-vary.esml	1	engine-debt	check	error: F7[]: unknown element `<vary>` at L9-method-schedule/method-vary.esml:23:9 — use a canonical element name (see `unknown::KNOWN_SUB_TAGS`)（W21 登记 §5.11）
-T-tasks/hyperparams.esml	2	engine-debt	check	error: F7[]: unknown element `<param>` at T-tasks/hyperparams.esml:30:22 — use a canonical element name (see `unknown::KNOWN_SUB_TAGS`) + error: F1[]: parser rejected the document: legacy spelling `<param>` at 2093:2124 — use `<parameter>`（F7+F1 双拒，W21 登记）
 X-use/use-library.esml	4	engine-debt	check	error: F10[]: `<instance>` references undeclared model `FixedTemperature` at X-use/use-library.esml:17:7 — declare `<modelType name="…">` first（×3 未声明模型 F10 + 1 F16 HIR）；不带 -L 时库模型不可解析；带 -L 见文件头注（设计行为非缺陷）
 X-use/use-multi-library.esml	4	engine-debt	check	error: F10[]: `<instance>` references undeclared model `FixedTemperature` at X-use/use-multi-library.esml:28:7 — declare `<modelType name="…">` first（×3 未声明模型 F10 + 1 F16 HIR）；不带 -L 时库模型不可解析；带 -L 见文件头注（设计行为非缺陷）
 L6-connect/connect-rules.esml	0	engine-debt	solve	[diag] solve failed: pantelides: structurally singular: 2 unmatched unknown(s), 0 redundant equation(s)（W56a 登记；coverage §5.3 已登记 `<connectRules>` 默认 CLI 路径不消费——`F-CONNECT-RULES-*` 只数 `rule` 条目不联 `connectClass`、HIR/flat 层无 `connect_rules` 消费点 ⇒ 求解层无连接约束建出 ⇒ 2 个 unmatched；check 层 errors=0）
-L4-port/port-carrier.esml	0	engine-debt	solve	pantelides: structurally singular — 4 unmatched unknown(s) i.a.h/i.b.h/j.a.h/j.b.h（+ redundant i.a.q）。引擎侧两 flow 端口闭合缺口，示例侧不可修（W55 探针 14 变体证实：两 flow 变量端口连接时引擎对第二个 flow 变量 q 不发守恒残差）。W56b 登记 stage=solve；check 层 errors=0。
+T-tasks/hyperparams.esml	0	engine-debt	solve	check 层 v1.9.4 已收 <param>（实测 errors=0，T-LANG-CENSUS 2026-11-12）但 solve/simulate 双红：error: verify_src[I3]: deprecated alias <param> at T-tasks/hyperparams.esml:1:1 — use the canonical spelling <parameter>。示例 canonical 依据 SPEC:785（<hyperParams> 超参 = <param name value/>）+ 本仓 XSD compute.xsd:387（<param> 0..unbounded），引擎 check 收 / solve 拒不一致 ⇒ 引擎求解层债（T-LANG-CENSUS 登记）。
