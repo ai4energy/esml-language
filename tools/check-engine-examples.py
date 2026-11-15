@@ -45,11 +45,14 @@ SOLVE_TIMEOUT_S = 120  # esml solve 超时（防挂死）
 
 # --------------------------------------------------------------------------- 引擎路径
 def resolve_engine():
-    """ESML_ENGINE_DIR 优先；否则默认 ~/esml-engine-user3/target/release/esml。找不到返回 None。"""
+    """ESML_ENGINE_DIR 优先（支持引擎仓根目录或含 esml 的目录）；否则默认 ~/esml-engine-user3/target/release/esml。"""
     env = os.environ.get("ESML_ENGINE_DIR")
     if env:
-        p = os.path.join(env, "esml")
-        return p if os.path.exists(p) else None
+        for rel in ("esml", os.path.join("target", "release", "esml")):
+            p = os.path.join(env, rel)
+            if os.path.exists(p):
+                return p
+        return None
     default = os.path.expanduser("~/esml-engine-user3/target/release/esml")
     return default if os.path.exists(default) else None
 

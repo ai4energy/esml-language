@@ -1,7 +1,7 @@
 # 语言规范部署手册
 
 > 适用：发布规范版本、发布 XSD/示例、给引擎仓 bump 子模块。
-> 最后核对：2026-11-11（v1.3.3）。
+> 最后核对：2026-11-15（v1.3.4）。
 
 ## 1. 产物
 
@@ -19,16 +19,17 @@
 ```sh
 make check
 make strict                 # 撤通配判别力闸（--strict，需 xmlschema）
-.venv/bin/python tools/check-examples.py --self-test
+python3 tools/check-examples.py --self-test
 git status --short          # 只应含本仓改动
 ```
 
 - 入口层注释里的根清单必须是 `validate_roots.py sync` 生成的，不手工改；
 - `SPEC.md` 与 XSD 同版；示例与规范同版；
 - 新负例已登记并说明红在哪一层；
-- `make check` 七道闸里有两道跨仓（`check-engine-xsd-parity` 漂移闸、
-  `check-engine-examples` 可运行性闸）需引擎仓：指向引擎仓根设 `ESML_ENGINE_DIR`
-  （不设时用默认 `~/esml-engine-user3`）；**缺引擎仓时这两道打印「跳过」rc=0**，
+- `make check` 八道闸里有三道跨仓（`check-engine-xsd-parity` 漂移闸、
+  `check-engine-examples` 可运行性闸、`check-example-expectations` 期望值闸）
+  需引擎仓：通过环境变量 `ESML_ENGINE_DIR` 指定（未设置时默认回退
+  `~/esml-engine-user3`）；**缺引擎仓时这三道打印「跳过」rc=0**，
   不算红，但发布前应尽量带引擎仓全跑；
 - `make strict` 比 `docs/audit/strict-baseline.txt` 基线：高于基线退出码 1，发布前必须持平或更低。
 
@@ -36,8 +37,8 @@ git status --short          # 只应含本仓改动
 
 ```sh
 git tag -a vX.Y.Z -m "ESML language vX.Y.Z"
-git push ai4energy main
-git push ai4energy vX.Y.Z
+git push origin main
+git push origin vX.Y.Z        # 若配双远端则同步推 ai4energy 与 ai4ecom
 ```
 
 版本号只增不改；破坏性语义变更走主版本，并在 `SPEC.md` 写明迁移。
@@ -66,7 +67,7 @@ cargo test -p esml-engine --test conformance
 | 收窄拼写 | 旧文档在解析期被拒；需 `esml migrate` 或逐条迁移 |
 | 改 XSD 分层 | 引擎/库/书仓的四方闸门同时红；必须同批更新 |
 
-发布后在 `docs/design/xsd-spec-parity.md` 与引擎兼容矩阵里登记版本与影响。
+发布后在 `SPEC.md` 附录 C 与引擎兼容矩阵里登记版本与影响。
 
 ## 6. 回滚
 

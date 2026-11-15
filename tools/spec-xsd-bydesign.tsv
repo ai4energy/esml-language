@@ -21,6 +21,4 @@
 # 记录示例（格式示例，本轮并未登记任何一条）：
 #   entry-root	system	canonical basic.xsd:917 声明为全局元素，入口层照收；SPEC 只在 §2 表格里提到 <system>，未列为文档根
 #
-# --- 本轮（v1.3.3 文档根对账）登记条目：无 ---
-# 4 处真实差异（canonical 的全局根 SPEC 没写成文档根）+ 2 处附带发现，
-# 全部有确定修法（见 docs/design/xsd-spec-parity.md 第四节），故本表为空。
+# --- 当前登记条目：无（三方根集合严格一致，SPEC §13 / XSD 已对齐，故本表为空） ---

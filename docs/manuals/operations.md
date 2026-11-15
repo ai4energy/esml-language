@@ -1,7 +1,7 @@
 # 语言规范运维手册
 
 > 适用：维护规范/XSD/示例的持续一致性，处置版本漂移与门红。
-> 最后核对：2026-11-11（v1.3.3）。
+> 最后核对：2026-11-15（v1.3.4）。
 
 ## 1. 日常巡检
 
@@ -24,10 +24,11 @@ python3 docs/validate_roots.py selftest
 | 跨仓 XSD 漂移闸 | `tools/check-engine-xsd-parity.py` + `tools/engine-drift.tsv` | 本仓 `xsd/` 与引擎仓 schema 有分歧且台账未裁决（缺引擎仓时跳过） |
 | 元素覆盖双向闸 | `tools/check-element-coverage.py` + `tools/element-coverage.tsv` | XSD 元素声明 ⇄ 示例用法差集未闭合（台账没跟上） |
 | 属性覆盖双向闸 | `tools/check-attr-coverage.py` + `tools/attr-coverage.tsv`（登记来源 `attr-acceptance.tsv`） | XSD 属性声明 ⇄ 示例用法差集未闭合 |
-| 引擎 × 示例可运行性闸 | `tools/check-engine-examples.py` + `tools/engine-example-debt.tsv` | 非负例示例 `esml check` 有错且台账没登记 / 台账 errors 数与实测不符（缺引擎仓时跳过） |
+| 引擎 × 示例可运行性闸 | `tools/check-engine-examples.py` + `tools/engine-example-debt.tsv` | 非负例示例 `esml check`/`solve` 与台账不符或未登记（缺引擎仓时跳过） |
+| XSD ⇄ SPEC 点名闸 | `tools/check-spec-element-coverage.py` + `tools/spec-element-coverage.tsv` | XSD 命名元素/属性在 `SPEC.md` 漏点名且未登记 |
+| 示例期望值台账闸 | `tools/check-example-expectations.py` + `tools/example-expectations.tsv` | 实跑结果超出台账 `tol` 或运行失败（缺引擎仓时跳过） |
 
-五张台账（element-coverage / attr-coverage / attr-acceptance / engine-drift / engine-example-debt）
-各管一件事、互不重叠；owner 语义（`W1`/`W3`/`W4` 警告不红 vs `engine-debt` 红）见 development.md 台账表。
+核心台账（`element-coverage` / `attr-coverage` / `attr-acceptance` / `engine-drift` / `engine-example-debt` / `spec-element-coverage` / `spec-xsd-bydesign` / `example-expectations` 与普查表 `solve-smoke`）各管一件事、互不重叠；owner 语义（`W1`–`W4` 警告不红 vs `engine-debt` 红）见 `development.md` 台账表。
 
 负例是**棘轮**：标 `schema` 的负例必须被 XSD 拒收；它变绿说明判据漏了。
 
@@ -43,8 +44,8 @@ python3 docs/validate_roots.py selftest
 | 下游 | 消费方式 | 变更后要跑 |
 |---|---|---|
 | 引擎 | 子模块 + XSD | `scripts/gate.sh`、conformance |
-| 库仓 | canonical XSD | G-L1/G-L2/G-L3/G-L4/G-L5 |
-| 书仓 | 示例语法 + 规范 | G-B1 语料门、示例检查 |
+| 库仓 | canonical XSD | `G-L1`–`G-L6`（含 `check-canonical-strict.sh`） |
+| 书仓 | 示例语法 + 规范 | `G-B1` 语料门、101 卷 `check_monograph.py` |
 | 编辑器 | XSD + 引擎能力探测 | 编辑器冒烟/兼容矩阵 |
 
 改语言语义时，四端都要在同一个发布窗口内更新；不要只改本仓。

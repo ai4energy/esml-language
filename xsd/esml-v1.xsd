@@ -9,7 +9,7 @@
      少一个 ⇒ 一份合法的 canonical 文档被本层判非法（假拒）；
      多一个 ⇒ 本层放行一份没有任何 canonical schema 能校验的文档（假收）。
      下方根矩阵块由 `docs/validate_roots.py` 的 sync 模式生成、逐字复核，
-     **不是手抄的清单**。裁决记录：docs/design/root-matrix-adjudication.md
+     **不是手抄的清单**。裁定依据见 `SPEC.md` §13。
 
      ROOT-MATRIX:BEGIN
      根清单 = canonical 层的全局元素（唯一真相 = canonical XSD）。
@@ -17,7 +17,7 @@
      少一个 ⇒ 合法文档被入口层判非法；多一个 ⇒ 根合法性闸有洞。
      本块由 `docs/validate_roots.py` 的 sync 模式生成，**勿手工编辑**；
      `docs/validate_roots.py` 逐字复核本块（漂移即判红）。
-     裁决记录：docs/design/root-matrix-adjudication.md
+     裁定依据：SPEC.md §13（入口层根集合 = canonical 全局元素集）
      根 | 入口层 | canonical 声明处 | 裁定
      computeTasks | 是 | esml-canonical-compute.xsd | —
      esml | 是 | esml-canonical-basic.xsd | —

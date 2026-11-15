@@ -14,7 +14,7 @@
 > v0.6.7 任务层口径：七类问题类（simulate / sensitivity / estimation / optimize / control / surrogate / validation）+ 三个辅助任务（forecast / data / decision）；辅助任务不占七类编号，也不引入新的求解角色。
 >
 > **两条版本线，别混**：**v0.x = 语言内容修订史**（见附录 C 的 v0.x 条目，一路到
-> v0.6.6 为止）；**v1.3.x = 本仓发布线**（自 v1.3.0 起）。本次 **v1.3.4** =
+> v0.6.7 为止）；**v1.3.x = 本仓发布线**（自 v1.3.0 起）。本次 **v1.3.4** =
 > 任务层的「七类问题类 + 三个辅助任务」口径落地（SPEC §6.9 / 附录 M / XSD 同步）。
 >
 > 本文描述 ESML 声明式物理建模语言：XML 语法、语义、编译器展开与求解约定。
@@ -42,7 +42,7 @@
 - **单位 = 界面层元数据，数值层用裸数**：单位表与 `VariableType.unit`
   只供界面做单位校验/显示/换算；方程字面量、`<set>/<initial>`、参数 default
   一律解析为无量纲数值，**建模/求解不做任何单位换算**。术语上
-  **`instances` = 组件实例集合**（XML `<instances>` / `SystemDef.instances`），
+  **`instances` = 组件实例集合**（XML `<instances>`），
   **`units` 只指单位表**（两者不再撞名）。
 
 ### 1.1 文档骨架（`<esml>` 根 · `<metadata>`）
@@ -92,7 +92,7 @@
 | 组件 | `<modelType name>` | 组件类型声明；`<members><instance name type/></members>`（§4.1）；`<extendsFrom>Base</extendsFrom>` 继承（§4.0） |
 | 系统/实例 | `<system name>`/`<instances><instance name type/>` | `<system>` 也可作为 instance 的 `type` 引用（子系统，§6.4） |
 | 作用域引用 | `<scope instance=".."><set path value/>`（`unit=` 非法） | `unit` 只表度量单位 |
-| 变量 | `<variable name type role="state\|algebraic\|flow\|parameter" initial default/>` | — |
+| 变量 | `<variable name type role="state\|algebraic\|discrete" initial default/>` | 闭集；参数用 `<parameter>`，端口角色见 `<portVariable>` |
 | 方程 | `<equation>expr (=\|~) expr</equation>` | — |
 | 连接 | `<connection from=path to=path/>` | 语义见 §8 |
 | 标准库引用 | `<use library="group:artifact:version"/>` | 合并坐标化组件库（§6.1） |
@@ -151,19 +151,17 @@
 
 ## 3. 类型系统
 
-- `variableTypes` 定义量纲类型（含 `role`，可带 bounds/unit/default）。
-  字段集共 15 项：
+- `variableTypes` 定义量纲或枚举类型（可带单位、上下界与默认值）。`VariableType` 常用属性：
   `name` · `unit` · `quantity` · `lowerBound` · `upperBound` · `default` ·
-  `nominal` · `role` · `kind` · `domain` · `delta` · `source` · `source_name` ·
-  `dimension` · `description`。
+  `nominal` · `kind` · `values` · `description`（注：变量角色只在 `<variable role="state|algebraic|discrete">` 上声明，不在 `<type>` 上写 `role=`——解析期对 `<type role=…>` 报旧写法错误）。
 - **枚举类型**：`<type name="E" kind="enumeration" values="a,b,c" default="a"/>`
   （字面量也可用子元素 `<literal name="a"/>`）。字面量引用 `E.a` 与枚举型默认**在编译期
   解析为声明序号整数**（`a`→0、`b`→1…），故中间表示仍为数值；`kind` 如实声明为 `"enumeration"`。
   兼容源拼写 `type E = enumeration(a,b,c)` 由转换器归一化。
 - 变量/端口变量**必须引用**一个已声明类型（强约束，`type="..."` 缺失 → 报错）。
-- `role=state` 的变量参与微分 `Der(...)`；`role=flow` 的变量在连接里守恒
-  （隐式连接器电学 `PortType.vars`）。`role=stream` 是元数据（不守恒），由
-  Mixer 等单元做组分加权（详附录 F1）。
+- 模型变量（`<variable>`）的 `role="state"` 表示参与微分 `Der(...)`；端口变量（`<portVariable>`）
+  在隐式物理连接器中使用 `portRole="potential|flow"` 实现等势与守恒（详见 §5），
+  `portRole="stream"` 则仅作流股元数据（不自动守恒，由 Mixer 等单元在内部完成组分加权，详附录 F1）。
 - `portVariable` 的角色按**三个正交轴**分开给（详 §5）：
 
   | 轴 | 属性 | 值域 | 管什么 |
@@ -173,9 +171,7 @@
   | 载量 | `carrier=` | 变量名 | 仅 `portRole="stream"` 时有意义，选加权流 |
 
   `var=` 不是合法写法，出现即报错。
-- 差值/仿射换算等按类型定义推进（quantity/delta 属后续类型扩展项）；
-  单位/量纲语义由 `VariableType.unit/quantity` 标注，**数值层用裸数**
-  （详见 §1 设计原则）。
+- 单位/量纲语义由 `VariableType` 的 `unit` / `quantity` 标注，**数值层用裸数**（详见 §1 设计原则）。
 - **类型按类别包裹（wrapper）**：`<variableTypes>` 里的 `<type>` 可以**直接裸放**，
   也可以按类别包一层——`<typesGeneric>` / `<typesThermal>` / `<typesDimensionless>`
   （`discipline=` 可选）。**包内 `<type>` 与裸放完全等价**，wrapper 只表达
@@ -259,7 +255,7 @@ ESML 的因果化在**每个方程上做"可解变量判定"**：
 要让它在**结构上无法被隔离**（放进两边都含它的守恒式，或引入中间变量分段）。
 
 **诊断约定**：实现**应**提供一种"打印因果计划"的诊断开关（打印三张表：
-**自由量 / 前向赋值 / 残差行**，每条赋值式给出完整表达式；并标记求值中的非有限值），
+**自由量 / 前向赋值 / 残差行**，每条赋值式给出完整表达式；并标记求值中的非有限值）。
 
 > **另一条相关的**：模型级 `<if>`（§6.5 / 附录「模型级 IF」）是"模式选择"的
 > **正规写法**，降级为 `lhs = ifelse(cond, rhsA, rhsB)` —— **一个 `<if>` 只产生一条
@@ -271,7 +267,7 @@ ESML 的因果化在**每个方程上做"可解变量判定"**：
 `<modelType>` 可声明 `<extendsFrom>Base,Other</extendsFrom>`（子元素，逗号分隔）或
 `extendsFrom="Base"` 属性。build 前实现把基类 `ports / variables / parameters / equations /
 discrete / events / members / connections` **合并**进派生类型（**派生同名优先**），递归解析、
-环报错、基类缺失 → `@warn` stub。**定位为能力覆盖（capability），最佳实践不推荐继承**：
+环报错、基类缺失时显式告警。**定位为能力覆盖（capability），最佳实践不推荐继承**：
 ESML 原生作者优先**组合（§4.1）/参数覆盖**；`<extendsFrom>` 主要服务于第三方转换库的消费。
 
 **`redeclare` / `replaceable`（canonical 表示）**：`redeclare` 语义等价于
@@ -279,7 +275,7 @@ ESML 原生作者优先**组合（§4.1）/参数覆盖**；`<extendsFrom>` 主�
 可选显式标记 `redeclare="true"`：名字必须在基类存在（否则**响亮报错**，
 防拼写错静默新增）。`replaceable="true"` 为元数据（未被替换时行为等同普通声明）。
 
-**拼写单轨**：类级继承的 canonical 写法只有 `<extendsFrom>`（§16 已删同义元素
+**拼写单轨**：类级继承的 canonical 写法只有 `<extendsFrom>`（§2 已删同义元素
 `<extends>` 与属性 `extends=`）。基类声明在**同一文档内**还是来自**第三方转换库**
 不改变拼写，两者都用 `<extendsFrom>`，合并规则同为**派生同名优先**。
 示例：`L3-model/extendsfrom.esml`（子类型继承基类参数 `k`）。
@@ -290,7 +286,7 @@ ESML 原生作者优先**组合（§4.1）/参数覆盖**；`<extendsFrom>` 主�
 `<members>` 就是**复合组件**。**复合自身是一等模型**：
 可声明自己的参数/变量/方程/端口；成员以 `父实例__成员名` 追加展开，壳实例**保留**，
 内部 `<connections>` 把**自己的端口**（无实例头的裸口名，如 `"L"`）接到成员端口
-（`"a.left"`），成员间内部接线同 。系统层连接复合端口与连接普通端口一致
+（`"a.left"`），成员间内部接线同上。系统层连接复合端口与连接普通端口一致
 （real↔real 逐 pvar 相等）。例：
 
 ```xml
@@ -317,7 +313,7 @@ ESML 原生作者优先**组合（§4.1）/参数覆盖**；`<extendsFrom>` 主�
   `<set path="成员.参数" value/>` 在展开时改写为对叶实例 `父__成员` 的参数覆盖
   （嵌套链式：`core.hot.Tset` → `d2__core__hot`）。参数覆盖 vs 变量钉值分开：
   参数用 `set path=`，变量用方程/`<initial>`。
-- 复合组件是**库内容**（§6.3 只收 component，复合=component 的装配形态，可入
+- 复合组件是**库内容**（§6.3 只收模型组件 `<modelType>`，复合为其装配形态，可入
   标准库）；`<set>` 只在**使用侧**（系统/子系统）写，组件内部不放。
 - 复合自带参数/端口/方程：**支持**（壳保留）；穿透式端口（成员口自动对外可见）仍**不支持**，
   用壳自身端口显式接线建模。撕裂/去冗余/降阶不在此（中间表示之后）。
@@ -328,8 +324,8 @@ ESML 原生作者优先**组合（§4.1）/参数覆盖**；`<extendsFrom>` 主�
 `<annotation>` 是**纯 UI 元数据**：求解器不读，不得影响任何数值结果。它携带的图标、
 布局与端口标注只供前端渲染，引擎 `check` 通过但 `solve` 完全忽略。
 
-三处宿主（已核对 XSD）：`<modelType>`（basic.xsd:531）、`<system>`（:667）、
-文档根 `<esml>`（:804）。
+三处宿主（对应 `xsd/esml-canonical-basic.xsd` 的 `ModelTypeDef` / `SystemType` / `<esml>`）：`<modelType>`、`<system>`、
+文档根 `<esml>`。
 
 | 元素 | 类型 | 属性 | 必填 |
 |---|---|---|---|
@@ -343,8 +339,8 @@ ESML 原生作者优先**组合（§4.1）/参数覆盖**；`<extendsFrom>` 主�
 
 ## 5. 端口（portType / port）
 
-- **PortType = 类型**：声明一组端口变量（可带 role potential/flow/stream/input/output，也可为
-  无 role 的显式域变量束），定义一次。
+- **PortType = 类型**：声明一组端口变量（可带 `portRole="potential|flow|stream"` 或 `causality="input|output"`，也可为
+  无角色属性的显式域变量束），定义一次。
 - **Port = 实例**：组件/系统上的连接点，`portType=` 引用一个 PortType。
 - 端口本身**不携带方程**；耦合语义由连接生成（§8）。
 - 端口机制是**通用组网接口**（电/热/流/工艺/信号皆然）：隐式域由连接生成守恒
@@ -360,12 +356,12 @@ ESML 原生作者优先**组合（§4.1）/参数覆盖**；`<extendsFrom>` 主�
 </portTypes>
 ```
 
-**role 词表与层次**：portVariable 的 `role=` 值分两类——
-物理连接器 `potential | through(flow 别名) | stream`（隐式域电/力守恒生成用；through=结点守恒量）；信号 `input|output`
+**角色词表与层次**：`<portVariable>` 的角色按轴声明——
+物理连接器 `portRole="potential|flow|stream"`（隐式域电/力守恒生成用；转换源里的 `through` 归一为 `flow`）；信号 `causality="input|output"`
 （因果）。**显式域（热/流/工艺）元件同样走 PortType 端口**（PortType-pure，
-连接=逐 pvar 相等、守恒/本构在单元内）：端口变量多为无 role 的普通变量束，
-**勿**标 `role="flow"`/`potential` 等（否则会触发隐式 wire 守恒叠加在显式相等上，见附录 F1）。
-端口级可加 `category="inlet|outlet|bi-directional"` 或自定义类别 + 连接规则表（附录 F4）作护栏。
+连接=逐 pvar 相等、守恒/本构在单元内）：端口变量多为无 `portRole` 的普通变量束，
+**勿**标 `portRole="flow"`/`potential`（否则会触发隐式节点守恒叠加在显式相等上，见附录 F1）。
+端口级可加方向 `category="inlet|outlet|bi"`（省略默认 `bi`），或用 `connectClass="…"` 配连接规则表（附录 F4）作配对护栏。
 
 **端口变量可带数组维度 `array=`（与 `<variable>` 的写法一致）**：
 
@@ -404,7 +400,7 @@ ESML 原生作者优先**组合（§4.1）/参数覆盖**；`<extendsFrom>` 主�
 * **引用形式**：`port.pvar[i]`（如 `out.w[1]`）解析到展开后的元素符号 `out.w_1`。
 * **连接语义不变**：仍按 §8 —— 显式域下 `connect` 只令两端 pvar **逐元素相等**，
   守恒写在单元内部；端口数组不引入任何额外的隐式守恒。
-* **`role` 与 `array` 正交**：显式域端口通常**无 role**；标了 `potential`/`flow` 的
+* **`portRole` 与 `array` 正交**：显式域端口通常**无 `portRole`**；标了 `portRole="potential"`/`flow` 的
   数组端口才走隐式域（每元素势相等 + 每元素流守恒）。
 
 **展开**：声明期展开为逐元素端口变量，索引写作 `port.pvar[i]`；
@@ -479,7 +475,7 @@ ESML 原生作者优先**组合（§4.1）/参数覆盖**；`<extendsFrom>` 主�
 - **标准库包** = 一个坐标化的库 XML（`coordinate="g:a:v"`），包含组件/端口/类型定义，
   由库坐标经 registry 解析为文件。
 - **系统文件**可只写拓扑/边界，用 `<use library="g:a:v"/>` 引用库包；`use` 指令
-  读取各库并合并后再接入系统
+  读取各库并合并后再接入系统。
 - 目的：组件一次入库、多系统按坐标复用；系统文件保持"纯接线+边界"（热示例已示范）。
 - 坐标规范：`group:artifact:version`（Maven 风格）。
 
@@ -489,11 +485,7 @@ ESML 原生作者优先**组合（§4.1）/参数覆盖**；`<extendsFrom>` 主�
 - **system 与 partition 不是可复用的库内容**——可作为**案例/examples 保留**（演示用法），但
   不进入坐标包/registry 的内容集。
 - **库文件可自带一个自包含示范 `<system>`**：让每个库 XML 都能被单独
-  `solve`/`simulate` 验证（消灭"无法验证的文件"）。**消费语义**：被 `<use>`/`-L` 合并时，
-  展开时只取参数/端口/方程正文，
-  示例系统即使与主模型同文件也不会被实例化（只实例化被选系统）。
-  `<instance>` 闭包线：若被引系统与主模型同文件，取缺省系统（无显式 `<system>` 时）
-  显式 `--system Demo` 仍可运行该示范。
+  `solve`/`simulate` 验证（消灭"无法验证的文件"）。**消费语义**：当该库被其他文件通过 `<use>`/`-L` 合并消费时，仅引入其中的类型、参数、端口与组件模型定义，示范 `<system>` 不会被实例化（只实例化调用方显式或默认选定的目标系统）；若直接运行该库文件且未显式指定 `--system`，则按规则选取其默认示范系统（或通过 `--system Demo` 显式运行）。
 
 ### 6.4 partition / crosslink（求解单元分层）
 
@@ -510,7 +502,7 @@ ESML 原生作者优先**组合（§4.1）/参数覆盖**；`<extendsFrom>` 主�
   （= 联立方程法，结果与不分区一致）；显式分区时由协调器在各 partition 接口上迭代。
 
 **crosslink 端点 = port 束（interface ≡ port）**：子系统要对外耦合的量也用 PortType 变量束在
-子系统上声明成 port，不另造一类「interface」元素（ interface 一词已因类型/实例歧义改名
+子系统上声明成 port，不另造一类「interface」元素（interface 一词已因类型/实例歧义改名
 PortType/Port；这里仅指**叫法**，XML 仍是 `<port portType=…/>`）。区分语义的是算符
 （connect vs crosslink）与层级，不是端点名词。
 
@@ -572,7 +564,7 @@ instance 的 `type` 指向 `<system>` 时，它按子系统展开，不当作缺
     变结构，保持扁平 DAE 方程数固定）。
 - 与**方程级**条件（§7 `ifelse` / `<if>` / `<case>`）不同：后者改方程右端，
   本条改**实例集合（拓扑）**。
-- 属性写法：实例上写 `condition="…"`（等价 `if="…"`）。
+- 属性写法：实例上只写 `condition="…"`（旧拼写 `if="…"` 在解析期报错）。
 - 示例：`L5-instance/instance-condition.esml`（**常量形态**；三个实例：缺省恒真 /
   条件为真 / 条件为假——条件为假那个实例连同其实例方程一并消失，模型里**没有**它，
   不是「解成 0」）；
@@ -649,7 +641,7 @@ Process/Case 也有 flowsheet 级 `EQUATION`。ESML canonical 对应地允许 `<
 `<advance>` / `<complete>` 带 `unit=`。寻址用作者点号 `m.x`（§3 / §9）。
 
 `$ADVANCE` 展开为 `<advance unit="…"/>`，`$COMPLETE` 为 `<complete unit="…"/>`，
-`$JUMP_TO` 为 `<jumpTo target="…"/>`。
+`$JUMP_TO` 展开为 `<jumpTo><set path="…" value="…"/></jumpTo>`。
 
 > **待实现**：`<advance>` 的**条件**形式（`<advance until="t > 5"/>`）目前
 > 解析层**不读** `until`（只读 `unit`），条件推进尚未实现；本节只列已实现形态。
@@ -666,12 +658,9 @@ Process/Case 也有 flowsheet 级 `EQUATION`。ESML canonical 对应地允许 `<
 `<project>` 是**文档根**（canonical 层的全局元素，入口层照收，清单见 §13），
 装的是「模型 + 任务」的工程单元。
 
-> **`<tasks>` 外层壳已废弃（canonical-strict，2026-11）**：旧 §6.8 的可选外层壳
-> 被 parser **F1 响亮拒收**（legacy spelling，点名 canonical 写法 `<computeTasks>`），
-> 三份 XSD 的声明（compute 全局元素 / basic `<esml>` 子元素表引用 / 入口同名根）
-> 已同步移除，根清单减为 11（§13）。canonical 任务段唯一写法是 `<computeTasks>`
-> （并列写法见 `T-tasks/tasks.esml`）。此前的壳裁决见
-> `esml-adr-archive`（ai4ecom）`language/design/tasks-shell-adjudication.md`（2026-10-21，现被取代）。
+> **`<tasks>` 外层壳已废弃**：`<tasks>` 已由解析器显式拒收，
+> 三份 XSD 与入口根清单已同步清理（现为 11 个文档根，见 §13）。
+> canonical 任务段唯一写法是 `<computeTasks>`（示例见 `T-tasks/tasks.esml`）。
 
 **canonical 形态**（`xsd/esml-canonical-project.xsd`）：
 ```xml
@@ -712,9 +701,6 @@ Process/Case 也有 flowsheet 级 `EQUATION`。ESML canonical 对应地允许 `<
 元素名用 camelCase（`systemRef`、`computeTasks`、`scenarioChain`、`<task>`）；
 kebab-case 拼写**不是合法语法**，报错（§2 收紧集）。
 
-**`<tasks>` 外层壳**：已废弃（canonical-strict，2026-11）——本节开头的废弃说明
-为唯一说法，不再重复；壳的旧裁决记录在 `esml-adr-archive`（ai4ecom）`language/design/tasks-shell-adjudication.md`。
-
 ### 6.9 计算任务表（`<computeTasks>` / `<task>`）
 
 **用途**：模型体系与计算体系同处一个文档时，`<computeTasks>` 挂任务表，
@@ -751,7 +737,7 @@ kebab-case 拼写**不是合法语法**，报错（§2 收紧集）。
 | `sensitivity` | `<perturb>`（属性式：`name` / `fraction` / `lower` / `upper`）、`<output>`（`<var>` 列表） |
 | `estimation` | `<estimate>`（`<var initial/>` 或属性式 `initial`）、`<data>` |
 | `optimize` | `<decision>`（`<var lower upper/>` 或属性式）、`<objective>`（含 `<expr>`）、`<constraints>`（含 `<constraint>`）、`<solver>` |
-| `control` | `<mpc N dt/>`（滚动时域）；MPC 载荷属性：`x0`（初始状态）/ `xref`（参考轨迹）/ `umax`、`umin`（控制量上下限）/ `r`（正则化权重）/ `steps`（预测步数）/ `tol`（收敛容差）/ `q`（状态代价权重） |
+| `control` | `<mpc N dt/>`（滚动时域）；MPC 载荷属性：`a` / `b` / `c`（状态空间矩阵）/ `x0`（初始状态）/ `xref`（参考轨迹）/ `umax`、`umin`（控制量上下限）/ `q`（状态代价权重）/ `r`（正则化权重）/ `steps`（预测步数） |
 | `surrogate` | `<surrogate method degree model/>`（`model`：拟合模型形态）、`<sampling size/>`、`<data>` |
 | `validation` | `<metrics>`（含 `<metric name expected tolerancePct/>`）、`<data>` |
 
@@ -763,7 +749,7 @@ kebab-case 拼写**不是合法语法**，报错（§2 收紧集）。
 | `data` | `<samples>`（内联样本）、可选 `<data>` | 对样本做摘要统计（count / min / max / mean / std / median），不求解 |
 | `decision` | `<decision name lower upper>`（候选集）、`<objective direction>` | 候选选择（单目标）或 Pareto 前沿（两目标），不求解 |
 
-**任务层口径**：七类问题类是闭集；辅助任务固定为 `forecast` / `data` / `decision` 三项，是功能层组合的显式声明，不占七类编号，也不引入新的求解角色。`kind` 的合法取值 = 七类问题类 ∪ 三个辅助任务；新增能力仍走附录 M 的功能层机制与组合，不新增问题类。
+**任务层口径**：问题类为**闭集七类**；辅助任务固定为 `forecast` / `data` / `decision` 三项，是功能层组合的显式声明，不占七类编号，也不引入新的求解角色。`kind` 的合法取值 = 七类问题类 ∪ 三个辅助任务；新增能力仍走附录 M 的功能层机制与组合，不新增问题类。
 
 **求解约定**：按 `kind` 构造问题再求解（任务声明 → 问题树 → 求解）；七类问题类是**闭集**，辅助任务是固定三项，二者都不通过新增 `kind` 扩展。
 
@@ -855,10 +841,14 @@ kebab-case 拼写**不是合法语法**，报错（§2 收紧集）。
   <then>...<else>...</else></if></equations>`（对称可逆）；多分支用
   `<case on="sel"><branch value="k">...</branch>...</case>`（情形A 合并右端 /
   情形B gating）。
-- 事件：`L8 <when condition>` 配 `<assign>`/`<reinit>`/`<elsewhen>`；D 改用
-  重写变量的事件驱动。
-- 数组变量求和/极值：内建 `sum(X)` / `mean(X)` / `min(X)` / `max(X)` /
-  `size(X)`（附录 F8）。
+- 事件：`<events><when condition>` 配 `<assign>` / `<reinit>` / `<elsewhen>`（事件动作改写连续状态或离散变量，详见 §2 与附录 F3）。
+- **常用表达式内建与自变量**（详见 `L1-expr-equation/builtins-*.esml`）：
+  - 独立时间自变量统一写作 **`t`**（不写作 `time`）。
+  - 初等/常用数学函数：`sin` / `cos` / `tan` / `asin` / `acos` / `atan` / `atan2`、`sinh` / `cosh` / `tanh` / `asinh` / `acosh` / `atanh`、`exp` / `ln` / `log10`、`sqrt` / `abs` / `floor` / `ceil` / `integer` / `mod` / `sign`、`clamp` / `min` / `max` / `mid` / `ifelse`。
+  - 复数算子：`complex(re, im)` / `real(z)` / `imag(z)`。
+  - 连续/同伦/事件与延迟算子：`Der(x)`、`delay(u, T)`、`homotopy(a, b)`、`relaxation(lo, hi, init)`、`edge(cond)`、`noEvent(expr)`。
+  - 数组归约与序集内建：`sum(X)` / `mean(X)` / `product(X)` / `min(X)` / `max(X)` / `size(X)`（附录 F8），以及序集算子 `CARD(S)` / `IN(x, S)` / `COMMON(A, B)`。
+  - 状态机与时钟算子：`activeState(A)`、`sample(x, c)` / `previous(x)` / `interval(c)` / `firstTick(c)` / `noClock(x)`（见 §7.1）。
 - **算法段语句集**：`<algorithm>` 内的 `<assign name|path value>`、`<if condition>`+`<then>`/
   `<else>`、`<for var in|range>`、`<return value>`、`<while condition>`。算法段降级为纯表达式
   （静态展开：`assign` 代入、`if/else`→`ifelse`、常量 `for` 展开）。示例：
@@ -910,7 +900,7 @@ kebab-case 拼写**不是合法语法**，报错（§2 收紧集）。
    **自动生成守恒**（effort 相等 + flow 求和=0）；全"相等型"端口 → 仅相等。
 2. **系统组网默认语义 = 显式平衡组件 + 变量/端口相等**（process 通用；水网已示范）：
    守恒/混合等复杂关系写进组件/节点实体，connect 本身不写守恒方程。
-3. **域惯例默认（领域矩阵，/50，库层约定）**：
+3. **库层领域惯例（默认约定）**：
    - 电、力 → 隐式连接器（potential/flow，结点势相等+流守恒自动）。
    - 热、流体（水/气/热网）、工艺介质 → **显式**：connect=变量相等，守恒/本构/
      反向分片全在单元内；分/合流用显式 Node/Merge/Split。
@@ -928,7 +918,7 @@ kebab-case 拼写**不是合法语法**，报错（§2 收紧集）。
 ## 9. 展平与命名（编译器）
 
 **命名模型**：
-- **身份 = 层级路径向量**（如 `[:inst, :port_a, :T]`），不是扁平字符串；扁平名只是
+- **身份 = 层级路径向量**（如 `[inst, port_a, T]`），不是扁平字符串；扁平名只是
   I/O/打印的投影。
 - **扁平投影 = 单点构造器**生成（杜绝前端/代码生成的形状漂移）。
 - **分隔符 = `__`**（双下划线）：`a__b__c`、`{inst}__{port}__{pvar}`、数组
@@ -955,52 +945,34 @@ kebab-case 拼写**不是合法语法**，报错（§2 收紧集）。
 
 ## 10. 求解语义
 
-- **稳态**：纯代数系统（`length(ml.states) == 0`）走 `NonlinearOnlySolver`
-  （Newton 阻尼迭代，实现）；守恒/边界由方程闭合。
-- **瞬态**：`role=state` + `Der(...)`；初值来自 `<variable initial/>`；DE 求解
+- **稳态**：纯代数系统（无 state 变量）走非线性代数求解器（如阻尼 Newton 迭代）；守恒/边界由方程闭合。
+- **瞬态**：`role=state` + `Der(...)`；初值来自 `<variable initial/>`（及 `<initial>` 约束）；微分/代数求解
   按问题类型分派（ODE / DAE 各选对应积分器）。大规模代数部分自动启用**稀疏 Jacobian**
   （当代数未知量数达到阈值后启用）。
-- 一致性初始化：求解入口接受 `NoInit` / `AlgConsistentInit` / `FullConsistentInit`
-  （默认 Full；`NoInit` 同义）。
-- **求解入口**（canonical 五段式）：
+- 一致性初始化：求解入口支持无初始化 / 仅代数一致初始化 / 全一致初始化
+  三种策略（默认为全一致初始化）。
+- **求解入口**（canonical 四阶段）：
   `解析文档 → 语言层模型 → 构建问题 → 求解`，
   数值按官方向量映射读取（状态/代数/离散/参数的 name→idx 映射；
   解向量按各段索引切片）。
 - **编译产物缓存**：编译产物（含结构变换前的形式）按内容哈希落盘
   （`SHA-256` + 源文档 + 产物），同文档同系统可复用；
-  结构变换产物（`reduce_high_order` / `dae_index_lowering` / `pantelides`）**不参与**磁盘缓存。
+  结构变换产物（高阶导降阶 / DAE 降指标 / Pantelides 等结构变换）**不参与**磁盘缓存。
   交付路径走加密的 `.esmlx`。
 
 ## 11. 物性插件
 
-- 语言不强绑物性实现；组件方程可引用已注册的外部函数，由使用者注入。
-- 插件须可求导：数值求解用解析、前向或有限差分；梯度契约见 §11.3。
-- 物性入口分两层：
-  1. **本地 helpers**（物性 helper 资产）—— 饱和水、制冷剂（R134a/NH3/R410A/R245fa/通用）、
-     NASA 多项式理想气体、单相蒸汽/压缩液体；ESML 绑定以这些为公开 API
-     （`psat_water` / `hf_R134a` / `props_ideal_gas_cp` / `T_isentropic_water` /
-     `h_pump_water` 等；不在此处展开，转由物性后端求值，符号层不介入）。
-  2. **物性总包**（外部独立包）—— 统一入口、后端注册表与多后端对比
-     （例如 Clapeyron / IAPWS-95 / Zimmer / CoolProp / REFPROP 等后端）。
-     物性库以 registered foreign 对象接入，不进入语言规范。
+- 语言核心不内置物性数据与状态方程；模型通过**外部函数**（`<function kind="external"><extern ffi="c" …/></function>`，C ABI + §14.2 导数契约）或**外部对象**（`<foreignObjects>`，附录 I）按插件方式接入物性计算。
+- 插件须显式声明导数模式（`analytic` / `fd` / `opaque`，见 §14.2），并遵守 §14.3 的「绝不静默」契约：缺库、缺符号或计算失败均以错误码响亮报告，不许用 `NaN` 静默传播。
+- 具体工质覆盖（如水与蒸汽 IAPWS、制冷剂、理想气体 NASA 多项式等）及外部物性 provider 库由独立组件包提供，不进入语言规范。
 
 ## 12. 标准库（Standard Library）
 
-- 标准库以**坐标**寻址，由 registry 把 `group:artifact:version` 解析为库文件。
-  现行坐标库：
-  - `cn.ai4energy.esml.thermal:heat-elements` —— **显式**热元件（FixedT/Conductor/
-    FixedHeatFlow/HeatCapacitor/Radiation/Node/Merge/Split + 复合 BoilerA*）。
-  - `cn.ai4energy.esml.thermal:tclab` —— TCLab 教学双区热模型（2 阶线性）。
-  - `cn.ai4energy.esml.fluid:water-elements` —— **显式**水网元件（Reservoir/Pipe/
-    NodeDemand/Junction/Pump/Tank/PRV·FCV/N* 分合流 + 复合 PipeLeg）。
-  - `cn.ai4energy.esml.electrical:dc-elements` —— **隐式连接器**电元件（Resistor/
-    VoltageSource/CurrentSource/Capacitor/Ground，potential/flow 结点守恒）。
-  - `cn.ai4energy.esml.electrical:power-elements` —— AC/DC 电源系统元件库。
-  - `cn.ai4energy.esml.water:*` —— Reservoir/Pipe_HW/PRV/LossValve/PumpQuad/Ring
-    Junction/Source/Sink 等水网与环网分合流元件。
-  - `cn.ai4energy.esml.absorbed:*` —— 化工吸收类元件（esterification_eq/
-    ether_dehydration_eq/adiabatic_equil_reactor/conversion_reactor_per_pass，
-    4 条）等。
+- 标准库以**坐标** `cn.ai4energy.esml.<域>:<件>:<版本>` 寻址，由库根下的 `registry.tsv` 将 `group:artifact:version` 解析为 `.esml` 库文件。常见领域坐标示例：
+  - `cn.ai4energy.esml.thermal:heat-elements` / `cn.ai4energy.esml.thermal:tclab` —— 显式热元件与双区教学热模型；
+  - `cn.ai4energy.esml.fluid:water-elements` / `cn.ai4energy.esml.hydraulic:water-network` / `cn.ai4energy.esml.water:*` —— 流体与给水管网显式元件；
+  - `cn.ai4energy.esml.electrical:dc-elements` / `cn.ai4energy.esml.electrical:power-elements` / `cn.ai4energy.esml.power:*` —— 隐式电连接器与电力潮流/暂态元件；
+  - `cn.ai4energy.esml.chemical:*` / `cn.ai4energy.esml.wastewater:*` / `cn.ai4energy.esml.storage:*` / `cn.ai4energy.esml.math:nonsmooth` / `cn.ai4energy.esml.units:units-v1` —— 化工、水处理、储能、非光滑数学函数与基础单位库。
 - **库文件自包含示范用例**：每个库文件**可以**在末尾放一个自包含
   `<system name="Demo">`，只用本文件类型 + 具体默认值，保证单文件可
   `solve`/`simulate`、数值可核。被别的文件 `<use>`/`-L` 消费时，示范系统
@@ -1035,8 +1007,7 @@ kebab-case 拼写**不是合法语法**，报错（§2 收紧集）。
 全局元素）；整张表由 `docs/validate_roots.py` **逐行机判**，不是手抄的清单。
 入口层 `esml-v1.xsd` 的根集合**恒等于** canonical 层的全局元素集合
 （唯一真相 = canonical XSD）——少一个则合法文档被入口层判非法，多一个则入口层
-放行一份没有 schema 能校验的文档。裁决见
-`docs/design/root-matrix-adjudication.md`。
+放行一份没有 schema 能校验的文档。
 
 **文档根清单**（入口层 `xsd/esml-v1.xsd` 的根清单 = canonical 层**全局元素集**）：
 `<esml>` / `<units>` / `<variableTypes>` / `<portTypes>` / `<modelTypes>` / `<systems>` /
@@ -1044,9 +1015,9 @@ kebab-case 拼写**不是合法语法**，报错（§2 收紧集）。
 —— 共 11 个。
 除 `<esml>` 外其余 10 个都可**单独成文件**（独立单位表 / 变量类型表 / 端口类型表 /
 组件类型表 / 系统表 / 单个系统 / 独立序集 / 独立元数据 / 独立计算任务表 / 独立工程壳）。
-（`<tasks>` 外层壳已自 canonical-strict（2026-11）起废弃，见 §6.8。）
+（`<tasks>` 外层壳已废弃，见 §6.8。）
 
-这 12 个之外的名字**不是文档根**：`<schedule>` / `<solutionParameters>` /
+这 11 个之外的名字**不是文档根**：`<schedule>` / `<solutionParameters>` /
 `<variables>` / `<domain>` 都不是 —— 它们只在 `<system>` / `<esml>` / `<modelType>` /
 `<domains>` 内部出现，入口层不收它们作根。
 
@@ -1106,7 +1077,7 @@ modelType、systems、sets、initial、connections、fixed/free、schedule）。
 |---|---|---|
 | `analytic` | `<partial wrt><equation>` 表达式 **或** `<derivativeSymbol order=1\|2 symbol>` | 填 Jacobian（最准） |
 | `fd` | 实现前向差分（`<fd step relative>`，默认 `1e-6` 相对） | 自动差分，**报告标注"该函数用 FD"** |
-| `opaque` | 无导数信息 | 符号层保持 `RExpr::OpaqueDeriv`（响亮）；仅无需解析 Jacobian 的路径可用，否则报错或降 FD 并**标注** |
+| `opaque` | 无导数信息 | 符号层保持不透明导数标记（opaque，响亮失败）；仅无需解析 Jacobian 的路径可用，否则报错或降级 FD 并**标注** |
 
 `zeroDerivative` 声明某输入偏导恒 0（省 Jacobian 项、省调用）；
 `noDerivative` 声明某输入**无**偏导（连 FD 也不做，Jacobian 对应项留 0）；
@@ -1125,7 +1096,7 @@ modelType、systems、sets、initial、connections、fixed/free、schedule）。
 
 **返回码** `0=ok`，非 0 = 错误码 → 实现**响亮失败**（带 `symbol`+码+位置）；
 **不许用 NaN 表示"没算出来"**。内存**调用方分配、被调方只写**，buffer 长度前置校验。
-**无异常穿越边界**（`catch_unwind`；C 侧禁 `longjmp`）。
+**无异常穿越边界**（实现侧拦截非本地控制流；C 侧禁 `longjmp`）。
 
 **调用约定（v1，写死）**：每个 extern 符号的 C 原型是
 ```c
@@ -1150,16 +1121,16 @@ int32_t ⟨symbol⟩(⟨arg0_c_type⟩, ⟨arg1_c_type⟩, …, double *out);
 使"夹具夹"能覆盖，不留"无法验证的外部能力"。
 
 ## 附录 A 术语
-PortType / Port / potential / flow / modelType / instance / D / role /
-compiler expansion / extern / analytic·fd·opaque。
+`portType` / `port` / `potential` / `flow` / `modelType` / `instance` / `role` /
+`portRole` / `causality` / compiler expansion / `extern` / `analytic`·`fd`·`opaque`。
 
 ## 附录 B 语法骨架（简）
 ```
-esml   := <esml> variableTypes? portTypes? modelTypes? systems? </esml>
-portType := <portType name domain> portVariable+ </portType>
-portVariable := <portVariable name portRole=potential|flow|stream causality=input|output carrier? type/>
-modelType := <modelType name domain> ports? parameters? variables?
-              equations? members? connections? </modelType>
+esml         := <esml> variableTypes? portTypes? modelTypes? systems? computeTasks? </esml>
+portType     := <portType name connectorFamily?> portVariable+ </portType>
+portVariable := <portVariable name (portRole=potential|flow|stream | causality=input|output)? carrier? type/>
+modelType    := <modelType name discipline? domain?> ports? parameters? variables?
+                  equations? members? connections? </modelType>
 member := <members><instance name type/></members>
 port := <port name portType category? connectClass? size? portSet?/>
 variable := <variable name type role initial default/>
@@ -1170,81 +1141,15 @@ scope := <scope instance=name><set path value/></scope>
 ```
 
 ## 附录 C 修订史
-- **v1.3.3：XSD 与示例的一致性清理**（本仓发布线 v1.3.x；v0.x 是语言内容修订史，
-  见下方条目）。逐条：
-  1. **XSD 收敛**（同一语义只留一个名字）：
-     - 属性名一律 camelCase —— kebab（`extends-from` / `time-layer` / `max-time` /
-       `a-part` / `b-part` / `port-set` / `control-horizon` / `sample-time` /
-       `lower-bound` / `upper-bound`）与 snake（`time_layer` / `from_state` /
-       `to_state` / `out_state` / `out_kind` / `out_system` / `lower_bound` /
-       `upper_bound` / `tolerance_pct`）旧拼法全部退位；
-     - legacy 属性名 `porttype` / `interface` / `desc` / `dir` 退位，canonical 是
-       `portType` / `description` / `category`；
-     - 删掉三个同义元素：`<extends>`（留 `<extendsFrom>`）、`<reassign>`（留
-       `<reset>`）、`<component>`（留 `<instance>`）；实例属性形态只剩 `type=`，
-       `component=` / `model-type=` 一并退位；
-     - 入口 schema `xsd/esml-v1.xsd` 的**根清单**对齐 canonical 层的全局元素集：
-       删 4 个 canonical 并不存在的假根（`schedule` / `solutionParameters` /
-       `variables` / `domain`），补 2 个漏根（`metadata` / `project`）；
-       `<tasks>` 先按假根删掉、后由 canonical-compute.xsd 升为全局元素（§6.8 的
-       顶层壳，入口层同步声明），故它**是**文档根，不在假根之列。
-  2. **示例**：全仓 136 件逐件过**两道**校验（入口 `esml-v1.xsd` + 逐元素的
-     `esml-canonical-basic.xsd`）；刻意保留的负例 11 件（schema 5 / semantic 6）
-     登记在 `tools/negatives.tsv`，写明红在哪一层。`<project>` 此前零覆盖，补了示例。
-  3. **规范正文**：§2 收紧集与 XSD 对齐 —— 去掉「`porttype=`/`interface=` 是兼容
-     别名」「XSD 为兼容旧文档仍声明 `<component>`」「`component=` 与 `type=` 等价」
-     这三处与 schema 相反的说法；其余章节逐条改成 canonical 拼法（§3 的
-     `lowerBound`/`upperBound`、§6.7 的 `<moveTo>`/`<jumpTo>`/
-     `<initialisationProcedure>`、§6.8 的 `<task>` 与 `<systemRef name src>`、
-     附录 K 的 `maxTime`、附录 B（续）的 `portSet`、附录 L.1 的术语表）。
-     端口变量统一 `<portVariable>` 属性形；元素形（`<flow>` 等）已随单轨裁决删除。
-     角色按轴给：物性 `portRole=`、信号 `causality=`、载量 `carrier=`。
-     本轮再补（残余对账）：§13 补**文档根清单**（12 个 = canonical 层全局元素集，
-     入口层根清单同集）与 `esml-canonical-project.xsd` 一行（此前表里缺这一行，
-     而 `<project>` 正是它声明的根），并点名 `<schedule>` / `<solutionParameters>` /
-     `<variables>` / `<domain>` 不是文档根；§6.8 写明 `<project>` 与 `<tasks>`
-     **都是**文档根（`<tasks>` 是 canonical-compute.xsd 的全局元素，入口层同步
-     声明），别把顶层壳与文档根混作一谈。
-  4. **机验**：`tools/aliases.tsv` 落成 82 条 legacy→canonical 裁决表（数据化，
-     不再只活在注释里）；`tools/check-examples.py` 据此加**别名闸**（legacy 名不得
-     被 XSD 声明、不得出现在示例里；非「待入」行的 canonical 必须在 XSD 里有同名
-     声明）与**根清单对账**（入口与 canonical 的全局元素集必须相等）。自证从
-     2 好 4 坏补到 **3 好 4 坏 + 1 反向自检**。
-     再加 `tools/check-spec-xsd-parity.py`：**文档根三方对账**（入口层 /
-     canonical 层 / 本规范正文三个集合逐条机判，散文里的根声明由脚本按显式
-     规则抽取），by-design 登记落在 `tools/spec-xsd-bydesign.tsv`；自证为
-     **5 好 4 坏 + 1 反向自检 + 4 例真实树变异测试**（删根 / 多根 / 规范凭空加根 /
-     canonical 加全局元素而入口层没收，每例都必须真变红）。
-- **v1.3.4（本批）**：
-  - 端口变量角色按轴拆开：物性 `portRole=`、信号 `causality=`、载量 `carrier=`；
-    元素形（`<flow>` / `<potential>` / `<stream>` / `<constant>` / `<discrete>` /
-    `<var>` / `<variable>`）删除，解析期报错（与已合并的 XSD 改动对得上：
-    `crates`/`xsd` 侧元素形声明已删）。
-  - 新立 §4.2 图形标注 `<annotation>`：纯 UI 元数据，求解器不读，不得影响任何数值结果。
-  - 新增漂移台账：语言仓 XSD 与引擎 parser 的分歧不再两边各改一半，统一登进
-    `tools/engine-drift.tsv`（另一单在建）。
-- v0.6.7：任务层口径定为「七类问题类 + 三个辅助任务」；`TaskKindType` 放行 forecast/data/decision，辅助任务不引入新的求解角色（见 §6.9 与附录 M）。
-- v0.6.4：§6.6 系统（flowsheet）级 `<equations>` canonical 定义（引用实例量 `inst.var`，折为扁平名 `inst__var`）；basic XSD `SystemType` 加 `<equations>`。
-- v0.6.3：§6.5 条件组件（实例级 `condition`）canonical 定义；basic XSD 补 `condition` 属性，并补 `kind`/`values`、partition/crosslink/partitions。
-- v0.6.1：端口变量点号作者语法 `port.pvar` + 自动物化（`__` 回归内部，§4/§9）；
-  `<extendsFrom>` 继承合并（§4.0/§9；XSD ModelType 加 `extendsFrom` 元素/属性）；
-  向量/矩阵表达式「不拍平」（§7）；未连接守恒端口 `flow=0`（隐式规则）。
-- v0.6.0：§13 分层验收（模型/计算两分、逐层链化、XSD 分层文档化）；
-  ComputeTask 正名；canonical-compute XSD 七类声明；任务层×功能层。
-- v0.6.2：§3 枚举类型（`kind="enumeration"`/`values`，字面量 `E.a`→声明序号）；
-  §4.0 `redeclare`/`replaceable` 的 canonical 表示（派生同名覆盖 + `redeclare="true"`
-  响亮校验）；§7 算法段 `while`（常量展开 + 运行时响亮报错）。
-- v0.5.2：§6.4 求解单元分层定案——可求解单元=`<system>`（唯一=system；
-  多个=partition 内部自解 + crosslink 模块间联立）；connect=组件间、crosslink=子系统间；
-  crosslink 端点=port 束；模型体系与计算求解体系两分。
-- v0.5.1：附录 K METHOD×Schedule 多段编排（语法 + 纯 ODE 段间续接/preset）。
-- v0.5.0（v0.4.1 增补）：端口规范词收窄 inlet|outlet|bi-directional；纯 PortType 连接护栏；Connection-Type 参数/PortSet；Source/Sink；SELECTOR；Ordered-Set（数组定维/成员常量/label 下标/成员一等 ConstSetMember）；IF(对称可逆)；FOR(lo..hi 与序集迭代)；CARD/IN(一等/运行时)；CASE(STN 情形A+B)；process 级全局参数传播。**v0.4.1 增补**：stream 流股组成；信号 causal 护栏；自定义端口类别+连接规则表；when/edge/reinit 事件语义糖；复合嵌入(复合壳保留)；on_load 预设；自由度 FIX/FREE；vector 归约内建(size/sum/mean/min/max)；附录 F1–F8。**高阶导**：`Der(Der(x))` 自动降阶（见附录 F）。
-**高指标 DAE（Pantelides）**：平衡高指标 DAE 自动降阶为一阶 index-1（见附录 F9）。
-- v0.4.1：§4.1 复合组件（成员装配/限定路径/嵌套展开）入 spec；附录 B 骨架补 members。
-- v0.4：§6.1 标准库坐标引用 `<use>`/registry.tsv；§12 标准库分层。
-- v0.3：词法收紧（canonical 唯一、旧词法报错）；补 §2 收紧规则表。
-- v0.2：改为自有术语；补插件/分段/scope 语义。
-- v0.1：初稿（章节骨架参照规范样例，已重构）。
+
+- **v1.3.4**：任务层定稿为「七类问题类 + 三个辅助任务（`forecast` / `data` / `decision`）」（§6.9、附录 M 与 `esml-canonical-compute.xsd` 同步）；统一规范措辞与语言无关边界。
+- **v1.3.3**：canonical 词法与 XSD 单轨收敛：
+  - 元素/属性统一 camelCase（移除 `extends-from` / `max-time` 等 kebab/snake 旧拼写，以及 `<extends>` / `<reassign>` / `<component>` / `component=` / `model-type=` / `porttype=` / `interface=` / `<tasks>` 外层壳）；
+  - 端口变量统一 `<portVariable>` 属性形，按轴区分 `portRole=` / `causality=` / `carrier=`；新增图形标注 `<annotation>`（§4.2）；
+  - 文档根统一为 11 个（入口 `xsd/esml-v1.xsd` 补 2 个漏根 `metadata` / `project`，与 canonical 全局元素集及 §13 清单三方一致，见 `docs/validate_roots.py` 与 `tools/check-spec-xsd-parity.py`）。
+- **v0.6.x**：§6.6 系统级 `<equations>`、§6.5 条件组件、§5 端口变量数组 `array=`、§4.0a 因果计划约定、枚举类型（`kind="enumeration"`）、`<extendsFrom>` 继承与 `redeclare`/`replaceable`、向量/矩阵表达式与端口变量点号语法 `port.pvar`。
+- **v0.5.x**：§6.4 `partition`/`crosslink` 分层定案；附录 K `schedule` 多段编排；端口类别收窄（`inlet|outlet|bi-directional`）、`portSet` / `<orderedSet>` / `<selector>` / `<if>` / `<for>` / `<case>`、`when`/`edge`/`reinit` 事件、向量归约内建及高阶导降阶。
+- **v0.1 – v0.4**：初稿骨架、词法收紧规则（§2）、标准库坐标 `<use>`（§6.1/§12）及复合组件 `<members>`（§4.1）。
 
 ## 附录 D 旧版文档边界
 
@@ -1272,15 +1177,14 @@ canonical 语法对旧词法直接报错（§2）。
 
 ## 附录 B（续）— 端口/角色规范词（canonical）
 
-- 端口方向只用 `<port … category="inlet|outlet|bi-directional">`；
-  自定义类别(如 node/connector)预留、连接规则后置。不再使用 dir/direction/in-out。
+- 端口方向闭集为 `<port … category="inlet|outlet|bi">`（省略默认 `bi`；不再使用 `dir` / `direction` / `in` / `out` / `bi-directional`）。自定义连接类别写在 `connectClass="…"` 上（见附录 F4）。
   变量级 `input/output` 保留给信号 causal role（不得当端口方向词用）。
 - PORTSET（参数沿流股传播）：`<port … portSet="flow">`（同模型同 portSet 参数等值）。
 - `<portType>` 变量：物性 `portRole="potential|flow|stream"`、信号 `causality="input|output"`，或省略。
   省略 = 显式域变量束（thermal/water/gas/process），连接=逐位置相等，无守恒 role。
 - Connection-Type 参数：`<portType><parameters><parameter …/></parameters>` → 组件自动带
   `⟨leaf⟩__⟨p⟩`；构建期按连接/portSet 值统一 + 冲突检测。
-- 边界组件：`Source`(固定头, bi-directional) / `Sink`(定流量, inlet) ≙ 电接地/电流源。
+- 边界组件：`Source`(固定头, bi) / `Sink`(定流量, inlet) ≙ 电接地/电流源。
 
 ### SELECTOR / CASE·STN
 - 模型级 `<selectors><selector name …><values><value>Below</value><value>Above</value></values><default>Below</default></selector></selectors>`
@@ -1313,11 +1217,12 @@ CASE/多区/滞回：配 SELECTOR + `<events><when>`(STN)，方程用 `ifelse(se
   按整数区间展开 body 方程，i 替换为整数字面量（XSD `004-equations` 含 `<for>`；当前 in 仅支持 lo..hi 整数字面量）。
 - 数组维 `<variable name="C" array="3"/>` 直接支持整数大小（无需 named dim）。
 
-### process 级全局默认参数传播（顶层 SET）
-- `<set path="P" value="…"/>` 不带 `<scope instance=…>` → 作为系统级默认，对**所有**声明该 param 的实例生效（除非该实例有显式/祖先覆盖）。
-- 层级参数传播（真嵌套）：子实例命名 = `父__子`；父作用域 `<scope instance="a"><set path="P"…` 向下覆盖子树 `a__…`，取最近祖先；自身显式最优先。
+### process 级全局默认参数传播（拟定草案，见 `docs/coverage.md` §5.2）
+- 规范草案：不带 `<scope instance=...>` 的 `<set path="P" value="…"/>` 作为系统级默认参数覆盖；当前 XSD 的 `<sets>` 仅允许 `<scope instance=...>` 包装形式，裸 `<set>` 尚未在 schema 与求解路径生效。
+- 层级参数传播：子实例展开为 `父__子`；父作用域 `<scope instance="a"><set path="b.P" value="…"/></scope>` 按限定路径覆写嵌套成员参数，自身显式覆盖最优先。
 - `<set>` 的 `unit=""` 按三级解析：显式 ＞ 实例名前缀 ＞ 全局默认。
 
+### 序集算子（CARD / IN）
 - `CARD(Name)` → 序集成员数；`IN(x, Name)` → 1/0。二者是一等表达式：编译期折叠
   字面量与成员标识（`IN("CO2",Sp)=1`、`IN(H2O,Sp)=1`），符号/参数形式展开为
   `IN(T,Sp) → ifelse(T<0,0,ifelse(T<n,1,0))`（n=成员数，越界夹紧，与 `ifelse` 语义一致）。
@@ -1346,9 +1251,9 @@ CASE/多区/滞回：配 SELECTOR + `<events><when>`(STN)，方程用 `ifelse(se
 
 ### CASE 多分支
 `<case on="sel"><branch value="k"><body><equation>lhs = rhs</equation>*</body></branch>*</case>`
-每方程 gated：`(1 - sign(abs(sel-k))) * (lhs-rhs) = 0`（激活分支才约束； 指示器风格）。
-- **情形A（STN 正统）**：各分支 lhs 同为 `Der(x)` → 合并右端 `Der(x)=Σ_k (1-sign|sel-k|)·rhs_k`（selector+events 驱动，bang-bang 同款）。
-- 示例：堰流代数情形；以及带 selector + case + 事件滞回的 STN 情形，平衡态 H≈W+(Fin/1.84)^(2/3)。
+- **情形 A（STN 合并右端）**：各分支 `lhs` 同为 `Der(x)` 时合并右端 `Der(x) = Σ_k (1 - sign(abs(sel-k))) * rhs_k`（配 selector + `<events><when>` 驱动）。
+- **情形 B（通用 gating）**：每个分支方程按指示器门控为 `(1 - sign(abs(sel-k))) * (lhs - rhs) = 0`（仅激活分支施加约束）。
+- 示例：堰流代数分支，以及带 `<selector>` + `<case>` + 事件滞回的 STN 模型。
 
 ### 附录 F1 — stream 流股组成（组分加权混合）
 - 流股语义：连接处变量**逐相等**（1:1 链），多股汇合的组分加权在单元（Mixer）内完成，
@@ -1371,10 +1276,8 @@ CASE/多区/滞回：配 SELECTOR + `<events><when>`(STN)，方程用 `ifelse(se
 - 限制：赋值 `value` 在编译期按常量求值；`elsewhen` 同时穿越的优先级按声明序确定。
 
 ### 附录 F4 — 自定义端口类别 + 连接规则表（opt-in）
-- `<port category=...>` 可带自定义类别字符串（如 feed/primary/secondary）；语法对非标准类别
-  方向按 `:bi`（双向），标准集合仍走 inlet/outlet 方向护栏。
-- 系统级 `<connectRules><rule from= to=/>*</connectRules>`：仅当至少一端为自定义类别时启用
-  规则表对称配对校验（bi-directional 万能）；无规则表而用自定义类别 → 编译期报错。
+- `<port connectClass="…"/>` 可声明自定义连接类别（如 `feed` / `primary` / `secondary`）；端口方向仍用 `category="inlet|outlet|bi"`。
+- 系统级 `<connectRules><rule from= to=/>*</connectRules>`：对带 `connectClass` 的端口做对称配对校验（`connectClass="bi-directional"` 为万能类，可与任意类配对）；使用自定义 `connectClass` 而未声明规则表时报错。
 - 信号口按**位置配对**（pvar 命名可不同，如 OutSignal.y ↔ InSignal.u）。
 - 示例：自定义类别端口的连接规则表 —— `L6-connect/connect-rules.esml`（feed 只允许接
   primary / secondary）。
@@ -1387,12 +1290,12 @@ CASE/多区/滞回：配 SELECTOR + `<events><when>`(STN)，方程用 `ifelse(se
 - 示例：信号口跨 PortType 的因果连接 —— `L4-port/signal-causal.esml`
   （`SigOut.y`(output) ↔ `SigIn.y`(input)，两份 portType 的 pvar 同名 `y`；
   组件侧显式声明 `p.y` / `q.y`）。
-  ⚠ 护栏本身（`signal_causal_guard`）**实现侧未落地**：input↔input、output↔output、
-  pvar 命名不一致这三种写法现实现一律放行，详见 `docs/coverage.md`。
+  ⚠ 该信号因果检查（direction + `portVariable` 同名校验）**实现侧尚未强制执行**：
+  `input↔input`、`output↔output`、pvar 命名不一致这三种写法当前仍可通过校验，详见 `docs/coverage.md` §5.3。
 
 ### 附录 F5 — on_load 预设方法
 - 模型级 `<methods><onLoad><set path="X" value="v"/>*</onLoad></methods>`：求解前覆盖
-  变量初值(`:initial`) / 参数默认(`:default`)（preset 语义）。
+  变量初值（`initial`） / 参数默认（`default`）（preset 语义）。
   在解析期应用；成员/状态级 FIX/FREE 由 §附录 F6/F7 处理。
 - 示例：`Calc.K` 由 1 预设为 5 ⇒ `x = 11`；`Tank.H` 由 0.1 设为 0.9 后排水。
 
@@ -1412,23 +1315,22 @@ CASE/多区/滞回：配 SELECTOR + `<events><when>`(STN)，方程用 `ifelse(se
 
 ### 附录 F7b — METHOD RUN 子过程
 - `<methods>` 内可声明多个 `<method name="...">` 子过程；顶层 method 通过
-  `<run name="..."/>` 顺序调用其它 method（`run`/`call` 同义）。调用深度上限 12（前端的 `onLoad` 方法应用）。
-- 语义：按声明序 + 调用序应用 `<set>`；每个 `<set>` 走与 on_load 同一通道（变量改 `:initial`、
-  参数改 `:default`），表达式 `value` 支持本组件内已解析参数默认/变量初值的引用
+  `<run name="..."/>` 顺序调用其它 method（方法体内用 `<run name="…"/>`；调度序列 `<schedule><sequence>` 内用 `<call method="…"/>`，见附录 K）。调用深度上限 12（前端的 `onLoad` 方法应用）。
+- 语义：按声明序 + 调用序应用 `<set>`；每个 `<set>` 走与 `<onLoad>` 同一通道（变量改初值 `initial`、
+  参数改默认值 `default`），表达式 `value` 支持本组件内已解析参数默认/变量初值的引用
   （如 `"2*W"`、`"T_in-5"`）。`<run>` 与 `<set>` 同 method 体内可任意顺序，解析为
   一次深度优先 DFS（参数会按调用序与 `<set>` 序叠加）。
 - 与系统级 `<fixed>/<free>` 的区别：method 级 `<fix>/<vary>`（见附录 K）走实现
   同一 FIX/FREE 路径，但**系统级 `<fixed>` 优先**（详 system methods/on_load/fix|vary）。
 - 示例：顶层 `top` method 内 `<run name="scale"/>` 先把 W 设为 2，再
   `<set path="H" value="3*W"/>` ⇒ H = 3×2 = 6；没有 RUN 时 H = 3×1 = 3。
-- 限制：method 仅在 `<onLoad>` 时机生效（与 `<methods><onLoad>` 同生命周期）；不引入
-  不引入运行时方法表。
+- 限制：method 仅在 `<onLoad>` 时机生效（与 `<methods><onLoad>` 同生命周期）；不引入运行时方法表。
 
-### 附录 F8 — vector 归约内建（size/sum/min/max 一等）
-- 文本方程支持 `sum(X)` / `mean(X)` / `min(X)` / `max(X)` / `size(X)`，X 为声明的 array
+### 附录 F8 — vector 归约内建（`size`/`sum`/`mean`/`product`/`min`/`max` 一等）
+- 文本方程支持 `sum(X)` / `mean(X)` / `product(X)` / `min(X)` / `max(X)` / `size(X)`，X 为声明的 array
   变量或 array 参数（`array="Dim"`）。物化时按 array 维解析 N（system `<set>` 覆盖优先，其次
-  cdef 参数默认/序集长度/字面量），展开为逐元素 `X_1..X_N`：sum→和、mean→和/N、min/max→逐元、
-  size→N 常量。标量/多参 `min(a,b)` 等原样走 原语内建。
+  参数默认/序集长度/字面量），展开为逐元素 `X_1..X_N`：sum→和、mean→和/N、product→乘积、min/max→逐元极值、
+  size→N 常量。标量/多参 `min(a,b)` 等原样走标量/多参内建。
 - 示例：`C[1..3] = 1/2/3` ⇒ S=6、M=2、lo=1、hi=3、sz=3。
 - 不支持：多维数组归约、嵌套调用。
 
@@ -1449,7 +1351,7 @@ CASE/多区/滞回：配 SELECTOR + `<events><when>`(STN)，方程用 `ifelse(se
   1. 输入口变量（input）由连接相等定值，必须有驱动源；悬空欠定（编译期应报）。
   2. 输出口变量（output）由组件内方程定值，可悬空。
   3. 驱动方 = 输出口组件（源/控制器/Driver）；`connect` 只许 output→input（附录 F2 护栏）。
-  4. 对象端口 `category="bi"`（避免  方向护栏把信号口误判）。
+  4. 对象端口 `category="bi"`（避免被方向护栏误判）。
   5. 连续量接口：控制量在饱和内用 `ifelse(u<lo,lo,ifelse(u>hi,hi,u))` 夹紧；积分器用状态
      `Der(ei)=e`（无 anti-windup 的连续 PI 会有积分饱和，需注意——离散实现见范式二）。
 - **两类闭环范式分界**：
@@ -1457,7 +1359,7 @@ CASE/多区/滞回：配 SELECTOR + `<events><when>`(STN)，方程用 `ifelse(se
 
   - 范式二（**软件 sample-hold 离散闭环**）：控制器在外部软件，
     每控制步 dt 用当前量重算 Q 并改**驱动块参数**，再解一小段；测量可加 A/D 量化/噪声。
-    可与开源 TCLab 参考模型（`tclab.TCLabModel`）在同一控制器下闭环对标。
+    可与外部标准参考热模型在同一控制器下闭环对标。
 - **对照**：把参考模型的 4 态线性 ODE 以 canonical 写法复刻，开环 Q1=30 时与参考实现
   逐点比较，最大偏差 < 1e-4 °C。
 
@@ -1469,7 +1371,7 @@ CASE/多区/滞回：配 SELECTOR + `<events><when>`(STN)，方程用 `ifelse(se
 
 | 能力 | 入口 |
 |---|---|
-| 端口变量束与方向护栏 | `portType` / `role=inlet\|outlet` |
+| 端口变量束与方向护栏 | `portType` / `category="inlet\|outlet\|bi"` |
 | 连接类型参数与 PortSet 等值、冲突检查 | `<connectionType>` / `<portSet>` |
 | Source / Sink 边界 | 标准库 |
 | 序集：数组定维、成员常量、label 下标、成员一等 | `<orderedSet>` |
@@ -1478,11 +1380,11 @@ CASE/多区/滞回：配 SELECTOR + `<events><when>`(STN)，方程用 `ifelse(se
 | FOR 循环（区间与序集迭代） | `<for>` |
 | CARD / IN 集合算子 | 内建 |
 | CASE 多分支（合并右端 / gating 两种情形） | `<case>` |
-| stream 流股组成：连接逐相等 + Mixer 单元加权 | `role=stream` / Mixer |
+| stream 流股组成：连接逐相等 + Mixer 单元加权 | `portRole="stream"` / Mixer |
 | 高阶导 Der(Der(x)) | 自动降阶 |
 | 高指标 DAE | 自动降阶至 index-1 |
 
-未纳入规范的能力：嵌套层级参数传播、分布式 PDE。
+未纳入规范的能力：分布式 PDE。
 
 ### 序集运算（编译期）
 
@@ -1493,95 +1395,70 @@ CASE/多区/滞回：配 SELECTOR + `<events><when>`(STN)，方程用 `ifelse(se
 - **入口**：`xsd/esml-v1.xsd`；模块化分解为 `esml-canonical-common.xsd` /
   `esml-canonical-basic.xsd`（模型面）/ `esml-canonical-compute.xsd`（计算面）/
   `esml-canonical-project.xsd`（工程壳）。
-- **严格 canonical 子集**：`xsd/esml-canonical-basic.xsd`（自包含、可编译），覆盖
-  基本面：`variableTypes/type`、`modelType(parameter/variable[array/distribution]/
-  equation/methods on_load(表达式))/system(component/sets/initial 逐索引)`。
-  对本子集外（实现已支持但 XSD 待对账）的元素/属性用 `##other` 宽容跳过，
-  不影响既有文档。
+- **严格 canonical 子集**：`xsd/esml-canonical-basic.xsd`（包含 `compute`），覆盖
+  模型面主体：`variableTypes/type`、`modelType`（`parameter` / `variable` 含 `array`・`distribution` /
+  `equation` / `methods`/`onLoad` / `case` / `discrete` / `connectRules` / `functions`）、
+  `system`（`instances`/`instance` / `sets` / `initial` / `orderedSet` / `fixed` / `free` / `portSet` / `schedule`）。
+  文档元数据 `<metadata>`（以及少量扩展属性位）由 `xs:any` / `xs:anyAttribute`（`processContents="lax"`）放行。
 - **校验**：
+  ```sh
+  python3 -c "import xmlschema; xmlschema.XMLSchema('xsd/esml-canonical-basic.xsd').validate('⟨file⟩.esml')"
   ```
-  xmllint --schema xsd/esml-canonical-basic.xsd ⟨file⟩.esml
-  ```
-  扩展段（case / methods / discrete / orderedSet / fixed / PORTSET /
-  connectRules / functions / …）由 `##other` 宽容跳过。
 
-## 附录 I — 用户函数与黑盒
+## 附录 I — 用户函数与外部对象
 
-- **声明**：`<esml><functions>` 顶层区段；`<function name>` + `<inputs><input name>` + `<body>纯代数式</body>`；
-  可选 `kind="external"`（黑盒：`evaluator` 句柄 + `<partials><partial wrt>` 解析偏导，OpenMDAO 风格）。
-- **纯函数语义**：调用在方程里内联展开（宏语义），天然可求导、可嵌套（function 内调 function）。
-示例：`weir_flow` 与 `weir_half` 的嵌套调用。
-- **外部函数**：`kind="external"` 数值 body 函数 + 已注册的外部对象 + `<partials>` 机制。
-  解析偏导可注入以构造残差 Jacobian；evaluator 句柄为无 body 的外部源。
+- **声明**：`<esml><functions>` 段声明；`<function name>` + `<inputs><input name>` + `<body>纯代数式</body>` 或 `<algorithm>`；
+  可选 `kind="external"`（外部函数：`<extern>` C ABI 句柄 + `<derivative>` 导数契约，含 `<partials><partial wrt>` / `<derivativeSymbol>` / `<zeroDerivative>` / `<noDerivative>`）。
+- **纯函数语义**：调用在方程里内联展开（宏语义），天然可求导、可嵌套。
+- **外部函数**：`kind="external"` 通过 `<extern>` 绑定 C ABI 符号，并按 `<derivative>` 提供解析偏导、有限差分（`<fd>`）或不透明标记（详 §14）。
 - **局部量 `<locals>`**：`<function>` 内可声明 `<locals><local name="t"/></locals>`；
   函数体（`<algorithm>`）里用 `<assign name="t" value="…"/>` 逐句赋值，局部量随函数
   调用被**内联展开**（不进入模型命名空间）。示例：`L8-function/locals.esml`。
-- **外部对象 `<foreignObjects>`**：顶层
+- **外部对象 `<foreignObjects>`**：
   `<foreignObjects><foreignObject name="fo" class="sensor"><method name="Level">
   <set path="y" value="3.0"/></method></foreignObject></foreignObjects>`；
   方程里以 `fo.Method()` 调用，方法体**只有 `<set>`**（先赋值后返回该值）。
   示例：`L8-function/foreign-object.esml`。
-- **XSD**：canonical 子集收录 `<functions>`（inputs / body / partials）。
+- **XSD**：canonical 子集收录 `<functions>`（`inputs` / `body` / `algorithm` / `locals` / `extern` / `derivative` / `partials`）。
 
-## 附录 J · 单位语义
+## 附录 J · 单位语义与扩展机制
 
-- **定案**：数值层用裸数——单位只是**界面与边界**的元数据；实现侧可留单位库
-- 单位语义操作：解析单位、取量纲、同量纲换算（含 `℃` 偏移）、一致性核验。
-  `<set unit="cm" value="500">`：值单位 vs 声明单位——同维换算（scale/offset），异维报错。
-  strict 日志指示器已修（原注组 external 不调用的 bug 已修），`<initial>` 为程序式调用的单位、形状类型。
-- 本语言不绑定具体单位库。
-- XSD：canonical/esml-v1 已带 `unit` 属性书写；esml-v1 全库校验不涉单位语义（单位语义由处理器校验）。
+- **定案**：数值层用裸数——单位只是**界面与边界**的元数据；实现侧可按需集成单位检查。
+- 单位语义操作：解析单位、取量纲、同量纲换算（含 `℃` 等仿射偏移）、一致性核验。
+  `<set unit="cm" value="500">`：值单位与声明单位同量纲换算、异量纲报错。
+- 本语言不绑定具体单位库；canonical XSD 对 `unit` 作表达式格式约束，具体量纲运算由处理器校验。
 
 ### METHOD FIX/VARY
 - `<system><methods><onLoad>` 内 `<fix name="inst.leaf" value?/>` / `<vary name="inst.leaf"/>`，
-  与系统级 `<fixed>/<free>` 同一 FIX/FREE 实现路径（显式 `<fixed>` 优先）；语义=钉值/参数升未知。
-  canonical XSD 已收 `methods/on_load/fix|vary`。
+  与系统级 `<fixed>/<free>` 同一 FIX/FREE 语义（显式 `<fixed>` 优先）：钉值或将参数升为未知量。
+  canonical XSD 已收录 `methods`/`onLoad`/`fix`/`vary`。
 
 ### 连接参数单向传播 / 回退
-- 现状：连接/PortSet 参数**无向值统一**（单锚传播+汇合冲突，构建期）。
-- ：连图定向检测（`_orient_connection`：out↔in 顺向/bi 随对方）；**bi↔bi 或环向 → @warn 回退无向**
-  （不破既有库）；equality 与汇合冲突语义不变；含 PORTSET 的方向探测。
-- 严格“最上游锚=唯一传播源/下游再设报错”单向语义为延伸（需行为收紧与全库审计）。
-- 回归：。（`_orient_connection` + cycle detection）。
+- 连接 / `portSet` 参数默认做无向等值统一与汇合冲突检测（构建期）。
+- 若启用方向传播检查，沿着 `outlet → inlet`（`bi` 随对方）定向传播；遇 `bi ↔ bi` 或环路时显式告警并回退为无向等值。
 
 ## 附录 K — METHOD × Schedule 编排
 
-- 语法（P1，向后兼容单段）：
+- **多段顺序求解语法**：
   ```xml
   <schedule><sequence>
-    <continueFor time="2"/>        <!-- 每段时长；连续时间顺序拼接（现求和多段） -->
-    <call method="ramp"/>           <!-- 段前预设（v0 由 preset 回调落地；XML 方法体接线=后续） -->
+    <continueFor time="2"/>        <!-- 推进一段时长；多段按连续时间顺序拼接 -->
+    <call method="ramp"/>           <!-- 段前调用方法体（置下一段初始/参数默认值） -->
     <continueFor time="3"/>
   </sequence></schedule>
   ```
-  多段（按时间段切分）求解，把末状态写回作下段初值，`preset` 在第 i≥2 段前
-  运行（可 `_set_param_default!` 段间改参数 = piecewise 阶跃操作）。
-- **调度步类型**：`<sequence>` 里的步有三种——
-  - `<continueFor time="2"/>`：**推进**一段时长（连续时间顺序拼接）；
-  - `<reset path="g.N" value="50.0"/>`：在**该步的累计时刻**（前面 `<continueFor time=>`
-    之和）把 `path` 置为 `value`；`path` 必须指向状态或变量（指到参数会显式告警且不改值）；
-  - `<stop time="10"/>`：**记录 STOP 边界**——其后若再跟 `<continueFor>` 会被校验拒绝。
-    它是**结构校验标记，不是运行时截断**：求解时长仍由 tspan 决定。
-
-  示例：`L9-method-schedule/reset.esml`（段间重置）、`L9-method-schedule/stop.esml`（STOP 标记）。
-- v0 边界：仅**纯 ODE**（无 algebraic/discrete）；段时长总和 = tspan 长度（否则报错）；
-  **控制器 / 无定模型 = 普通 simulate**（为单元测试注入，不改 ESMLModel 结构本身）
-- 示例：段解析、多段拼接等价单次连续求解、段间改 k ⇒ H=6.8。
-- 不支持：代数/离散模型、求解器切换、事件触发编排。
+  多段按时间段切分求解，上段末状态写回作为下一段初值；`<call method="…"/>` 归属其**后续** `<continueFor>` 段并于该段求解前执行。
+- **调度步类型**：`<sequence>` 内支持四类步——
+  - `<continueFor time="2" solver?="…"/>`：**推进**一段指定时长（连续时间顺序拼接），可选段内 `solver` 覆盖（如 `tsit5` / `rodas5p` / `fbdf` / `ida` / `dfbdf` / `qndf` / `nonlinear`）；
+  - `<continueUntil condition="m.x &lt; 1.0" maxTime="5"/>`：**事件触发推进**——条件过零时提前结束该段，下一段从终止时刻续接；
+  - `<reset path="g.N" value="50.0"/>`：在**该步的累计时刻**（前面 `<continueFor>` 时长之和）把 `path` 置为 `value`；`path` 必须指向状态或变量（指到参数会显式告警且不改值）；
+  - `<stop time="10"/>`：**记录 STOP 边界**——其后若再跟 `<continueFor>` 会被校验拒绝。它是结构校验标记，不单独截断命令行给定的 `tspan`。
+  示例：`L9-method-schedule/reset.esml`、`L9-method-schedule/stop.esml`、`L9-method-schedule/continue-until.esml`。
 
 ### `<call method>` 方法体
-- `<methods><method name="ramp"><set path="m.k" value="1.0"/></method></methods>` 解析为
-  `metadata[:__schedule_methods__]`（命令序列）；`<sequence>` 内 `<call method="X">` 归属**其后**
-  `<continueFor>` 段（`metadata[:__schedule_seg_calls__]`）。
-- 段前执行该段 call 的方法体（`set/fix` 改参数默认值），
-  先于程序化 `preset`。寻址属性（`path` 等）只收**作者点号** `m.k`：`__` 是生成层内部
-  段分隔、作者标识符禁含（§3），故 `m__k` 一律拒收并提示规范写法。
-- **代数/离散模型**：多段连续求解不再限纯 ODE；未知量含状态、代数量与离散量
-  布局写回 `ml.u0` 续接。
-- **每段 solver 切换**：`<continueFor time="1" solver="rodas5p"/>`；可在段内覆盖求解器
-  （tsit5 / rodas5p / fbdf / ida / dfbdf / qndf / nonlinear）。
-- **事件触发段间切换**：`<continueUntil condition="m.x &lt; 1.0" maxTime="5"/>`——
-  条件穿越零时提前结束该段，下段从其终止时刻续接。
+- `<methods><method name="ramp"><set path="m.k" value="1.0"/></method></methods>` 声明具名子方法；`<sequence>` 内 `<call method="X"/>` 在其后的推进段求解前执行。
+- 方法体中 `<set>` / `<fix>` 修改参数默认值或初始配置；寻址属性（`path` 等）只收**作者点号** `m.k`（标识符禁含 `__`，见 §2/§9）。
+- 连续状态、代数变量与离散量统一在段间续接（支持含代数/离散变量的模型与段内 `solver` 切换）。
 
 ## 附录 L — 术语表与命名（类型/实例词义）
 
@@ -1610,7 +1487,7 @@ CASE/多区/滞回：配 SELECTOR + `<events><when>`(STN)，方程用 `ifelse(se
 
 - **文件后缀**：明文 `.esml` / 加密交付 `.esmlx` / `.xml` 过渡兼容（历史，不推荐）；角色前缀
   `*.comp.esml`=组件/模型类型库、`*.sys.esml`=系统/场景实例。
-- **role 词**（port）：potential/flow(through)/stream = acausal；input/output = 信号；不写 = 显式束（附录 B（续））。
+- **端口变量角色词**（`<portVariable>`）：`portRole="potential|flow|stream"`（物性） / `causality="input|output"`（信号）；省略表示显式变量束（附录 B（续））。
 
 ## 附录 M — 计算面术语（任务 / 问题类 / 调度 / 求解器）
 
@@ -1622,7 +1499,7 @@ CASE/多区/滞回：配 SELECTOR + `<events><when>`(STN)，方程用 `ifelse(se
 - **功能层 = 机制 + 组合**（放某类之下，作其 method/模式/载荷，不进 enum）：
   - simulate × `solve=steady|transient` · `schedule` 多段 · 求解器（AE/ODE/DAE 自动分派）；
   - sensitivity = simulate × 扰动后处理；estimation = optimize(simulate 目标) × data；validation = simulate × 对比指标 —— 三者是 **simulate 的驱动组合**，不重复实现 simulate；
-  - optimize × lp/qp/nlp/minlp（HiGHS/Ipopt 等后端）· objective/decision/bounds/constraints；
+  - optimize × lp/qp/nlp/minlp（SQP / 内点 / 分支定界等求解后端）· objective/decision/bounds/constraints；
   - control = optimize × simulate 滚动（MPC/PID/setpoint）；
   - surrogate = 采样(simulate)→拟合（lsq/lasso/alamo/degree）；
   - 分区 co-sim / crosslink 协调 / Schur 等 = 求解机制层（S 层）。
@@ -1635,18 +1512,17 @@ CASE/多区/滞回：配 SELECTOR + `<events><when>`(STN)，方程用 `ifelse(se
 | 辅助任务（三项） | 功能层组合的显式声明 | `forecast`（surrogate 时间轴特例）/ `data`（摘要统计）/ `decision`（候选选择）；不占七类编号 |
 | metadata 参数 | 每模块声明"具有哪些" | 每类任务各自声明其可用的元数据项，建模时生成 |
 | 求解角色 | AE / ODE / DAE | 按模型（纯代数/状态/高指标降阶后）自动选 |
-| `schedule` 段 | 运行时编排 | ：多 `<continueFor>` 段 + 段前 `<call method>`；`METHOD/RUN` 逐段 |
-| `METHOD` | 求解流程声明 | 方法脚本式参考 风格；`FIX/VARY`(自由度)、`RUN`(驱动)、`solve` 组合（附录 K） |
+| `schedule` 段 | 运行时编排 | 多 `<continueFor>` 段与段前 `<call method>`，按序推进与续接 |
+| `METHOD` | 求解流程声明 | 方法脚本风格；`FIX`/`VARY`（自由度）、`RUN`（子方法调用）、段间配置（附录 K） |
 | `<computeTasks>` / `<task>` XSD | compute 各层 schema | `esml-canonical-compute.xsd`：kind 决定载荷结构，守恒由结构决定；**按 kind 构造问题再求解**（task 声明 → 问题树 → 求解）；条目元素名单轨为 `<task>`（§6.9） |
 
-> 术语原则：**类型 modelType · 实例 instance（component 兼容）· 场景/子系统 system ·
-> 计算任务 task / 问题类七类 · 求解角色 AE/ODE/DAE · 编排 schedule + METHOD** —— 详见附录 L/M。
+> 术语原则：**类型 `modelType` · 实例 `instance` · 场景/子系统 `system` ·
+> 计算任务 `task` / 问题类七类 + 辅助三项 · 求解角色 `AE`/`ODE`/`DAE` · 编排 `schedule` + `METHOD`** —— 详见附录 L/M。
 
 ## 附录 N — 处理管线与中间表示
 
 **拓扑**：`XML/.esml（解析）→ 中间表示 → 编译产物`：
-- **解析**：把 XML 读为有类型的第一遍对象图（units / types / ports / components /
-  systems / tasks 等）。
+- **解析**：把 XML 读为有类型的第一遍对象图（units / variableTypes / portTypes / modelTypes / systems / computeTasks 等）。
 - **中间表示**：结构化的对象图（组件定义、模型类型、系统定义、模型实例、端口…）；
   连接 / 方程 / 调度是对象间的关系。
 - **编译**：展平嵌套、端口物化等展开后得到求解所需的编译产物。

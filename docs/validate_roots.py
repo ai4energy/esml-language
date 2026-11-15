@@ -55,13 +55,13 @@ INDENT = "     "
 
 # 入口层根 − canonical 全局元素 的**显式例外**。
 #
-# 例外不是「随手放行」：每一条都要写清理由 + 裁决记录（docs/design/）。
+# 例外不是「随手放行」：每一条都要写清理由 + 裁决说明（如 SPEC.md §13 / 仓库记录）。
 # 机制保留是为了让「以后确实要放宽根集合」变成一次**显式决策**，而不是
 # 一次没人看见的 schema 改动。形状：
 #
-#     "<root>": ("为什么它可以不作为 canonical 全局元素", "docs/design/xxx.md"),
+#     "<root>": ("为什么它可以不作为 canonical 全局元素", "裁决依据（如 SPEC.md §13）"),
 #
-# 当前为空 —— 见 docs/design/root-matrix-adjudication.md 的裁定。
+# 当前为空（入口层根集合与 canonical 全局元素集合严格相等）。
 EXCEPTIONS: dict = {}
 
 # SPEC.md §13 里那张「XSD 分层文档化」表的表头（用来定位，不依赖行号）。
@@ -165,7 +165,7 @@ def render_region(matrix: dict, exceptions: dict) -> list:
         INDENT + "少一个 ⇒ 合法文档被入口层判非法；多一个 ⇒ 根合法性闸有洞。",
         INDENT + "本块由 `docs/validate_roots.py` 的 sync 模式生成，**勿手工编辑**；",
         INDENT + "`docs/validate_roots.py` 逐字复核本块（漂移即判红）。",
-        INDENT + "裁决记录：docs/design/root-matrix-adjudication.md",
+        INDENT + "裁定依据：SPEC.md §13（入口层根集合 = canonical 全局元素集）",
         INDENT + "根 | 入口层 | canonical 声明处 | 裁定",
     ]
     for g in roots:
@@ -478,7 +478,7 @@ def selftest(repo: Path) -> bool:
             print("      → PASS（0 个问题）")
 
         # ---- 好例 3：合成夹具 —— 多出来的根已登记为例外 ----
-        exc = {"legacy": ("夹具专用的已登记例外", "docs/design/selftest.md")}
+        exc = {"legacy": ("夹具专用的已登记例外", "fixture-selftest")}
         fx = _fixture(tmp / "good3", ["a", "b", "legacy"],
                       {"esml-canonical-x.xsd": ["a", "b"]}, exc)
         p3 = _run(fx, exc)

@@ -34,8 +34,8 @@ C1/C2 合起来就是「入口层根清单 = canonical 层全局元素集」—�
 SPEC 侧的抽取（散文 → 元素名）
 ----------------------------
 SPEC.md 是散文，没有「根清单」字段，只能从正文里抽。抽取规则写死在本文件里，
-**规则本身也是可审的**（改动规则 = 改判定口径，必须同步改本段注释与
-`docs/design/xsd-spec-parity.md`）：
+**规则本身也是可审的**（改动规则 = 改判定口径，必须同步更新本段注释与
+`SPEC.md` §13）：
 
   R1  根声明行 = 散文行里出现根标记词（`根` / `顶层`）的**行**。
       排除假朋友：`库根`(=libroot)、`根目录`、`根取并集`。
@@ -846,7 +846,7 @@ def main(argv=None):
             if kind in ("C3", "C4") and name in data["spec"]:
                 ev = f"（证据 SPEC.md:{','.join(str(x) for x in data['spec'][name])}）"
             w(f"      <{name}>  {msg} {ev}\n")
-    w(f"\n[parity] 共 {len(fs)} 处差异。裁决见 docs/design/xsd-spec-parity.md\n")
+    w(f"\n[parity] 共 {len(fs)} 处差异。请对照 SPEC.md §13 / tools/spec-xsd-bydesign.tsv 裁决\n")
     return 1
 
 

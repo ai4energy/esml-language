@@ -1,7 +1,7 @@
 # 语言规范开发手册
 
 > 适用：改 `SPEC.md`、`xsd/`、`L0`–`L9` / `T-tasks` / `X-use` 示例。
-> 最后核对：2026-11-11（v1.3.3）。
+> 最后核对：2026-11-15（v1.3.4）。
 
 ## 1. 环境
 
@@ -22,16 +22,18 @@
 | `T-tasks` | 计算任务示例 |
 | `X-use` | 库引用示例 |
 | `docs/validate_roots.py` | 根矩阵对账（make check 第 1 道） |
-| `docs/validate_examples.py` | 规范 ⇄ 示例五道检查（`--strict` 加撤通配判别力第 6 道）（第 2 道） |
+| `docs/validate_examples.py` | 规范 ⇄ 示例五道检查（`--strict` 追加撤通配判别力闸）（第 2 道） |
 | `tools/check-examples.py` | 逐件双 schema 校验 + 负例登记 |
 | `tools/negatives.tsv` | 刻意负例及红在哪一层 |
 | `tools/check-engine-xsd-parity.py` | 跨仓 XSD 漂移闸：本仓 `xsd/` ⇄ 引擎仓 `$ESML_ENGINE_DIR/schema/`，分歧对 `tools/engine-drift.tsv` 裁决（第 3 道；缺引擎仓时跳过） |
 | `tools/check-element-coverage.py` | 元素覆盖双向闸：XSD 命名元素 ⇄ 非负例示例用法，台账 `tools/element-coverage.tsv`（第 4 道；仅标准库） |
 | `tools/check-attr-coverage.py` | 属性覆盖双向闸：XSD 命名属性 ⇄ 非负例示例用法，台账 `tools/attr-coverage.tsv`（第 5 道；仅标准库） |
 | `tools/check-engine-examples.py` | 引擎 × 示例可运行性闸：逐件 `esml check` 非负例，台账 `tools/engine-example-debt.tsv`（第 6 道；缺引擎仓时跳过） |
+| `tools/check-spec-element-coverage.py` | XSD 声明元素/属性 ⇄ `SPEC.md` 点名闸，台账 `tools/spec-element-coverage.tsv`（第 7 道；仅标准库） |
 | `tools/check-example-expectations.py` | 示例「期望值」台账闸：逐台账行实跑引擎、解析变量值、与台账 `value` 按 `tol` 比对；台账 `tools/example-expectations.tsv`（第 8 道；缺引擎仓时跳过） |
+| `tools/check-spec-xsd-parity.py` | 入口层 / canonical 层 / `SPEC.md` §13 文档根三方对账，by-design 登记 `tools/spec-xsd-bydesign.tsv`（进阶脚本） |
 
-台账六张（前五张与上面脚本一一对应，各管一件事、互不重叠；`solve-smoke.tsv` 为普查台账，无对应闸脚本，口径见行内说明）：
+常用覆盖/债务台账六张（另配 `negatives.tsv` / `aliases.tsv` / `spec-element-coverage.tsv` / `spec-xsd-bydesign.tsv` / `example-expectations.tsv`；`solve-smoke.tsv` 为普查台账，无对应闸脚本）：
 
 | 台账 | 责任 | 责任人（owner）语义 |
 |---|---|---|
@@ -61,7 +63,7 @@ make strict                                 # 撤通配判别力闸（--strict�
 make elements                               # 只跑元素覆盖双向闸
 make spec-elements                          # 只跑 XSD 声明 ⇄ SPEC 点名闸
 make expectations                           # 只跑示例「期望值」台账闸
-.venv/bin/python tools/check-examples.py --self-test
+.venv/bin/python tools/check-examples.py --self-test   # 或 python3（需 lxml）
 ```
 
 `make check` 的八道闸（顺序即 Makefile 行序）：
@@ -95,8 +97,9 @@ esml simulate path/to/example.esml -L path/to/library
 
 1. 提交只含本仓改动；不把引擎/书仓文件带进来；
 2. 跑 `make check` + `tools/check-examples.py --self-test`；
-3. 发版：更新版本说明 → 打 annotated tag `vX.Y.Z` → 推 `ai4energy`；
-4. 通知引擎仓 bump 子模块指针（见部署手册）。
+3. 提交（**不加** `Co-Authored-By` 尾注）；
+4. 发版：更新版本说明 → 打 annotated tag `vX.Y.Z` → 推 `origin`（若配双远端则同步 `ai4energy` / `ai4ecom`）；
+5. 通知引擎仓 bump 子模块指针（见部署手册）。
 
 ## 7. 常见问题
 
