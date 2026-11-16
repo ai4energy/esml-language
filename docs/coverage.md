@@ -53,7 +53,7 @@
 |---|---|---|
 | `ConstSetMember` | `SPEC.md` 提及一等成员类型，但 `xsd/` 未声明，示例中亦无覆盖 | 留缺口 |
 | 附录 F2 信号因果护栏 | 引擎 `check` 对 `input↔input`、`output↔output`、端口变量同名不一致仍放行 | [signal-causal.esml](../L4-port/signal-causal.esml) 头注已标明 |
-| `<param>`（`esml-canonical-compute.xsd`） | 已有示例 [hyperparams.esml](../T-tasks/hyperparams.esml)；引擎 `check` 已通过而 `solve`/`simulate` 仍拒 `I3`，见 §5.11 与 §5.13 | 归入 §5.13 跟踪 |
+| `<param>`（`esml-canonical-compute.xsd`） | 已有示例 [hyperparams.esml](../T-tasks/hyperparams.esml)；`esml check` 与 `esml solve` 现均通过 | 已闭合 |
 | `domain`（`<instance>` / `<modelType>` / `<system>`） | `esml check` 通过但求解期零读取；`<portType domain=...>` 则被引擎 F1 响亮拒收 | [attr-acceptance.tsv](../tools/attr-acceptance.tsv) 记 `no-example` / `rejected-legacy` |
 | `side`（`<annotation><port>`） | `PortMarkType` 下图形标注可过 `check` 但无求解语义；模型侧 `<port side=...>` 被 F1 拒收 | [attr-acceptance.tsv](../tools/attr-acceptance.tsv) 记 `no-example` / `rejected-legacy` |
 | `MetadataType` `xs:any`（`##targetNamespace` + `##other`） | XSD 1.0 UPA 禁止在同内容模型中混用同名元素与 `##targetNamespace` 通配 | `by-design`；见 §0 strict 基线 `3` |
@@ -98,10 +98,9 @@
 本节记录**语言层（`SPEC.md` + `xsd/`）已声明，但引擎尚有缺口**的项（与 `§5.12` / `§5.13` 方向严格区分）：
 
 - **属性 `<type role=…>`（`VariableType`）**：`xsd/esml-canonical-basic.xsd` 的 `VariableType` 仍保留可选 `role` 属性声明，但引擎六轴单轨规定角色只属于 `<variable role="state|algebraic|discrete">`，对 `<type role=…>` 报 F1 Legacy。
-- **元素 `<param>`（`<hyperParams>` 子元素）**：[hyperparams.esml](../T-tasks/hyperparams.esml) `esml check` 已通过（`errors=0`），但 `esml solve` / `simulate` 仍以 `I3: deprecated alias <param>` 拒绝（check 与 solve 规则不一致，见 §5.13）。
-- **属性 `phase` / `aPart` / `bPart` / `synchronize` / `nominal` / `quantity` 等**：属 XSD 已声明但引擎 `F7`/`IE8` 拒收项，逐条裁决见 [engine-drift.tsv](../tools/engine-drift.tsv) 与 [attr-acceptance.tsv](../tools/attr-acceptance.tsv)。
+- **属性 `phase` / `aPart` / `bPart` / `nominal` / `quantity` 等**：属 XSD 已声明但引擎 `F7` 拒收项，逐条裁决见 [engine-drift.tsv](../tools/engine-drift.tsv) 与 [attr-acceptance.tsv](../tools/attr-acceptance.tsv)。
 
-此前曾在 `check` 层被 F7 拒收的 `<literal>`、`<vary>`、`<while>` 已随引擎 v1.9.4 收口（`errors=0`），对应 `stage=check` 债行已按闭合判据从台账移除。
+此前曾在 `check` / `solve` 层被拒收的 `<literal>`、`<vary>`、`<while>`、`<hyperParams><param>` 及 `<transition synchronize=…>` 已随引擎 v1.9.4 收口，对应债行已按闭合判据从台账移除或转为 `accepted`。
 
 ### 5.12 属性面判别力边界（`lax` `xs:anyAttribute`）
 
@@ -114,8 +113,8 @@
 **三角分界**：`§5.11` = XSD 收、check 拒；`§5.12` = XSD 通配收、check 拒；**`§5.13` = XSD 收且 `esml check` 收（`errors=0`），但 `esml solve` / `simulate` 失败**。
 
 当前普查与债务台账指针（实时数据以两张 `.tsv` 为准）：
-- **非负例求解普查**（[solve-smoke.tsv](../tools/solve-smoke.tsv)，非闸门）：`158` 件非负例中 `142 ok`、`8 ok-simulate`、`6 na`（`4 na-no-system` + `2 na-artifact`）、`2 fail`（均为 `fail-engine-debt`）。
+- **非负例求解普查**（[solve-smoke.tsv](../tools/solve-smoke.tsv)，非闸门）：`158` 件非负例中 `143 ok`、`8 ok-simulate`、`6 na`（`4 na-no-system` + `2 na-artifact`）、`1 fail`（`fail-engine-debt`）。
   - `na-artifact`（2 件）：`extern-cabi.esml`、`derivative-analytic.esml`（需外部动态库工件，非引擎缺陷）。
-- **引擎可运行性闸门台账**（[engine-example-debt.tsv](../tools/engine-example-debt.tsv)，`5` 行）：
+- **引擎可运行性闸门台账**（[engine-example-debt.tsv](../tools/engine-example-debt.tsv)，`4` 行）：
   - `stage=check`（3 行）：`D-skeleton/data-scenario.esml`（`<scenario tasks=...>`），`X-use/use-library.esml` 与 `X-use/use-multi-library.esml`（不带 `-L` 库根时的预期缺库失败）。
-  - `stage=solve`（2 行）：`L6-connect/connect-rules.esml`（求解期不消费 `<connectRules>` 导致结构奇异），`T-tasks/hyperparams.esml`（`check` 已收 `<param>` 而 `solve`/`simulate` 仍报 `I3`）。
+  - `stage=solve`（1 行）：`L6-connect/connect-rules.esml`（求解期不消费 `<connectRules>` 导致结构奇异）。

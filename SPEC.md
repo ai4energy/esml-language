@@ -878,10 +878,10 @@ kebab-case 拼写**不是合法语法**，报错（§2 收紧集）。
 每个状态对应一个**互斥的离散 active 旗标**，方程里用 `activeState(A)` 读它；
 `condition` 是迁移触发条件；`reset="true"` 表示该次迁移**复位**相关状态；
 `priority`（整数，多条迁移同拍竞争时取优先级最高者）；`immediate="true"` 表示触发后立即进入目标状态（不等时钟拍）；
-`synchronize` 是 canonical 声明保留，**引擎当前拒收（F7/IE8），登记见 docs/coverage.md §5.11 与 tools/engine-drift.tsv**。
+`synchronize="true"` 表示当源状态包含嵌套 `<stateMachine>` 时等待所有嵌套子状态机到达终态（无出边状态）后再联合迁移（无嵌套子状态机时空真就绪；若嵌套子状态机无任何终态，引擎报 `IE8 SynchronizeNoFinalState`；省略 `immediate` 时默认随 `synchronize` 取真）。
 示例：`L2-discrete/state-machine.esml`（两状态 toggle）、
 `L2-discrete/reset-transition.esml`（迁移带 `reset=`）、
-`L2-discrete/transition-attrs.esml`（迁移带 `priority` / `immediate`）。
+`L2-discrete/transition-attrs.esml`（迁移带 `priority` / `immediate` / `synchronize`）。
 
 **时钟 `<clock>`**：模型级可直挂 `<clock name="c" interval="0.1" phase="0"/>`，也可用容器
 `<clocks><clock name="c" interval="0.1"/></clocks>`——**两种写法等价**。

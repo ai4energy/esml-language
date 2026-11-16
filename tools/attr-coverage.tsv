@@ -8,12 +8,13 @@
 #         covered ⇒ 不算缺（登记来源在 attr-acceptance.tsv，本闸只核闭合）。
 # 方向 B：by-design ⇒ 警告；落在 anyAttribute 宿主上的未声明属性 ⇒ 宽松放行（by-design，机判）。
 # 台账行必须与当天重算差集闭合：补了示例/声明 ⇒ 删行或改 verdict；闸门机判闭合，过时即红。
-# 共 10 行
-# pending：0 行（首版全部 covered / by-design，无 pending；方向 A 零示例 9 个：9 个 covered 指向
-# attr-acceptance.tsv（W25 derivative-analytic.esml 落了 @order 示例，原 @order by-design 行已删）；
+# 共 9 行
+# pending：0 行（全部 covered / by-design，无 pending；方向 A 零示例 8 个：8 个 covered 指向
+# attr-acceptance.tsv（W25 derivative-analytic.esml 落了 @order 示例，原 @order by-design 行已删；
+# transition-attrs.esml 落了 @synchronize 示例，原 @synchronize covered 行已删）；
 #
-# —— 方向 A：声明了、非负例示例零使用（10 个）。
-# 9 个已由 attr-acceptance.tsv 裁决（verdict=covered，指向它；本台账只记「已被裁决、不重复建」）。
+# —— 方向 A：声明了、非负例示例零使用（8 个）。
+# 8 个已由 attr-acceptance.tsv 裁决（verdict=covered，指向它；本台账只记「已被裁决、不重复建」）。
 # @order 不在 attr-acceptance：它的两个宿主 <discretization>/<derivativeSymbol> 都带 xs:anyAttribute，
 # 且 basic:184-186 注释明说 method/order 是「扩展属性、不参与求解语义」⇒ by-design（不是编的，见 evidence 行号）。
 attribute	@aPart	covered	engine-debt	零示例；attr-acceptance.tsv 已裁决（connection，rejected-f7/engine-debt）⇒ 登记来源在那，本行只核闭合
@@ -24,7 +25,6 @@ attribute	@param	covered	engine-debt	零示例；attr-acceptance.tsv 已裁决�
 attribute	@phase	covered	engine-debt	零示例；attr-acceptance.tsv 已裁决（clock，rejected-f7/engine-debt）⇒ 登记来源在那，本行只核闭合
 attribute	@quantity	covered	engine-debt	零示例；attr-acceptance.tsv 已裁决（variable，rejected-f7/engine-debt）⇒ 登记来源在那，本行只核闭合
 attribute	@side	covered	engine-debt	零示例；attr-acceptance.tsv 已裁决（port，rejected-legacy/no-example）⇒ 登记来源在那，本行只核闭合
-attribute	@synchronize	covered	engine-debt	零示例；attr-acceptance.tsv 已裁决（transition，rejected-ie/engine-debt）⇒ 登记来源在那，本行只核闭合
 #
 # —— 方向 B：非负例示例在用、XSD 未命名声明（1 个）。
 # @xmlns 是 XML 命名空间属性（https://www.ai4energy.cn/esml/v1），从不是 xs:attribute ⇒ by-design。

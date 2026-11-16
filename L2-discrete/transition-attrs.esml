@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
-<!-- 语法点 <transition> 的 priority 与 immediate 属性：priority 控制多迁移竞争时的优先级，
-     immediate=true 表示迁移在当前时刻立即生效（不等下个采样点）。
-     本例 A→B 带 priority=2 immediate=true。
+<!-- 语法点 <transition> 的 priority、immediate 与 synchronize 属性：priority 控制多迁移竞争时的优先级，
+     immediate=true 表示迁移在当前时刻立即生效（不等下个采样点），synchronize=true 按 Modelica 3.3 §17.3
+     等待源状态内部所有嵌套子状态机到达终态后联合迁移（无嵌套子状态机时空真就绪）。
+     本例 A→B 带 priority=2 immediate=true，B→A 带 synchronize=true。
      规范条文：§7.1（状态机与时钟）。
-     引擎债：synchronize 属性由引擎 IE8 SynchronizeUnsupported 响亮拒收，本例不写。
      check errors=0。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L2_TransitionAttrs">
   <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
@@ -22,7 +22,7 @@
       <state name="A" initialState="true"/>
       <state name="B"/>
       <transition from="A" to="B" condition="time &gt; 1" priority="2" immediate="true"/>
-      <transition from="B" to="A" condition="time &gt; 2"/>
+      <transition from="B" to="A" condition="time &gt; 2" synchronize="true"/>
     </stateMachine>
   </modelType></modelTypes>
   <systems><system name="S">
