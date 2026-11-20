@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
-<!-- `<modelType>` 的图形标注 `<annotation>`：`<icon>` + `<placement>`。
+<!-- `<modelType>` 与 `<instance>` 的图形标注 `<annotation>`：`<icon>` + `<placement>` + `<label>`。
      纯 UI 元数据，求解器不读，不得影响任何数值结果。
      这里用 `data:` 内联 SVG，示例因此自包含、不依赖旁边的图标文件。
      规范条文：§4.2（图形标注）。 -->
@@ -10,14 +10,21 @@
   <modelTypes>
     <modelType name="Tagged">
       <annotation>
-        <icon src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgNjAiPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAiIGhlaWdodD0iNjAiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iIzMzMyIvPjwvc3ZnPg==" w="100" h="60"/>
-        <placement x="0" y="0" w="100" h="60" rot="0"/>
+        <icon src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgNjAiPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAiIGhlaWdodD0iNjAiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iIzMzMyIvPjwvc3ZnPg==" w="100" h="60" equipmentClass="vessel" variant="vertical" nozzle="flanged"/>
+        <placement x="0" y="0" w="100" h="60" rot="0" mirrorX="false" mirrorY="false"/>
+        <label kind="tag" text="V-101" path="y"/>
       </annotation>
       <variables><variable name="y" type="real" role="algebraic"/></variables>
       <equations><equation>y = 1.0</equation></equations>
     </modelType>
   </modelTypes>
   <systems><system name="Demo">
-    <instances><instance name="g" type="Tagged"/></instances>
+    <instances>
+      <instance name="g" type="Tagged">
+        <annotation>
+          <placement x="120" y="80" w="100" h="60" rot="0" mirrorX="false" mirrorY="false"/>
+        </annotation>
+      </instance>
+    </instances>
   </system></systems>
 </esml>

@@ -349,17 +349,55 @@
     <xs:anyAttribute processContents="lax"/>
   </xs:complexType>
 
-  <!-- L-ANNOT · 图形/图标/摆位/端口落点（不进语义；求解器忽略；随模型走；可 diff） -->
-  <!-- 最小字段集：
-         <icon src="..." w="..." h="..."/>          类型级；仓内相对路径或 data:image/svg+xml;base64,...
-         <placement x y w h rot/>                   实例级；rot 默认 0
-         <port name side offset/>                   端口落点；side=top|bottom|left|right|center
+  <!-- L-ANNOT v2 · 图形/图标/摆位/端口落点/工业铭牌（不进语义；求解器忽略；随模型走；可 diff） -->
+  <!-- 规范字段集：
+         <icon src="..." w="..." h="..." equipmentClass="..." variant="..." nozzle="..."/>
+             src 支持三种规范源：symbol:<域>/<名>（按 libroot/assets/icons 解析，位置无关）、
+             仓内相对 .svg 路径、或 data:image/svg+xml;base64,...
+         <placement x y w h rot mirrorX mirrorY/>   类型框或实例级摆位；rot 默认 0，mirrorX/mirrorY 默认 false
+         <port name side offset nozzle/>            端口落点；side=top|bottom|left|right|center
+         <label kind text path/>                    设备位号/标题/实时工况微徽标（kind=tag|title|badge）
        ★ 方向不新增字段 ✗ —— 由 <portVariable portRole="potential|flow"> 推导
-       ★ dims 属于真语义 ⇒ 不在 L-ANNOT 本期（开另一只活） -->
+       ★ dims 属于真语义 ⇒ 不在 L-ANNOT（开另一只活） -->
+  <xs:simpleType name="EquipmentClassType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="vessel"/>
+      <xs:enumeration value="reactor"/>
+      <xs:enumeration value="column"/>
+      <xs:enumeration value="exchanger"/>
+      <xs:enumeration value="pump"/>
+      <xs:enumeration value="compressor"/>
+      <xs:enumeration value="turbine"/>
+      <xs:enumeration value="valve"/>
+      <xs:enumeration value="pipe"/>
+      <xs:enumeration value="junction"/>
+      <xs:enumeration value="furnace"/>
+      <xs:enumeration value="electrical"/>
+      <xs:enumeration value="machine"/>
+      <xs:enumeration value="instrument"/>
+      <xs:enumeration value="control"/>
+      <xs:enumeration value="source"/>
+      <xs:enumeration value="sink"/>
+      <xs:enumeration value="package"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="NozzleStyleType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="flanged"/>
+      <xs:enumeration value="welded"/>
+      <xs:enumeration value="threaded"/>
+      <xs:enumeration value="bushing"/>
+      <xs:enumeration value="signal"/>
+      <xs:enumeration value="none"/>
+    </xs:restriction>
+  </xs:simpleType>
   <xs:complexType name="IconType">
     <xs:attribute name="src" type="xs:string" use="required"/>
     <xs:attribute name="w" type="xs:double" use="optional"/>
     <xs:attribute name="h" type="xs:double" use="optional"/>
+    <xs:attribute name="equipmentClass" type="esml:EquipmentClassType" use="optional"/>
+    <xs:attribute name="variant" type="xs:string" use="optional"/>
+    <xs:attribute name="nozzle" type="esml:NozzleStyleType" use="optional"/>
     <xs:anyAttribute processContents="lax"/>
   </xs:complexType>
   <xs:complexType name="PlacementType">
@@ -368,6 +406,8 @@
     <xs:attribute name="w" type="xs:double" use="optional"/>
     <xs:attribute name="h" type="xs:double" use="optional"/>
     <xs:attribute name="rot" type="xs:double" use="optional"/>
+    <xs:attribute name="mirrorX" type="xs:boolean" use="optional"/>
+    <xs:attribute name="mirrorY" type="xs:boolean" use="optional"/>
     <xs:anyAttribute processContents="lax"/>
   </xs:complexType>
   <xs:simpleType name="PortSideType">
@@ -383,6 +423,13 @@
     <xs:attribute name="name" type="esml:Ident" use="required"/>
     <xs:attribute name="side" type="esml:PortSideType" use="required"/>
     <xs:attribute name="offset" type="xs:double" use="optional"/>
+    <xs:attribute name="nozzle" type="esml:NozzleStyleType" use="optional"/>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+  <xs:complexType name="GraphicLabelType">
+    <xs:attribute name="kind" type="xs:string" use="optional"/>
+    <xs:attribute name="text" type="xs:string" use="optional"/>
+    <xs:attribute name="path" type="xs:string" use="optional"/>
     <xs:anyAttribute processContents="lax"/>
   </xs:complexType>
   <xs:complexType name="AnnotationType">
@@ -390,6 +437,7 @@
       <xs:element name="icon" type="esml:IconType" minOccurs="0" maxOccurs="unbounded"/>
       <xs:element name="placement" type="esml:PlacementType" minOccurs="0" maxOccurs="unbounded"/>
       <xs:element name="port" type="esml:PortMarkType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="label" type="esml:GraphicLabelType" minOccurs="0" maxOccurs="unbounded"/>
     </xs:choice>
     <xs:anyAttribute processContents="lax"/>
   </xs:complexType>
@@ -562,7 +610,7 @@
     <xs:attribute name="condition" type="xs:string" use="required"/>
   </xs:complexType>
   <xs:complexType name="InstRefType">
-      <xs:sequence>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
         <!-- 实例级初值覆盖 `<set path=… value?=…/>`（SPEC:427 实例覆盖；
              SetType 定义在 project.xsd 跨 include 不可引用 ⇒ 就地内联同名形状）。 -->
         <xs:element name="set" minOccurs="0" maxOccurs="unbounded">
@@ -572,7 +620,9 @@
             <xs:anyAttribute processContents="lax"/>
           </xs:complexType>
         </xs:element>
-      </xs:sequence>
+        <!-- L-ANNOT v2：实例级画布摆位/旋转/翻转标注（不进语义，求解器忽略） -->
+        <xs:element name="annotation" type="esml:AnnotationType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:choice>
     <xs:attribute name="name" type="esml:Ident" use="required"/>
     <xs:attribute name="type" type="xs:string" use="required"/>
     <xs:attribute name="domain" type="xs:string" use="optional"/>

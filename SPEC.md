@@ -102,7 +102,7 @@
 | 方法 | `<methods><onLoad><set path= value=/>*</onLoad><method name><run name=/>[<set path= value=/>]*</method></methods>` | on_load/RUN（附录 F5/F7b） |
 | 自由度 | `<fixed>/<free>` 系统级块 | 钉代数变量 / 参数升未知（附录 F6/F7） |
 | 调度 | `<schedule><sequence><continueFor time=.../>[<call method=.../>]*</sequence></schedule>` | （附录 K）；多段连续求解 |
-| 图形标注 | `<annotation>`（`<icon>`/`<placement>`/`<port>`） | 纯 UI 元数据（§4.2） |
+| 图形标注 | `<annotation>`（`<icon>`/`<placement>`/`<port>`/`<label>`） | 纯 UI 元数据（§4.2） |
 
 `count` 在 `<instance>`（`InstRefType`）上是 canonical 声明（实例重复份数，`use="optional"`）；`<port>`（`PortInstanceType`）上的 `count` 已删声明，引擎对 `<port count=...>` 响亮拒收（F1 unknown attribute，裁决见 [`tools/attr-acceptance.tsv`](tools/attr-acceptance.tsv) 的 `rejected-legacy` 行）。
 
@@ -321,19 +321,20 @@ ESML 原生作者优先**组合（§4.1）/参数覆盖**；`<extendsFrom>` 主�
 
 ### 4.2 图形标注 `<annotation>`
 
-`<annotation>` 是**纯 UI 元数据**：求解器不读，不得影响任何数值结果。它携带的图标、
-布局与端口标注只供前端渲染，引擎 `check` 通过但 `solve` 完全忽略。
+`<annotation>` 是**纯 UI 元数据**：求解器不读，不得影响任何数值结果。它携带的设备图示、
+摆位、端口落点与工业铭牌只供前端渲染，引擎 `check` 通过但 `solve` 完全忽略。
 
-三处宿主（对应 `xsd/esml-canonical-basic.xsd` 的 `ModelTypeDef` / `SystemType` / `<esml>`）：`<modelType>`、`<system>`、
-文档根 `<esml>`。
+四处宿主（对应 `xsd/esml-canonical-basic.xsd` 的 `ModelType` / `SystemType` / `InstRefType` / `<esml>`）：`<modelType>`、`<system>`、`<instance>`、
+文档根 `<esml>`。其中 `<icon src="…"/>` 支持三种规范源：位置无关库符号 `symbol:<domain>/<name>`（按激活 `libroot/assets/icons/` 解析）、仓内相对 `.svg` 路径、或内联 `data:image/svg+xml;base64,…`。
 
 | 元素 | 类型 | 属性 | 必填 |
 |---|---|---|---|
-| `<icon>` | `IconType` | `src` `w` `h` | `src` 必填；`w`/`h` 可省 |
-| `<placement>` | `PlacementType` | `x` `y` `w` `h` `rot` | 全可省 |
-| `<port>` | `PortMarkType` | `name` `side` `offset` | `name`/`side` 必填；`offset` 可省 |
+| `<icon>` | `IconType` | `src` `w` `h` `equipmentClass` `variant` `nozzle` | `src` 必填；其余可省 |
+| `<placement>` | `PlacementType` | `x` `y` `w` `h` `rot` `mirrorX` `mirrorY` | 全可省 |
+| `<port>` | `PortMarkType` | `name` `side` `offset` `nozzle` | `name`/`side` 必填；`offset`/`nozzle` 可省 |
+| `<label>` | `GraphicLabelType` | `kind` `text` `path` | 全可省 |
 
-三者均可 0..unbounded，可并列多份。
+四者均可 0..unbounded，可并列多份。
 
 示例：`L3-model/annotation.esml`。
 
