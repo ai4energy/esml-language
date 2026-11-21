@@ -7,7 +7,6 @@
      `<jumpTo>`/`<moveTo>`，见 `L2-discrete/initialisationprocedure-*.esml` 正例。
      非零退出是预期行为。
      规范条文：§6.7 系统初始化过程（`<initialisation-procedures>` / `<move-to>` / `<jump-to>` 一律拒收；canonical 只收 `<jumpTo>`/`<moveTo>`）。 -->
- -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L2_JumpToProbe">
   <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="M" discipline="generic">

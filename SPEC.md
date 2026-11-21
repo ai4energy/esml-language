@@ -596,6 +596,7 @@ Process/Case 也有 flowsheet 级 `EQUATION`。ESML canonical 对应地允许 `<
 - 与 `<modelType>` 的 `<equations>` 语义一致；差别只是这一层没有自己的变量表，
   声明的量来自实例。
 - 本层与 `<modelType>` 级方程同语义，二者可混用。
+- **系统级事件 `<events>`**：同理，`<system>` 亦可直接携带 `<events><when condition="…">…</when></events>`（引用实例路径如 `path="u1.on"`），展开期与组件级事件同语义并入系统事件表。
 
 ### 6.7 系统初始化过程（`<initialisationProcedures>`）
 

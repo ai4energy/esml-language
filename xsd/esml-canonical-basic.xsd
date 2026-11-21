@@ -1028,6 +1028,15 @@
           </xs:element>
         </xs:choice></xs:complexType>
       </xs:element>
+      <!-- 语言规范 §6.6：系统级事件，动作与条件引用实例路径 `inst.var` -->
+      <xs:element name="events" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="when" type="esml:WhenType"/>
+            <xs:element name="elsewhen" type="esml:WhenType"/>
+          </xs:choice>
+        </xs:complexType>
+      </xs:element>
       <xs:element name="sets" minOccurs="0">
         <xs:complexType><xs:sequence>
           <xs:element name="scope" type="esml:ScopeSetType" minOccurs="0" maxOccurs="unbounded"/>
