@@ -822,12 +822,12 @@
       <xs:element name="discrete" type="esml:DiscreteSegmentType" minOccurs="0" maxOccurs="unbounded"/>
       <xs:element name="events" minOccurs="0" maxOccurs="unbounded">
         <xs:complexType>
-          <!-- `<elsewhen>` 与 `<when>` 平级（`WhenType` 自身另可嵌套 elsewhen，
-               那条路径用于单块内链式条件；两条路径都由 model.rs 的事件读取消费）。 -->
-          <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <!-- `<elsewhen>` 必须跟在 `<when>` 之后（`WhenType` 自身另可嵌套 elsewhen，
+               两条路径共用互斥链语义；禁止无主悬空 `<elsewhen>`）。 -->
+          <xs:sequence minOccurs="0" maxOccurs="unbounded">
             <xs:element name="when" type="esml:WhenType"/>
-            <xs:element name="elsewhen" type="esml:WhenType"/>
-          </xs:choice>
+            <xs:element name="elsewhen" type="esml:WhenType" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
         </xs:complexType>
       </xs:element>
       <!-- 类级继承的 canonical 拼法只有上面那个 `<extendsFrom>`（规范 §4.0）；
@@ -1031,10 +1031,10 @@
       <!-- 语言规范 §6.6：系统级事件，动作与条件引用实例路径 `inst.var` -->
       <xs:element name="events" minOccurs="0" maxOccurs="unbounded">
         <xs:complexType>
-          <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:sequence minOccurs="0" maxOccurs="unbounded">
             <xs:element name="when" type="esml:WhenType"/>
-            <xs:element name="elsewhen" type="esml:WhenType"/>
-          </xs:choice>
+            <xs:element name="elsewhen" type="esml:WhenType" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
         </xs:complexType>
       </xs:element>
       <xs:element name="sets" minOccurs="0">

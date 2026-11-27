@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <!-- Author: Mingtao Li <mingtao@xjtu.edu.cn> -->
 <!-- SPDX-License-Identifier: MIT -->
-<!-- 语法点 `<when>` 内的 `<elsewhen condition>`：候选分支。解析期把 `<elsewhen>` 拍平为
-     规范条文：附录 F3（事件语义糖）。
-     独立的 `<when>`，同刻按声明序应用（顺序近似，不是显式 priority 链）。 -->
+<!-- 语法点 `<when>` 内的 `<elsewhen condition>`：互斥分支链。解析期为同一 `<when>/<elsewhen>` 链
+     分配共享互斥组（`excl_group`），同一事件时刻按声明序最多只触发首个命中的分支（对齐 Modelica
+     `when ... elsewhen ...`）。规范条文：附录 F3（事件语义糖）。 -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" schema="esml/v1" name="L2_ElseWhen">
   <variableTypes><type name="real" unit="1" default="0.0"/></variableTypes>
   <modelTypes><modelType name="M">

@@ -1269,13 +1269,19 @@ CASE/多区/滞回：配 SELECTOR + `<events><when>`(STN)，方程用 `ifelse(se
 
 ### 附录 F3 — when/edge/reinit 一等事件语义糖
 - `<when condition>`（既有）+ 新糖：条件支持 `edge(cond)`（真沿：cond 从假到真的穿越时刻）、
-  `noEvent(e)`（no-op 注解，剥离）、`pre(x)`（事件间离散恒为常数，条件里 `pre(x)==x`，实现为恒等；
-  `pre` 记忆按事件间离散量保存）。
-- `<assign path=X value=v>`：事件把**离散**置 v；`<reinit path=X value=v>`：事件时刻把
-  **连续状态** X 直接置 v（u 状态段写入）。
-- `<elsewhen condition>` 嵌套于 `<when>`：扁平化为有序 EventDef，声明序=同时穿越时的优先级。
-- 示例：锯齿泵注，液位 H 在 [0.05, 0.8] 间往复，周期 37.5 s。
-- 限制：赋值 `value` 在编译期按常量求值；`elsewhen` 同时穿越的优先级按声明序确定。
+  `noEvent(e)`（no-op 注解，剥离）、`pre(x)`（事件间离散恒为常数，事件迭代内冻结为触发前快照）。
+- `<assign path=X value=v>`：事件把**离散或代数变量**置 `v`；`<reinit path=X value=v>`：事件时刻把
+  **连续状态** X 直接重初始化为 `v`（并重置积分器步阶与历史，区分于不破坏状态连续性的 `<assign>`）。
+  `value` 支持运行期完整表达式与 `pre(x)` 快照求值（不再限于编译期常量）。
+- `<elsewhen condition>`（既可嵌套在 `<when>` 内部，也可在 `<events>` 中紧跟前序 `<when>`/`<elsewhen>` 平级排列）：
+  同一 `<when>…<elsewhen>*` 链共享一个互斥组（`excl_group`），同一事件时刻按声明序最多只触发首个条件为真的分支（对齐 Modelica `when ... elsewhen ...`）；禁止无主悬空 `<elsewhen>`。
+- 复合布尔触发（含 `and` / `or` / `not` 且带连续比较原子的条件，如 `x > 0.5 and y < 1.0`）：运行时自动提取连续原子作子步精确过零求根，定位命中全条件的精确事件时刻；仅纯离散（无连续原子）触发留在步边界判定。
+- 跨积分器一致事件契约：所有 DAE/ODE 积分器（隐式 BDF / 自适应步长 Adaptive BDF / Radau IIA / 显式 RK45）统一执行：
+  (1) `t0` 时刻初始事件（`t >= t0` / 初始满足条件）触发并刷新初值与观测输出；
+  (2) 同刻 `Periodic`（`sample`）+ `Continuous`（过零）+ `Time` 合并仲裁；
+  (3) 同一事件时刻内离散传播/状态机转移定稿后执行单次代数一致性刷新（保持事件内 `pre(x)` 快照不泄漏）。
+- EMT 开关事件统一入口：`ESM_Switch` 除 `sw_t1..sw_t4` 参数外，系统级 `<events><when condition="t >= ..."><assign path="<sw>.{closed,state,s}" value="0|1"/></when></events>` 在 EMT 降级期自动下沉为开关事件队列，与一般模型事件采用统一语法。
+- 示例：锯齿泵注（`L2-discrete/when-reinit.esml`）与互斥分支（`L2-discrete/elsewhen.esml`）。
 
 ### 附录 F4 — 自定义端口类别 + 连接规则表（opt-in）
 - `<port connectClass="…"/>` 可声明自定义连接类别（如 `feed` / `primary` / `secondary`）；端口方向仍用 `category="inlet|outlet|bi"`。
