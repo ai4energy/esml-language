@@ -17,7 +17,7 @@
   </system></systems>
   <computeTasks name="t-cv" target="S">
     <task name="mpc" kind="control">
-      <mpc N="10" dt="1"/>
+      <mpc N="10" dt="1" mode="nmpc" rho="0.1" wOver="2.0" wUnder="2.0"/>
       <estimate name="g.lambda" initial="0.05"/>
       <controlVars>
         <var name="g.lambda"/>

@@ -365,6 +365,10 @@
             <xs:attribute name="q" type="xs:double" use="optional"/>
             <xs:attribute name="r" type="xs:double" use="optional"/>
             <xs:attribute name="steps" type="xs:int" use="optional"/>
+            <xs:attribute name="mode" type="xs:string" use="optional"/>
+            <xs:attribute name="rho" type="xs:double" use="optional"/>
+            <xs:attribute name="wOver" type="xs:double" use="optional"/>
+            <xs:attribute name="wUnder" type="xs:double" use="optional"/>
             <xs:anyAttribute processContents="lax"/>
           </xs:complexType>
         </xs:element>
@@ -507,6 +511,8 @@
             <xs:attribute name="var" type="xs:string" use="optional"/>
             <xs:attribute name="setpoint" type="xs:string" use="optional"/>
             <xs:attribute name="tolerance" type="xs:string" use="optional"/>
+            <xs:attribute name="lowerBound" type="xs:string" use="optional"/>
+            <xs:attribute name="upperBound" type="xs:string" use="optional"/>
             <xs:anyAttribute processContents="lax"/>
           </xs:complexType>
         </xs:element>

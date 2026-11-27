@@ -739,7 +739,7 @@ kebab-case 拼写**不是合法语法**，报错（§2 收紧集）。
 | `sensitivity` | `<perturb>`（属性式：`name` / `fraction` / `lower` / `upper`）、`<output>`（`<var>` 列表） |
 | `estimation` | `<estimate>`（`<var initial/>` 或属性式 `initial`）、`<data>` |
 | `optimize` | `<decision>`（`<var lower upper/>` 或属性式）、`<objective>`（含 `<expr>`）、`<constraints>`（含 `<constraint>`）、`<solver>` |
-| `control` | `<mpc N dt/>`（滚动时域）；MPC 载荷属性：`a` / `b` / `c`（状态空间矩阵）/ `x0`（初始状态）/ `xref`（参考轨迹）/ `umax`、`umin`（控制量上下限）/ `q`（状态代价权重）/ `r`（正则化权重）/ `steps`（预测步数） |
+| `control` | `<mpc N dt/>`（滚动时域）；MPC 载荷属性：`a` / `b` / `c`（状态空间矩阵）/ `x0`（初始状态）/ `xref`（参考轨迹）/ `umax`、`umin`（控制量上下限）/ `q`（状态代价权重）/ `r`（正则化权重）/ `steps`（预测步数）/ `mode`（代价族 `linear\|nmpc`）/ `rho`（输入差分权重）/ `wOver`、`wUnder`（超调与欠调跟踪权重），以及 `<controlled lowerBound upperBound/>`（软输出上下限） |
 | `surrogate` | `<surrogate method degree model/>`（`model`：拟合模型形态）、`<sampling size/>`、`<data>` |
 | `validation` | `<metrics>`（含 `<metric name expected tolerancePct/>`）、`<data>` |
 
