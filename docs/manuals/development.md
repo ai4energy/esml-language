@@ -1,7 +1,7 @@
 # 语言规范开发手册
 
-> 适用：改 `SPEC.md`、`xsd/`、`L0`–`L9` / `T-tasks` / `X-use` 示例。
-> 最后核对：2026-11-15（v1.3.4）。
+> 适用：改 `SPEC.md`、`xsd/`（含 `InitialStateType`、`VendorControllerType`、`DecisionRefType` 与 `esml-canonical-*.xsd`）、`L0`–`L9` / `T-tasks` / `X-use` 示例。
+> 最后核对：2026-11-28（v1.3.4 · 跨仓 XSD 0/0 零漂移）。
 
 ## 1. 环境
 

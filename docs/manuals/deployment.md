@@ -1,7 +1,7 @@
 # 语言规范部署手册
 
-> 适用：发布规范版本、发布 XSD/示例、给引擎仓 bump 子模块。
-> 最后核对：2026-11-15（v1.3.4）。
+> 适用：发布规范版本、同步公开 XSD 资产（`ai4energy-docs/docs/public/schema/`）与示例、给引擎仓 bump 子模块。
+> 最后核对：2026-11-28（v1.3.4 · 跨仓 XSD/SPEC 0/0 零漂移）。
 
 ## 1. 产物
 
@@ -10,8 +10,8 @@
 | 产物 | 路径 | 消费者 |
 |---|---|---|
 | 语言规范 | `SPEC.md`（网页/PDF 由站点构建） | 人、引擎文档、书系 |
-| 入口 XSD | `xsd/esml-v1.xsd` | 引擎、编辑器、第三方工具 |
-| canonical XSD | `xsd/esml-canonical-*.xsd` | 引擎/库/书仓的机验 |
+| 入口 XSD | `xsd/esml-v1.xsd`（同步至 `ai4energy-docs/docs/public/schema/`） | 引擎、编辑器、第三方工具、公开文档站 |
+| canonical XSD | `xsd/esml-canonical-*.xsd`（含 `base`/`common`/`compute`/`project`） | 引擎/库/书仓的机验与公开 Schema 下载 |
 | 示例与负例 | `L*/`、`T-tasks/`、`X-use/`、`tools/negatives.tsv` | 引擎 G16 语料、书系示例 |
 
 ## 2. 发版前检查
