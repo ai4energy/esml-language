@@ -19,6 +19,9 @@
   <computeTasks name="t-est" target="S">
     <task name="est" kind="estimation">
       <tspan from="0" to="60"/>
+      <initialState>
+        <var name="g.N" value="100.0"/>
+      </initialState>
       <estimate name="g.lambda" initial="0.05"/>
       <samples>
         <sample x="0" y="100"/>

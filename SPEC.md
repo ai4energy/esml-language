@@ -737,8 +737,8 @@ kebab-case 拼写**不是合法语法**，报错（§2 收紧集）。
 |---|---|
 | `simulate` | `<tspan from to/>`、`<solver>` |
 | `sensitivity` | `<perturb>`（属性式：`name` / `fraction` / `lower` / `upper`）、`<output>`（`<var>` 列表） |
-| `estimation` | `<estimate>`（`<var initial/>` 或属性式 `initial`）、`<data>` |
-| `optimize` | `<decision>`（`<var lower upper/>` 或属性式）、`<objective>`（含 `<expr>`）、`<constraints>`（含 `<constraint>`）、`<solver>` |
+| `estimation` | `<estimate>`（`<var initial/>` 或属性式 `initial`）、`<data>`、可选 `<initialState>`（`<var name value/>` 定态初值覆盖） |
+| `optimize` | `<decision>`（`<var lower upper/>` 或属性式 `lower` / `upper` / `rate`）、`<objective>`（含 `<expr>`）、`<constraints>`（含 `<constraint>`）、`<solver>` |
 | `control` | `<mpc N dt/>`（滚动时域）；MPC 载荷属性：`a` / `b` / `c`（状态空间矩阵）/ `x0`（初始状态）/ `xref`（参考轨迹）/ `umax`、`umin`（控制量上下限）/ `q`（状态代价权重）/ `r`（正则化权重）/ `steps`（预测步数）/ `mode`（代价族 `linear\|nmpc`）/ `rho`（输入差分权重）/ `wOver`、`wUnder`（超调与欠调跟踪权重），以及 `<controlled lowerBound upperBound/>`（软输出上下限） |
 | `surrogate` | `<surrogate method degree model/>`（`model`：拟合模型形态）、`<sampling size/>`、`<data>` |
 | `validation` | `<metrics>`（含 `<metric name expected tolerancePct/>`）、`<data>` |
@@ -772,7 +772,7 @@ kebab-case 拼写**不是合法语法**，报错（§2 收紧集）。
 | `<constraints>` / `<constraint>` | 约束 | `T-tasks/task-constraint.esml` |
 | `<hyperParams>` | 超参（`<param name value/>`） | `T-tasks/hyperparams.esml` |
 | `<benchmarks>` / `<benchmark>` | 基准（属性 `name` / `expected` / `unit` / `tol` / `source`） | `T-tasks/benchmarks.esml` / `T-tasks/task-vendor-text.esml` |
-| `<controller>`（内含 `<setpoint>` / `<gains>`） | 控制器声明（属性 `kind` / `sampleTime` / `controlHorizon` / `antiWindup` / `bumpless`；`<gains>` 属性 `Kp` / `Ki` / `Kd`） | `T-tasks/controller.esml` / `T-tasks/controller-gains.esml` / `T-tasks/gains.esml` |
+| `<controller>`（内含 `<setpoint>` / `<gains>`） | 控制器声明（属性 `kind` / `sampleTime` / `controlHorizon` / `tauD` / `setpointWeight` / `derivativeOn` / `antiWindup` / `bumpless` / `trackingTime`；`<gains>` 属性 `Kp` / `Ki` / `Kd`） | `T-tasks/controller.esml` / `T-tasks/controller-gains.esml` / `T-tasks/gains.esml` |
 | `<setpoint>` | 设定点 | `T-tasks/setpoint.esml` |
 | `<actuator>` / `<sensor>` / `<controlled>` | 执行器 / 传感器 / 被控量 | `T-tasks/actuator.esml` / `T-tasks/sensor.esml` / `T-tasks/controlled.esml` |
 | `<controlVars>` / `<designVars>` | 控制变量 / 设计变量（`<var name/>`） | `T-tasks/control-vars.esml` / `T-tasks/design-vars.esml` / `T-tasks/controlled-control-vars.esml` |

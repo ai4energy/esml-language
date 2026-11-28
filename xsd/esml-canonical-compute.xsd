@@ -80,6 +80,19 @@
     </xs:sequence>
   </xs:complexType>
 
+  <xs:complexType name="InitialStateType">
+    <xs:sequence>
+      <xs:element name="var" minOccurs="1" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="name" type="xs:string" use="required"/>
+          <xs:attribute name="value" type="xs:double" use="required"/>
+          <xs:anyAttribute processContents="lax"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:anyAttribute processContents="lax"/>
+  </xs:complexType>
+
   <xs:complexType name="DataRefType">
     <xs:attribute name="source" type="xs:string" use="optional"/>
     <xs:attribute name="cols" type="xs:string" use="optional"/>
@@ -238,8 +251,12 @@
     <xs:attribute name="horizon" type="xs:string" use="optional"/>
     <xs:attribute name="sampleTime" type="xs:string" use="optional"/>
     <xs:attribute name="controlHorizon" type="xs:string" use="optional"/>
+    <xs:attribute name="tauD" type="xs:string" use="optional"/>
+    <xs:attribute name="setpointWeight" type="xs:string" use="optional"/>
+    <xs:attribute name="derivativeOn" type="xs:string" use="optional"/>
     <xs:attribute name="antiWindup" type="xs:string" use="optional"/>
     <xs:attribute name="bumpless" type="xs:string" use="optional"/>
+    <xs:attribute name="trackingTime" type="xs:string" use="optional"/>
     <xs:anyAttribute processContents="lax"/>
   </xs:complexType>
 
@@ -261,6 +278,7 @@
       <xs:element name="var" type="esml:VarRefType" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
     <xs:attribute name="name" type="xs:string" use="optional"/>
+    <xs:attribute name="rate" type="xs:string" use="optional"/>
     <xs:attribute name="lower" type="xs:double" use="optional"/>
     <xs:attribute name="upper" type="xs:double" use="optional"/>
     <xs:attribute name="initial" type="xs:double" use="optional"/>
@@ -328,6 +346,7 @@
             <xs:anyAttribute processContents="lax"/>
           </xs:complexType>
         </xs:element>
+        <xs:element name="initialState" type="esml:InitialStateType"/>
         <xs:element name="estimate" type="esml:EstimateRefType"/>
         <xs:element name="decision" type="esml:DecisionRefType"/>
         <xs:element name="data" type="esml:DataRefType"/>

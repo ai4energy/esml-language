@@ -22,11 +22,11 @@
       <tspan from="0" to="60"/>
       <mpc N="10" dt="1"/>
       <estimate name="g.lambda" initial="0.05"/>
-      <controller kind="pid" sampleTime="1" antiWindup="conditional" bumpless="true">
+      <controller kind="pid" sampleTime="1" tauD="0.1" setpointWeight="1.0" derivativeOn="measurement" antiWindup="conditional" bumpless="true" trackingTime="5.0">
         <gains Kp="-0.1" Ki="-0.005" Kd="0.0"/>
       </controller>
       <controlled var="g.N" setpoint="0.0"/>
-      <decision name="g.lambda" lower="0" upper="1"/>
+      <decision name="g.lambda" lower="0" upper="1" rate="0.2"/>
     </task>
   </computeTasks>
 </esml>
